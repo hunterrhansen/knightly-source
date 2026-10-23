@@ -138,10 +138,8 @@ export function shownPositionId(state: ReviewState) {
 export function canExplore(state: ReviewState) {
   if (!state.tree || (state.view === 'lesson' && state.stage !== 'review'))
     return false;
-  const step = activeStep(state),
-    e = state.exercise;
-  const solving = step?.type === 'find' && !!e && !e.mark && !e.hinted;
-  if (!solving) return true;
+  const guarded = unsolvedFindPosition(state);
+  if (guarded === undefined) return true;
   const ply = state.line
     ? gamePlies(state.tree, state.line.path) === state.line.path.length
       ? state.line.path.length
@@ -149,7 +147,22 @@ export function canExplore(state: ReviewState) {
     : state.view === 'replay'
       ? state.replayIndex
       : state.cursor;
-  return ply !== step.ply - 1;
+  return ply !== guarded;
+}
+/** The game position (plies played) of a find still to answer, whose moves
+ * and engine evaluation would give its answer away. */
+function unsolvedFindPosition(state: ReviewState) {
+  const step = activeStep(state),
+    e = state.exercise;
+  return step?.type === 'find' && e && !e.mark && !e.hinted
+    ? step.ply - 1
+    : undefined;
+}
+/** The live engine's path for a game position, unless it is a find still to
+ * answer: the stored analysis stays the only eval there. */
+export function liveEnginePath(state: ReviewState, index: number) {
+  if (!state.tree || unsolvedFindPosition(state) === index) return undefined;
+  return gamePath(state.tree, index);
 }
 
 export class ReviewSession extends LessonStore<Exercise, Phase, ReviewState> {

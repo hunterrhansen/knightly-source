@@ -71,7 +71,11 @@ import { useReviewKeys } from './review-keys';
 import type { LoadLines } from './review-lines';
 import { evalText, gradeOf, whiteWinPct } from './review-moments';
 import { reviewResults } from './review-results';
-import { ReviewSession, type ReviewState } from './review-session';
+import {
+  liveEnginePath,
+  ReviewSession,
+  type ReviewState,
+} from './review-session';
 import { ReviewSummary, ReviewSummaryLoading } from './review-summary';
 import { WinGraph } from './win-graph';
 
@@ -181,8 +185,8 @@ function Lesson({
   const styles = useLessonStyles();
   const aside = useAside(session, state, `${state.cursor}:${state.step}`, load);
   const lines = useLineActions(session, state);
-  const engineEval = useLineEval(state.tree, state.line?.path);
-  const bestArrow = usePreferences().preferences.bestMove === 'on';
+  const { preferences } = usePreferences();
+  const bestArrow = preferences.bestMove === 'on';
   // The same answer haptics as practice: an error on each miss, success
   // when a find is answered clean.
   const misses = useMissCount(
@@ -228,6 +232,13 @@ function Lesson({
     !!shownPlayed?.best_san &&
     !(shownGrade && praised.has(shownGrade));
   // The verdict's Why? opens the best line once a find is answered.
+  // Live engine (Settings): the device engine evaluates game positions too,
+  // beside the stored analysis, which keeps every grade.
+  const livePath =
+    preferences.liveEngine === 'on' && game.analysed && !state.line
+      ? liveEnginePath(state, findStep ? shownPly - 1 : shownPly)
+      : undefined;
+  const engineEval = useLineEval(state.tree, state.line?.path ?? livePath);
   const answeredFind =
     findStep && state.phase === 'answered' && !!state.exercise?.mark;
   const openBest =
@@ -287,7 +298,15 @@ function Lesson({
   const evalIndex = find ? shown - 1 : shown;
   const played = shown > 0 ? game.plies[shown - 1] : undefined;
   const grade = game.analysed ? gradeOf(played) : undefined;
-  const evaluation = game.analysed ? evalText(game, evalIndex) : '';
+  const liveShown = !!livePath && engineEval.status === 'ready';
+  const evaluation = !game.analysed
+    ? ''
+    : liveShown
+      ? engineEval.text
+      : evalText(game, evalIndex);
+  const whiteShare = liveShown
+    ? engineEval.white
+    : whiteWinPct(game, evalIndex);
   const e = state.exercise;
   const last = replay.positions.length - 1;
   const finishing =
@@ -524,7 +543,7 @@ function Lesson({
                 {...(inLine
                   ? barFor(engineEval)
                   : {
-                      white: whiteWinPct(game, evalIndex),
+                      white: whiteShare,
                       evalText: evaluation,
                     })}
               />
@@ -569,7 +588,7 @@ function Lesson({
                     {...(inLine
                       ? barFor(engineEval)
                       : {
-                          white: whiteWinPct(game, evalIndex),
+                          white: whiteShare,
                           evalText: evaluation,
                         })}
                   />
@@ -613,8 +632,17 @@ function AllMoves({
   const lesson = useLessonStyles();
   const aside = useAside(session, state, String(state.replayIndex), load);
   const lines = useLineActions(session, state);
-  const engineEval = useLineEval(state.tree, state.line?.path);
-  const bestArrow = usePreferences().preferences.bestMove === 'on';
+  const { preferences } = usePreferences();
+  const bestArrow = preferences.bestMove === 'on';
+  const livePath =
+    preferences.liveEngine === 'on' &&
+    game.analysed &&
+    !state.blocked &&
+    !state.line
+      ? liveEnginePath(state, state.replayIndex)
+      : undefined;
+  const engineEval = useLineEval(state.tree, state.line?.path ?? livePath);
+  const liveShown = !!livePath && engineEval.status === 'ready';
   const insets = useSafeAreaInsets();
   const wide = useWideLesson();
   const replay = state.replay;
@@ -676,7 +704,7 @@ function AllMoves({
       <EvalBar
         orientation="vertical"
         whiteOnTop={orientationOf(game, state.flipped) === 'b'}
-        {...(lineOpen
+        {...(lineOpen || liveShown
           ? barFor(engineEval)
           : {
               white: whiteWinPct(game, index),
@@ -715,7 +743,9 @@ function AllMoves({
               ? `${replay.labels[index]} is ${phrase[grade]}`
               : replay.labels[index]}
           </Text>
-          <Text style={styles.cardEval}>{evalText(game, index)}</Text>
+          <Text style={styles.cardEval}>
+            {liveShown ? chipFor(engineEval) : evalText(game, index)}
+          </Text>
         </View>
         {hidden ? (
           <ActionButtonLink

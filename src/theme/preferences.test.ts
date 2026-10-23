@@ -13,6 +13,7 @@ const defaults = {
   lastMove: 'on',
   sounds: 'on',
   bestMove: 'on',
+  liveEngine: 'off',
   weekStart: 'sunday',
 };
 

@@ -266,12 +266,17 @@ Checked on the VM on October 23, 2026.
   walk on the web are unchecked. The original
   frontend (`legacy-web`) still runs unrouted for rollback
   ([deployment](deploy.md#rolling-back-the-web-cutover)).
-- **iPhone:** TestFlight `beta` build 61 (standalone, production API) is from
-  main `91bff6b` (through #338), uploaded October 23; build 60 carried #333.
-  Builds 58 and earlier break against this backend. **None of the ward path,
-  the walk, the new watch mix, the safety-check labels, the endgame drills or
-  the tappable badges has been seen on a phone.** Keeping a watch on build 61
-  is the open gate.
+- **iPhone:** TestFlight `beta` build 62 (standalone, production API, IPA
+  36 MB) is from main `f06db78` (through #341), uploaded October 23. It is the
+  first build with on-device Stockfish (#336) for review's side lines, the
+  Privacy and licences notice (#334) and the GPL licence (#340); its source is
+  published as [knightly-source@ios-build-62](https://github.com/hunterrhansen/knightly-source/tree/ios-build-62)
+  (Actions disabled there). Build 61 (`91bff6b`) carried #338, build 60 #333;
+  builds 58 and earlier break against this backend. **None of the ward path,
+  the walk, the new watch mix, the safety-check labels, the endgame drills,
+  the tappable badges or a side line's on-device eval has been seen on a
+  phone.** Keeping a watch and playing a review side line on build 62 is the
+  open gate.
 - **Production learner data:** #309 reset production's posts-reached record to
   the Gatehouse so every post is walked; the record before the walk is kept as
   the setting `wards_reached_before_walk`.

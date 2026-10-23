@@ -7,7 +7,7 @@ import type {
 import type { GameDetail } from '../../lib/api/review-contract';
 import { reviewBoard } from './review-board';
 import { buildLesson, replayGame } from './review-lesson';
-import { ReviewSession } from './review-session';
+import { liveEnginePath, ReviewSession } from './review-session';
 
 /** The board the screen shows for the session's state. */
 const boardOf = (session: ReviewSession) =>
@@ -870,4 +870,15 @@ test('Best opens the stored line as a side line from before the move, and Next l
   expect(session.openLine(1, ['e7e4'])).toBe(false);
   session.next();
   expect(session.getSnapshot().line).toBeUndefined();
+});
+
+test('the live engine skips a find’s position until it is answered or revealed', async () => {
+  const { session } = setup();
+  await session.load();
+  // The first step finds a better first move: the start is its position.
+  expect(liveEnginePath(session.getSnapshot(), 0)).toBeUndefined();
+  expect(liveEnginePath(session.getSnapshot(), 2)).toEqual(['e2e4', 'e7e5']);
+  session.browseAt(1);
+  session.revealAnswer();
+  expect(liveEnginePath(session.getSnapshot(), 0)).toEqual([]);
 });

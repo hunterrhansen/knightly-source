@@ -25,6 +25,8 @@ const schema = z.object({
   lastMove: z.enum(['on', 'off']).catch('on'),
   sounds: z.enum(['on', 'off']).catch('on'),
   bestMove: z.enum(['on', 'off']).catch('on'),
+  // Off by default: the device engine also evaluates the game's own moves.
+  liveEngine: z.enum(['on', 'off']).catch('off'),
   weekStart: z.enum(['sunday', 'monday']).catch('sunday'),
 });
 export type Preferences = z.infer<typeof schema>;

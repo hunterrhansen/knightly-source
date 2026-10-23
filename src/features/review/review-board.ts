@@ -168,6 +168,8 @@ function explorable(
       moves: legalMoves(board.position.fen),
       submissionEnabled: true,
     },
+    // A selected piece shows where it can go, as the find board does.
+    presentation: { ...board.presentation, showDestinations: true },
     onAttempt: play,
   };
 }

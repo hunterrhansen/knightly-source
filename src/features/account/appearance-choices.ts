@@ -72,6 +72,13 @@ export const appearanceChoices: { [K in AppearanceChoice]: Choice<K> } = {
       { value: 'off', label: 'Off' },
     ],
   },
+  liveEngine: {
+    label: 'Live engine in reviews',
+    options: [
+      { value: 'off', label: 'Off' },
+      { value: 'on', label: 'On' },
+    ],
+  },
   weekStart: {
     label: 'Week starts on',
     options: [
@@ -89,6 +96,7 @@ export const boardChoices: readonly AppearanceChoice[] = [
   'lastMove',
   'sounds',
   'bestMove',
+  'liveEngine',
 ];
 export function choiceLabel<K extends AppearanceChoice>(
   key: K,

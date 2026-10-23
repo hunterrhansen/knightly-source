@@ -115,11 +115,17 @@ with an `AbortError`, so a late `bestmove` never answers the newer position.
 - **Position.** The request is the position after the last capture or pawn
   move and the UCI moves since, as Lichess sends, so the engine sees
   repetitions.
-- **When it runs.** Only while a side line is on the board (your moves or a
+- **When it runs.** While a side line is on the board (your moves or a
   Best/Explain line). Game positions keep the backend's eval and best move so
-  the bar, arrows, grades and win graph agree. Each new position stops the
-  previous search; a result for a position the board has left is dropped, and
-  finished results are kept for the visit.
+  the arrows, grades and win graph agree, unless **Live engine in reviews**
+  (Settings → board choices, off by default, as Lichess's local-analysis
+  toggle) is on: then the device engine also evaluates the game position shown
+  in the lesson and All moves, and the eval bar and coach chip (All moves' card)
+  switch from the stored eval to its result once one arrives. Grades, the win
+  graph and the best-move arrow stay the stored analysis. It never evaluates
+  the position of a find still to answer (`liveEnginePath`). Each new position
+  stops the previous search; a result for a position the board has left is
+  dropped, and finished results are kept for the visit.
 - **Limits.** MultiPV 1. Stop at depth 22 or 5 s on web and depth 20 or 3 s on
   phones (`go depth … movetime …`), whichever comes first. Leaving review
   stops the search.
