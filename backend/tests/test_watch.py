@@ -9,7 +9,7 @@ from conftest import add_review_game, add_review_move, days_ago
 from fastapi.testclient import TestClient
 from fsrs import Card, State
 
-from knightly import api, daily, db, deck, wards, watch
+from knightly import api, curriculum, daily, db, deck, wards, watch
 
 TODAY = date(2026, 10, 14)
 
@@ -269,17 +269,20 @@ def test_stars_count_what_you_learned_but_never_reach_a_rank(conn):
     reached = {r["key"]: r["reached_on"] for r in journey["ranks"]}
     assert reached["page"] == "2026-08-30"  # the first night kept
     assert reached["squire-1"] is None  # twelve stars, but no castle's posts cleared
-    assert [r["post"] for r in journey["ranks"]] == [None, 3, 6, 9, 12, 15, None]
+    posts = [r["post"] for r in journey["ranks"]]
+    assert posts[:7] == [None, 3, 6, 9, 12, 15, 18] and posts[-1] == len(curriculum.WARDS)
     assert (journey["stars"], journey["rank"], journey["rank_reached_on"]) == (12, "Page", "2026-08-30")
     assert (journey["next_rank"], journey["next_post"]) == ("Squire I", 3)
 
 
 def test_each_castle_stands_after_its_posts(conn):
     """The rank ladder and the walk's castles are one ladder: Squire I onward at every
-    POSTS_PER_RANK posts, in wards.POST_RANKS order."""
+    POSTS_PER_RANK posts, in wards.POST_RANKS order, and Castellan when the last post clears."""
     by_post = {key: post for key, _, post in watch.RANKS if post is not None}
-    assert list(by_post) == list(wards.POST_RANKS)
-    assert list(by_post.values()) == [i * wards.POSTS_PER_RANK for i in range(1, len(by_post) + 1)]
+    assert list(by_post) == [*wards.POST_RANKS, wards.FINAL_RANK]
+    steps = [i * wards.POSTS_PER_RANK for i in range(1, len(wards.POST_RANKS) + 1)]
+    assert list(by_post.values()) == [*steps, len(curriculum.WARDS)]
+    assert steps[-1] < len(curriculum.WARDS), "every ladder rank has posts to clear"
 
 
 def test_a_lapse_dims_a_star_without_lowering_the_count_or_a_reached_rank(conn):

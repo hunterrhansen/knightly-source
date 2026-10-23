@@ -4,7 +4,7 @@ import type {
   JourneyWard,
 } from '../../lib/api/journey-contract';
 import type { MapCastle } from './journey-map';
-import { POST_RANKS, POSTS_PER_RANK, postCopy, rankOfPost } from './ward-copy';
+import { POST_RANKS, postCopy, rankOfPost } from './ward-copy';
 
 // The path through the wards (docs/specs/2026-10-20-ward-path-design.md, "Home:
 // the ward path"): the curriculum's posts as sections and their lessons as
@@ -109,11 +109,12 @@ export function lessonDetail(lesson: PathLesson) {
 }
 
 /**
- * The rank castles between posts: one after every third post, the keep after
- * the last. A castle is reached when every post before it is cleared or
- * blocked (a blocked post never counts for or against a rank), or when the
- * server's ranks already have it reached; a rank once reached is not lost.
- * The castle after `posts` stands for Knight III, beyond the curriculum.
+ * The rank castles between posts: one after every third post, and Castellan
+ * after the last (POST_RANKS). A castle is reached when every post before it is
+ * cleared or blocked (a blocked post never counts for or against a rank), or
+ * when the server's ranks already have it reached; a rank once reached is not
+ * lost. A castle past the posts the server sent stands `beyond` them: an older
+ * server's shorter walk.
  */
 function postCastles(
   posts: readonly PathPost[],
@@ -121,13 +122,10 @@ function postCastles(
 ): MapCastle[] {
   const castles: MapCastle[] = [];
   let nextFound = false;
-  for (let i = 1; i < POST_RANKS.length; i++) {
-    const rank = POST_RANKS[i];
-    if (!rank) continue;
-    const before = posts.filter((p) => p.index <= i * POSTS_PER_RANK);
-    // Knight III stands at the keep, after the last post: beyond the curriculum,
-    // reached by no post (backend wards.POST_RANKS stops at Knight II).
-    const beyond = i * POSTS_PER_RANK >= posts.length;
+  for (const rank of POST_RANKS.slice(1)) {
+    const at = rank.post ?? posts.length;
+    const beyond = at > posts.length;
+    const before = posts.filter((p) => p.index <= at);
     const open = before.filter(
       (p) => p.state !== 'cleared' && p.state !== 'blocked',
     ).length;
@@ -145,7 +143,7 @@ function postCastles(
       state,
       reachedOn: server?.reached_on ?? null,
       toGo: beyond ? 0 : open,
-      after: Math.min(i * POSTS_PER_RANK, posts.length),
+      after: Math.min(at, posts.length),
       beyond,
     });
   }
@@ -169,7 +167,7 @@ function postRank(journey: JourneyMap, posts: readonly PathPost[]) {
         : last,
     0,
   );
-  return POST_RANKS[Math.max(server, byPosts)] ?? POST_RANKS[0];
+  return POST_RANKS[Math.max(server, byPosts)] ?? { key: 'page', name: 'Page' };
 }
 
 export type WardPathLayout = {

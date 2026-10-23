@@ -68,7 +68,7 @@ def test_every_mate_drill_ends_in_checkmate_on_your_move():
 
 def test_every_king_and_pawn_drill_has_only_one_right_move_each_time(table):
     for row in drills():
-        if row["Themes"].split()[0] not in ("keySquares", "opposition", "squareOfPawn"):
+        if row["Themes"].split()[0] not in ("keySquares", "opposition", "squareOfPawn", "rookPawn"):
             continue
         board = chess.Board(row["FEN"])
         moves = [chess.Move.from_uci(u) for u in row["Moves"].split()]

@@ -102,14 +102,30 @@ are approved (2026-10-20).
 | 16 | Inner | The Chapel | Mating patterns | "The same shapes in every window. Learn them and you'll see them in your games." | Knight II |
 | 17 | Inner | The Mews | Trapping a piece | "A falcon with no room to fly is caught." | Knight II |
 | 18 | Inner | The Great Hall | Luring and interference | "Court tricks: pull a piece where you want it, or get in another's way." | Knight II |
-| | | *The Keep: Knight III* | Steps 5–6, later | "Not yet. When the walls are yours, we go in together." | |
+| | | *Castle: Knight III* | | | |
+
+### Beyond the walls (decided 2026-10-23)
+
+The walk goes on through the rest of the Steps Method in its own order
+(`curriculum.WARDS` 19–47, plan approved 2026-10-23): **Part II, the Keep**,
+floor by floor from the Forebuilding to the Keep Roof (posts 19–32: the rest of
+Steps 3 and 3+, then 4 and 4+); **Part III, the March**, riding the border
+towers from the Crossing to the Last Tower (33–43: Steps 5 and 5+); and
+**Part IV, the Citadel**, a castle of one's own (44–47: Step 6). It stays a
+vigil. Each part's first post opens with a rule across the road ("THE KEEP",
+"THE MARCH", "THE CITADEL"). The places and the knight's lines are in
+`src/features/today/ward-copy.ts`; their history notes stay empty until each is
+sourced. Ranks go on a castle every third post: Knight III after post 18, Knight
+Banneret I–III, Captain of the Watch I–III, Warden of the March I–III, and
+Castellan when the last post is held (names are placeholders; they wear Knight
+III's emblem until they have art). Positional lessons (mini plans, weak pawns,
+open files…) are introduced and show "Coming soon" until drills exist.
 
 The ward boundaries fall on rank castles: the Portcullis is the gate into the
 Middle Ward (Squire II) and the Gate Towers into the Inner Ward (Knight I). The
 ranks keep their names and keys (`watch.RANKS`), and since 2026-10-22 posts are
-the only way to a rank: stars count moves that stopped slipping. Knight III stands at the keep
-and stays out of reach until posts beyond 18 exist: the curriculum does not go
-there yet.
+the only way to a rank: stars count moves that stopped slipping. Knight III's
+castle stands after post 18, at the door of the Keep.
 
 On the path a rule across the road names the ward it enters ("MIDDLE WARD"),
 between the last post of one ward and the first of the next, as Duolingo
@@ -205,7 +221,7 @@ and with no migration, holding each post's first-entered and first-cleared
 date. A rank is reached when every non-blocked post before its castle has
 been cleared once. Built (`wards.record`, `wards.post_ranks`, read by `watch._ranks`;
 `/api/journey` records before it ranks, so a castle reached shows in the same
-response). Knight III stays at the keep, reached by no post.
+response). Castellan is reached when the last post is held.
 
 **Every post is walked** (decided 2026-10-21). Only evidence from after a post
 is reached counts toward it (the record's `entered_at`, stamped the moment the

@@ -83,7 +83,8 @@ export function castleText(castle: MapCastle) {
       ? `Reached ${shortDate(castle.reachedOn)}`
       : 'Reached';
   if (castle.key === 'page') return 'Your first watch';
-  if (castle.beyond || castle.after === undefined) return 'At the keep · later';
+  if (castle.beyond || castle.after === undefined)
+    return 'Beyond the posts built';
   if (castle.state === 'later' || castle.toGo === null)
     return `After post ${castle.after}`;
   return `${posts(castle.toGo)} to go`;

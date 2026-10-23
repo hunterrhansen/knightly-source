@@ -550,7 +550,7 @@ function wardPathModel(
       topic: `${current.topic} · ${heldLine(current)}`,
       subtitle: current.line ?? current.topic,
     },
-    // Above the last post, the keep: Knight III, beyond the posts built.
+    // Castles past the posts drawn (an older server's shorter walk) wait above.
     later: layout.castles.filter((c) => c.beyond || !drawn.has(c.key)),
     earlier: before,
   };

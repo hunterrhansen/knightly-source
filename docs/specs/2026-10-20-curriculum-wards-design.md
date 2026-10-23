@@ -146,8 +146,17 @@ answer keys; the method has no controlled outcome study, so this is expert conse
   numbers are never shown as Knightly's progress.
 
 With four idea slots a night a lesson takes about two weeks; the eighteen posts' basic volume
-about a year at one watch a night, before the Plus lessons and Steps 4-6 that would follow the
-Keep. Pace stays set by mastery: extra watches go faster, and placement (#325) is how a
+about a year at one watch a night.
+
+**The whole method (built 2026-10-23).** After the eighteen posts the walk continues through
+the rest of Steps 3 and 3+, then 4 and 4+ (the Keep, posts 19-32), 5 and 5+ (the March, 33-43)
+and 6 (the Citadel, 44-47): 47 posts, 110 lessons, in the method's own order from its lesson
+lists. Positional lessons with no puzzle equivalent (mini plans, weak pawns, open files, strong
+squares, bishops) are introduced and show as coming soon, never blocking their post, until a
+drill exists. Endgame lessons draw the corpus's endgame positions under the `simple` shape,
+except the rook pawn, which has exact generated drills (`rookPawn`); queen against pawn, the
+wrong bishop and rook endings wait on generated drills of their own. Ranks continue every third
+post to Warden of the March III, and Castellan when the last post clears. Pace stays set by mastery: extra watches go faster, and placement (#325) is how a
 stronger player skips ahead.
 
 ## The five practice modes

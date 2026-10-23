@@ -11,6 +11,7 @@ play both colours. Deterministic for a seed and engine version; the output is co
 
 import argparse
 import csv
+import hashlib
 import random
 import sys
 
@@ -23,7 +24,14 @@ MAX_YOURS = 3  # your moves in a line at most
 FIELDS = ["PuzzleId", "FEN", "Moves", "Rating", "RatingDeviation", "Popularity", "NbPlays", "Themes", "GameUrl"]
 # Rough ratings, so the target-rating pick spreads them (puzzles.target_rating); a longer line
 # is harder. Lichess's own pawnEndgame puzzles under 1200 are the reference.
-BASE = {"squareOfPawn": 900, "keySquares": 1050, "opposition": 1200, "queenMate": 650, "rookMate": 750}
+BASE = {
+    "squareOfPawn": 900,
+    "keySquares": 1050,
+    "opposition": 1200,
+    "rookPawn": 1300,
+    "queenMate": 650,
+    "rookMate": 750,
+}
 
 
 # --- king and pawn against king (exact) ------------------------------------------------------
@@ -95,8 +103,11 @@ def kpk_line(table, board: chess.Board) -> list[chess.Move]:
 
 
 def kpk_theme(board: chess.Board, move: chess.Move) -> str:
-    """Which idea a KPK only-move is about."""
+    """Which idea a KPK only-move is about. A rook pawn is its own lesson (Steps 3+): the
+    corner changes which positions win."""
     pawn_sq = next(iter(board.pieces(chess.PAWN, chess.WHITE) | board.pieces(chess.PAWN, chess.BLACK)))
+    if chess.square_file(pawn_sq) in (0, 7):
+        return "rookPawn"
     strong = board.color_at(pawn_sq)
     if board.turn == strong:
         return "squareOfPawn" if board.piece_type_at(move.from_square) == chess.PAWN else "keySquares"
@@ -129,7 +140,9 @@ def setup(board: chess.Board) -> chess.Move | None:
 
 def kpk_drills(rng: random.Random, per_theme: int) -> list[dict]:
     table = eg.solve_kpk()
-    found: dict[str, list[tuple[str, list[str], int]]] = {t: [] for t in ("keySquares", "opposition", "squareOfPawn")}
+    found: dict[str, list[tuple[str, list[str], int]]] = {
+        t: [] for t in ("keySquares", "opposition", "squareOfPawn", "rookPawn")
+    }
     squares = list(range(64))
     for wk in squares:
         for bk in squares:
@@ -285,7 +298,8 @@ def main() -> None:
                 fen, moves = mirrored(fen, moves)
             writer.writerow(
                 {
-                    "PuzzleId": f"kn{d['theme'][:2]}{i:05d}",
+                    # From the drill itself, so a regenerated file never reuses an id already loaded.
+                    "PuzzleId": "kn" + hashlib.sha1(f"{fen} {' '.join(moves)}".encode()).hexdigest()[:10],
                     "FEN": fen,
                     "Moves": " ".join(moves),
                     "Rating": BASE[d["theme"]] + 100 * (d["yours"] - 1),

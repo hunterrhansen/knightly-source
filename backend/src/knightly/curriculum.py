@@ -89,10 +89,10 @@ def _l(
     return Lesson(key, name, track, step, themes, shape, drill, practice)
 
 
-# Steps 1-plus through 4, which is roughly where Knightly's learners are. Step 1's basic
-# lessons are the rules of chess and are dropped: everyone here already plays online. Steps 5
-# and 6 (rook endings, strong squares, open files, the seventh rank) are deliberately absent
-# until someone is reliably clearing ward 18. Lesson names are the Steps Method's own terms
+# The whole Steps Method from 1-plus to 6, in its order: eighteen posts on the walls (Steps 1-3,
+# with some 3+ and 4), then the Keep (the rest of 3 and 3+, then 4 and 4+), the March (5 and 5+)
+# and the Citadel (6). Step 1's basic lessons are the rules of chess and are dropped: everyone
+# here already plays online. Lesson names are the Steps Method's own terms
 # (decided 2026-10-23), which differ from common usage in places: "X-ray attack" is a skewer,
 # "luring away" is deflection. Their step numbers are never shown as Knightly's progress.
 WARDS: tuple[Ward, ...] = (
@@ -222,6 +222,200 @@ WARDS: tuple[Ward, ...] = (
         _l("interfering", "Interference", "tactic", "4", "interference"),
         _l("deflection", "Luring away", "tactic", "4", "deflection"),
         _l("clearing", "Clearing", "tactic", "4", "clearance"),
+    ),
+    # --- Part II, the Keep: the rest of Steps 3 and 3+, then Steps 4 and 4+ (2026-10-23) -----
+    # In the method's own order. A lesson with no themes is a positional one Steps teaches by
+    # explanation and judgement; it is introduced (intros.py) and shows as coming soon, never
+    # blocking its post, until a drill exists. Endgame lessons draw the corpus's endgame
+    # positions (`simple` shape) until generated drills replace them, as rookPawn has.
+    _w(
+        "defending-double-attack",
+        "Defending against a double attack",
+        _l("defending-double-attack", "Defending against a double attack", "defence", "3", "defensiveMove"),
+        _l("draw-3", "Draw", "endgame", "3"),
+    ),
+    _w(
+        "mini-plan",
+        "The mini plan",
+        _l("mini-plan", "Mini plan", "positional", "3"),
+        _l("rook-pawn", "The rook pawn", "endgame", "3+", "rookPawn"),
+    ),
+    _w(
+        "vulnerability-opening",
+        "Vulnerability in the opening",
+        _l("vulnerability-opening", "Vulnerability in the opening", "opening", "3+", "attackingF2F7", "hangingPiece"),
+        _l("underpromotion", "Underpromotion", "endgame", "3+", "underPromotion"),
+    ),
+    _w(
+        "pinning",
+        "Pinning",
+        _l("development", "Development", "opening", "3+"),
+        _l("pinning", "Pinning", "tactic", "3+", "pin"),
+    ),
+    _w(
+        "blocking",
+        "Blocking",
+        _l("opening-advantage", "Opening advantage", "opening", "4"),
+        _l("blocking", "Blocking", "mate", "4", "smotheredMate", "attraction"),
+    ),
+    _w(
+        "pin-luring",
+        "The pin: luring",
+        _l("pin-luring", "The pin: luring", "tactic", "4", "pin", "attraction"),
+        _l("passed-pawn-4", "The passed pawn", "endgame", "4", "advancedPawn"),
+    ),
+    _w(
+        "the-magnet",
+        "The magnet",
+        _l("eliminating-double-attack", "Eliminating the defence: double attack", "tactic", "4", "capturingDefender"),
+        _l("magnet", "The magnet", "mate", "4", "exposedKing", "sacrifice"),
+    ),
+    _w(
+        "weak-pawns",
+        "Weak pawns",
+        _l("weak-pawns", "Weak pawns", "positional", "4"),
+        _l("material-advantage", "Material advantage", "endgame", "4"),
+    ),
+    _w(
+        "attack-on-the-king",
+        "Attack on the king",
+        _l("chasing-targeting", "Chasing and targeting", "tactic", "4", "fork", "deflection"),
+        _l("king-attack-4", "Attack on the king", "mate", "4", "kingsideAttack"),
+    ),
+    _w(
+        "seventh-rank",
+        "Seventh rank and endgame strategy",
+        _l("seventh-rank-4", "Seventh rank", "endgame", "4", "rookEndgame", shape="simple"),
+        _l("endgame-strategy", "Endgame strategy", "endgame", "4", "zugzwang", "pawnEndgame"),
+        _l("queen-against-pawn", "Queen against pawn", "endgame", "4", "queenEndgame", shape="simple"),
+    ),
+    _w(
+        "attacking-the-king",
+        "Attacking the king",
+        _l("attacking-king-4p", "Attacking the king", "mate", "4+", "kingsideAttack", "exposedKing"),
+        _l("opening-traps", "Vulnerability in the opening: traps", "opening", "4+", "attackingF2F7"),
+    ),
+    _w(
+        "interference-blocking",
+        "Interference and blocking",
+        _l("interference-4p", "Interference", "tactic", "4+", "interference"),
+        _l("blocking-4p", "Blocking", "mate", "4+", "smotheredMate"),
+        _l("draws-4p", "Draws", "endgame", "4+"),
+    ),
+    _w(
+        "mini-plans",
+        "Mini-plans and batteries",
+        _l("mini-plans-4p", "Mini-plans", "positional", "4+"),
+        _l("pawn-endings-4p", "Pawn endings", "endgame", "4+", "pawnEndgame", "zugzwang"),
+        _l("batteries", "Discovered attack", "tactic", "4+", "discoveredAttack", "discoveredCheck"),
+    ),
+    _w(
+        "endgame-technique",
+        "Endgame technique",
+        _l("endgame-technique", "Endgame technique", "endgame", "4+", "rookEndgame", shape="simple"),
+        _l("chess-problems", "Chess problems", "calculation", "4+", "quietMove"),
+    ),
+    # --- Part III, the March: Steps 5 and 5+ ---------------------------------------------------
+    _w(
+        "material-and-time",
+        "Material and time",
+        _l("material-and-time", "Material and time", "positional", "5"),
+        _l("mate-5", "Mate", "mate", "5", "mateIn3"),
+    ),
+    _w(
+        "breakthrough",
+        "Breakthrough",
+        _l("breakthrough", "Breakthrough", "endgame", "5", "advancedPawn", "pawnEndgame"),
+        _l("using-pawns", "Using pawns", "positional", "5"),
+    ),
+    _w(
+        "pawn-race",
+        "Pawn race",
+        _l("pawn-race", "Pawn race", "endgame", "5", "promotion", "pawnEndgame"),
+        _l("seventh-rank-5", "Seventh rank", "endgame", "5", "rookEndgame"),
+    ),
+    _w(
+        "discovery-and-pin",
+        "Discovered attack and pin",
+        _l("discovered-attack-5", "Discovered attack", "tactic", "5", "discoveredAttack", "clearance"),
+        _l("pin-5", "Pin", "tactic", "5", "pin"),
+    ),
+    _w(
+        "rook-against-pawn",
+        "Rook against pawn",
+        _l("opening-5", "The opening", "opening", "5"),
+        _l("rook-against-pawn", "Rook against pawn", "endgame", "5", "rookEndgame", shape="simple"),
+    ),
+    _w(
+        "strong-square",
+        "Strong square",
+        _l("strong-square", "Strong square", "positional", "5"),
+        _l("defending-5", "Defending", "defence", "5", "defensiveMove"),
+    ),
+    _w(
+        "rook-endings",
+        "Rook endings",
+        _l("rook-endings", "Rook endings", "endgame", "5", "rookEndgame", shape="simple"),
+        _l("king-attack-5", "Attack on the king", "mate", "5", "kingsideAttack", "sacrifice"),
+    ),
+    _w(
+        "open-file",
+        "Open file",
+        _l("open-file", "Open file", "positional", "5"),
+        _l("draw-5", "Draw", "endgame", "5"),
+    ),
+    _w(
+        "king-in-the-middle",
+        "King in the middle",
+        _l("activity-5p", "Activity", "positional", "5+"),
+        _l("pawn-endings-5p", "Pawn endings", "endgame", "5+", "pawnEndgame", "zugzwang"),
+        _l("king-in-middle-5p", "King in the middle", "mate", "5+", "exposedKing"),
+    ),
+    _w(
+        "wrong-bishop",
+        "The wrong bishop",
+        _l("wrong-bishop", "The wrong bishop", "endgame", "5+", "bishopEndgame", shape="simple"),
+        _l("vulnerability-5p", "Vulnerability", "tactic", "5+", "trappedPiece", "hangingPiece"),
+        _l("queen-endings", "Queen endings", "endgame", "5+", "queenEndgame"),
+    ),
+    _w(
+        "zugzwang",
+        "Zugzwang",
+        _l("defending-5p", "Defending", "defence", "5+", "defensiveMove"),
+        _l("eternal-pins", "Eternal pins", "tactic", "5+", "pin"),
+        _l("bishop-against-pawns", "Bishop against pawns", "endgame", "5+", "bishopEndgame", shape="simple"),
+        _l("zugzwang", "Zugzwang", "endgame", "5+", "zugzwang"),
+    ),
+    # --- Part IV, the Citadel: Step 6 (a self-study book, chapters rather than lessons) --------
+    _w(
+        "citadel-gate",
+        "The king in the middle",
+        _l("king-in-middle-6", "The king in the middle", "mate", "6", "exposedKing", "sacrifice"),
+        _l("passed-pawn-6", "The passed pawn", "endgame", "6", "advancedPawn", "promotion"),
+        _l("strategy", "Strategy", "positional", "6"),
+    ),
+    _w(
+        "citadel-walls",
+        "Mobility and the opening",
+        _l("mobility-6", "Mobility", "positional", "6"),
+        _l("draw-6", "Draw", "endgame", "6"),
+        _l("opening-6", "The opening", "opening", "6"),
+    ),
+    _w(
+        "citadel-hall",
+        "Tactics",
+        _l("tactics-6", "Tactics", "tactic", "6", "sacrifice", "deflection", "attraction"),
+        _l("pawn-ending-6", "Pawn ending", "endgame", "6", "pawnEndgame"),
+        _l("bishop-or-knight", "Bishop or knight?", "positional", "6"),
+    ),
+    _w(
+        "castellans-tower",
+        "King's attack and the ending",
+        _l("kings-attack-6", "King's attack", "mate", "6", "kingsideAttack", "mateIn3"),
+        _l("advantage-ending", "Advantage in the ending", "positional", "6"),
+        _l("bishops", "Bishops", "positional", "6"),
+        _l("defending-6", "Defending", "defence", "6", "defensiveMove"),
+        _l("rook-endgame-6", "Rook endgame", "endgame", "6", "rookEndgame", shape="simple"),
     ),
 )
 

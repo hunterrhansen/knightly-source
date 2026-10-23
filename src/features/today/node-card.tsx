@@ -295,7 +295,7 @@ function CastleCard({ castle }: { castle: MapCastle }) {
         castle.state !== 'reached' && (
           <Text style={styles.quiet}>
             {castle.beyond
-              ? 'The keep is beyond the posts built so far.'
+              ? 'It stands beyond the posts built so far.'
               : `It stands after post ${castle.after}. Hold every post before it to reach it.`}
           </Text>
         )}

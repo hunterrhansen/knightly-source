@@ -14,7 +14,8 @@ the method". So these are generated, and every one is checked rather than guesse
 
 The generator writes DATA in the Lichess puzzle file's layout, and `load` stores it beside the
 corpus (`knightly endgames`), themed so the curriculum's endgame lessons draw on it. These
-themes are ours, not Lichess's: keySquares, opposition, squareOfPawn, queenMate, rookMate.
+themes are ours, not Lichess's: keySquares, opposition, squareOfPawn, rookPawn (the rook
+pawn's own wins and draws, Steps 3+), queenMate, rookMate.
 """
 
 import csv
@@ -26,7 +27,7 @@ from . import db
 
 DATA = Path(__file__).with_name("data") / "endgame_drills.csv"
 # Our themes, beside Lichess's in `lichess_puzzles.themes`.
-THEMES = ("keySquares", "opposition", "squareOfPawn", "queenMate", "rookMate")
+THEMES = ("keySquares", "opposition", "squareOfPawn", "rookPawn", "queenMate", "rookMate")
 
 WIN, DRAW = 1, 0
 

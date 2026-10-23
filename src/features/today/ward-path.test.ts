@@ -198,32 +198,61 @@ test('a post cleared this session is a moment; one first cleared on an earlier d
   expect(postMoment(before, before, '2026-10-20')).toBeNull();
 });
 
-test('the whole walk is drawn: every post ahead with its lessons locked, up to the keep', () => {
+/** The fixture's eighteen posts, then the Keep, the March and the Citadel as
+ * the server sends them: posts 19 to 47, ahead. */
+const fullWalk = (current: number) => [
+  ...sampleWards(current),
+  ...Array.from({ length: 29 }, (_, i) => ({
+    key: `post-${i + 19}`,
+    name: `Post ${i + 19}`,
+    index: i + 19,
+    state: 'ahead' as const,
+    lessons: [
+      {
+        key: `lesson-${i + 19}`,
+        name: `Lesson ${i + 19}`,
+        track: 'tactic',
+        step: '4',
+        held: false,
+        solves: 0,
+        teachable: true,
+      },
+    ],
+  })),
+];
+
+test('the whole walk is drawn: every post ahead with its lessons locked, to the Citadel', () => {
   const model = pathModel(todaySamples.Ready, {
     ...firstNights,
-    wards: sampleWards(2),
+    wards: fullWalk(2),
   });
   const ahead = model.nodes.filter(
     (n) => n.kind === 'post' && n.post?.state === 'ahead',
   );
-  // Posts 3 to 18 above the Drawbridge, nearest last; the Gatehouse is behind.
+  // Posts 3 to 47 above the Drawbridge, nearest last; the Gatehouse is behind.
   expect(ahead.map((n) => n.post?.index)).toEqual(
-    Array.from({ length: 16 }, (_, i) => 18 - i),
+    Array.from({ length: 45 }, (_, i) => 47 - i),
   );
   const locked = model.nodes.filter((n) => n.kind === 'locked');
-  expect(locked.length).toBeGreaterThan(30);
+  expect(locked.length).toBeGreaterThan(60);
   expect(locked.every((n) => n.state === 'later')).toBe(true);
   // Each castle stands on the road just below the post it opens onto (the
-  // Lists, post 4, for Squire I); the keep is above the last post.
+  // Lists, post 4, for Squire I; the Keep's first post for Knight III).
   const keys = model.nodes.map((n) => n.key);
   expect(keys.indexOf('castle-squire-1')).toBe(
     keys.indexOf(postKey('double-attack')) + 1,
+  );
+  expect(keys.indexOf('castle-knight-3')).toBe(
+    keys.indexOf(postKey('post-19')) + 1,
   );
   expect(node(model, 'castle-squire-1')).toMatchObject({
     kind: 'castle',
     state: 'later',
   });
-  expect(model.later.map((c) => c.name)).toEqual(['Knight III']);
+  // Every rank on the ladder has its castle; Castellan, after the last post,
+  // waits above the end of the walk.
+  expect(keys.filter((k) => k.startsWith('castle-'))).toHaveLength(15);
+  expect(model.later.map((c) => c.name)).toEqual(['Castellan']);
 });
 
 test('a post behind keeps the watches kept while it was current', () => {

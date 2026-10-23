@@ -27,18 +27,28 @@ TONIGHT_ROWS = 3  # move rows on the Watch page's tonight card
 RECENT_DAYS = 7  # a new slip from a game this recent leads the tonight headline
 WEEK_DAYS = 7  # the Games summary card's period
 
-# (key, name, post): the post whose clearing reaches the rank (a castle every
-# wards.POSTS_PER_RANK posts). Page comes with the first night kept; Knight III stands at the
-# Keep, beyond the posts built so far, so no post reaches it yet.
-RANKS = [
-    ("page", "Page", None),
-    ("squire-1", "Squire I", 3),
-    ("squire-2", "Squire II", 6),
-    ("squire-3", "Squire III", 9),
-    ("knight-1", "Knight I", 12),
-    ("knight-2", "Knight II", 15),
-    ("knight-3", "Knight III", None),
-]
+# (key, name, post): the post whose clearing reaches the rank (wards.rank_posts: a castle every
+# wards.POSTS_PER_RANK posts, Castellan at the Citadel's last). Page comes with the first night
+# kept. Knight III is reached entering the Keep; the names past it are placeholders.
+_NAMES = {
+    "squire-1": "Squire I",
+    "squire-2": "Squire II",
+    "squire-3": "Squire III",
+    "knight-1": "Knight I",
+    "knight-2": "Knight II",
+    "knight-3": "Knight III",
+    "banneret-1": "Knight Banneret I",
+    "banneret-2": "Knight Banneret II",
+    "banneret-3": "Knight Banneret III",
+    "captain-1": "Captain of the Watch I",
+    "captain-2": "Captain of the Watch II",
+    "captain-3": "Captain of the Watch III",
+    "warden-1": "Warden of the March I",
+    "warden-2": "Warden of the March II",
+    "warden-3": "Warden of the March III",
+    "castellan": "Castellan",
+}
+RANKS = [("page", "Page", None), *((key, _NAMES[key], post) for key, post in wards.rank_posts().items())]
 RANKS_SETTING = "ranks_reached"  # {rank key: "YYYY-MM-DD"}: reached ranks are never lost
 NIGHT_MILESTONES = (7, 30, 100, 365)
 # A move has stopped slipping (and earns its star) once FSRS expects it to hold this many

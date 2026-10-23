@@ -36,9 +36,7 @@ export function useSprite(role: SpriteRole) {
 }
 
 /** The distant skyline of a castle ward: none for the Outer Ward. */
-export function useSkyline(
-  ward: 'outer' | 'middle' | 'inner' | 'keep' | undefined,
-) {
+export function useSkyline(ward: string | undefined) {
   const skylines = useContext(Kit).skylines;
   // The keep's own scene needs no keep looming behind it.
   return ward === 'middle' || ward === 'inner' ? skylines[ward] : null;

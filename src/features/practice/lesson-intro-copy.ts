@@ -161,6 +161,291 @@ const COPY: Record<string, IntroCopy> = {
     line: 'Sometimes your own piece blocks the way. Move it, even as a sacrifice, to open the line.',
     look: 'Which of your pieces is in the way?',
   },
+  // Beyond the Keep: Steps 3 to 6, each from its Steps lesson's aim.
+  'defending-double-attack': {
+    line: 'Two threats at once? Look for the one move that answers both: guard one while saving the other, or strike back with check.',
+    look: 'Which move saves both?',
+  },
+  'draw-3': {
+    line: 'When the night is lost, look for the draw: stalemate, too little material to mate, or a check they can never escape.',
+    look: 'Is there a way to draw?',
+  },
+  'mini-plan': {
+    line: 'No tactic tonight? Make a small plan: aim at their weakest point, improve your worst piece, or fix their pawns.',
+    look: 'What small plan helps most?',
+  },
+  'rook-pawn': {
+    line: 'A rook pawn is the weakest: the corner lets the defending king hold on. Know when it still wins.',
+    look: 'Can their king reach the corner?',
+  },
+  'vulnerability-opening': {
+    line: 'Early in the game, pieces are often left loose and the king is unguarded. Look for what they’ve neglected.',
+    look: 'What did they leave unguarded?',
+  },
+  underpromotion: {
+    line: 'A queen isn’t always best. When it stalemates or misses a check, a knight or rook can win instead.',
+    look: 'Which piece should the pawn become?',
+  },
+  development: {
+    line: 'Bring every piece out, each to a good square, before any piece moves twice.',
+    look: 'Which piece is still asleep?',
+  },
+  pinning: {
+    line: 'Pin a piece to something bigger, and pin it again from another line if you can.',
+    look: 'Which piece can you pin?',
+  },
+  'opening-advantage': {
+    line: 'A lead in development is worth using before it fades: open lines while their pieces sleep.',
+    look: 'How do you use your lead?',
+  },
+  blocking: {
+    line: 'Make their own pieces block their king’s escape squares, then mate.',
+    look: 'Which square can you make them block?',
+  },
+  'pin-luring': {
+    line: 'Lure a piece onto the line where a pin is waiting.',
+    look: 'Which piece can you draw into the pin?',
+  },
+  'passed-pawn-4': {
+    line: 'A passed pawn wants to run. Push yours with support, and stop theirs before it’s too late.',
+    look: 'Push, or stop theirs first?',
+  },
+  'eliminating-double-attack': {
+    line: 'When a defender spoils your double attack, take it, chase it or lure it away first.',
+    look: 'Which defender spoils the fork?',
+  },
+  magnet: {
+    line: 'Sacrifice to drag the king out of his shelter, onto a square where mate is waiting.',
+    look: 'Where can you drag the king?',
+  },
+  'weak-pawns': {
+    line: 'Isolated, doubled and backward pawns are weak. Aim your pieces at them and keep yours healthy.',
+    look: 'Which of their pawns is weakest?',
+  },
+  'material-advantage': {
+    line: 'Ahead in material? Trade pieces, not pawns, and the win comes nearer.',
+    look: 'Which trade brings the win closer?',
+  },
+  'chasing-targeting': {
+    line: 'Chase a piece onto the square where your fork is waiting, or aim at the square it must go to.',
+    look: 'Where can you chase it?',
+  },
+  'king-attack-4': {
+    line: 'Attack a castled king with pieces working together: rook and bishop, rook and knight, knight and bishop.',
+    look: 'Which pieces can join the attack?',
+  },
+  'seventh-rank-4': {
+    line: 'A rook on the seventh rank attacks pawns and pens the king in.',
+    look: 'Can your rook reach the seventh?',
+  },
+  'endgame-strategy': {
+    line: 'In the endgame the king fights, an outside passed pawn wins, and the opposition decides.',
+    look: 'Which rule decides this ending?',
+  },
+  'queen-against-pawn': {
+    line: 'A queen beats a pawn on the seventh by checking the king in front of it, except some rook and bishop pawns that draw.',
+    look: 'Can you get your king closer with check?',
+  },
+  'attacking-king-4p': {
+    line: 'Attack the king with more pieces than he has defenders, and open the lines to him.',
+    look: 'How do you open the king?',
+  },
+  'opening-traps': {
+    line: 'Some opening traps are old as the castle. Know them, so you set them and never fall in.',
+    look: 'What trap is set here?',
+  },
+  'interference-4p': {
+    line: 'Put a piece between a defender and what it guards.',
+    look: 'Which line can you cut?',
+  },
+  'blocking-4p': {
+    line: 'Make their pieces crowd their own king, then mate.',
+    look: 'Which square can you make them block?',
+  },
+  'draws-4p': {
+    line: 'Stalemate, a perpetual check, or too little to mate: a lost game can still be held.',
+    look: 'How do you save the game?',
+  },
+  'mini-plans-4p': {
+    line: 'Raise your activity, find their weakness, open the position when you’re better.',
+    look: 'What small plan helps most?',
+  },
+  'pawn-endings-4p': {
+    line: 'Pawn endings are counted, not guessed: the opposition, spare tempi and the right moment to push.',
+    look: 'Count it before you move.',
+  },
+  batteries: {
+    line: 'Line up a battery, then move the front piece with a threat of its own.',
+    look: 'How do you set up the battery?',
+  },
+  'endgame-technique': {
+    line: 'Winning endings follow rules: activate the king, cut the enemy king off, and push the passed pawn.',
+    look: 'Which rule wins this ending?',
+  },
+  'chess-problems': {
+    line: 'Composed puzzles, mate in two: a quiet first move sets the trap.',
+    look: 'Look for the quiet first move.',
+  },
+  'material-and-time': {
+    line: 'Material isn’t everything. A pawn behind can be worth it for a lead in time and activity.',
+    look: 'Is the material worth the time?',
+  },
+  'mate-5': {
+    line: 'Mates in two and three: picture every check and every reply before you start.',
+    look: 'What is the first forcing move?',
+  },
+  breakthrough: {
+    line: 'Pawns facing each other can break through with a sacrifice, and one pawn runs home.',
+    look: 'Which pawn breaks through?',
+  },
+  'using-pawns': {
+    line: 'Pawns hold squares, open lines and make passed pawns. Each pawn move should do one of these.',
+    look: 'What should this pawn do?',
+  },
+  'pawn-race': {
+    line: 'When both sides push, count who queens first, and whether the new queen gives check.',
+    look: 'Who queens first?',
+  },
+  'seventh-rank-5': {
+    line: 'Two rooks on the seventh rank can mate or sweep up pawns.',
+    look: 'How do your rooks use the seventh?',
+  },
+  'discovered-attack-5': {
+    line: 'Make the discovery: clear the line, remove a defender, or build the battery.',
+    look: 'What stands in the battery’s way?',
+  },
+  'pin-5': {
+    line: 'Win with the pin: clear its line, aim at the target, then attack the pinned piece.',
+    look: 'How do you win the pinned piece?',
+  },
+  'opening-5': {
+    line: 'Choose the opening move that develops, fights for the centre, and keeps your king safe.',
+    look: 'Which move does the most?',
+  },
+  'rook-against-pawn': {
+    line: 'A rook stops a pawn when its king can help; cut the enemy king off and count the tempi.',
+    look: 'Can you cut their king off?',
+  },
+  'strong-square': {
+    line: 'A strong square can never be attacked by an enemy pawn. Put a knight there.',
+    look: 'Which square can no pawn reach?',
+  },
+  'defending-5': {
+    line: 'Defend first: the threat of mate, the passed pawn, the attack on your king.',
+    look: 'What is their threat?',
+  },
+  'rook-endings': {
+    line: 'Rook endings follow known plans: build a bridge, cut the king off, keep your rook behind the pawn.',
+    look: 'Which plan wins here?',
+  },
+  'king-attack-5': {
+    line: 'Attack the castled king, often with a sacrifice to tear the cover away.',
+    look: 'Which sacrifice opens the king?',
+  },
+  'open-file': {
+    line: 'An open file is a road for rooks. Take it first, then use it to get in.',
+    look: 'Which file should your rook take?',
+  },
+  'draw-5': {
+    line: 'Stalemate, too little material, the wrong bishop: know the draws so you can find them, or avoid them.',
+    look: 'Is this a draw?',
+  },
+  'activity-5p': {
+    line: 'Make your pieces active and open the position for them.',
+    look: 'Which piece needs more room?',
+  },
+  'pawn-endings-5p': {
+    line: 'Tempo moves decide pawn endings: the side that runs out of good moves loses.',
+    look: 'Who runs out of moves first?',
+  },
+  'king-in-middle-5p': {
+    line: 'A king left in the middle is a target. Open the centre before he escapes.',
+    look: 'How do you open the centre?',
+  },
+  'wrong-bishop': {
+    line: 'A bishop that can’t cover the queening corner draws with a rook pawn. Know which bishop wins.',
+    look: 'Does the bishop cover the corner?',
+  },
+  'vulnerability-5p': {
+    line: 'Look for what’s weak, but check whether grabbing it is really winning.',
+    look: 'Is the pawn really free?',
+  },
+  'queen-endings': {
+    line: 'In queen endings, keep checking or shield your king; the passed pawn decides.',
+    look: 'Can their checks run out?',
+  },
+  'defending-5p': {
+    line: 'Defend calmly against threats, passed pawns and attacks on your king.',
+    look: 'What is their threat?',
+  },
+  'eternal-pins': {
+    line: 'Keep a pin going without rushing; it can hold a whole position. And know how to break one.',
+    look: 'How do you keep the pin?',
+  },
+  'bishop-against-pawns': {
+    line: 'A bishop stops pawns from a distance, on the squares in front of them.',
+    look: 'Which square stops both pawns?',
+  },
+  zugzwang: {
+    line: 'Sometimes any move makes things worse. Give them the move when they can only spoil their position.',
+    look: 'Can you pass the move to them?',
+  },
+  'king-in-middle-6': {
+    line: 'Punish a king still in the centre: open lines, even at the cost of material.',
+    look: 'How do you open the centre?',
+  },
+  'passed-pawn-6': {
+    line: 'Make a passed pawn, push it with support, and stop theirs with a blockade.',
+    look: 'How do you make a passed pawn?',
+  },
+  strategy: {
+    line: 'Plans come from the pawn structure: where to attack, where to put your pieces.',
+    look: 'What does the pawn structure tell you?',
+  },
+  'mobility-6': {
+    line: 'Give your pieces room, and take room away from theirs.',
+    look: 'Which move restricts them most?',
+  },
+  'draw-6': {
+    line: 'Fortresses, perpetuals and stalemates: the best defence can still end level.',
+    look: 'Can you build a fortress?',
+  },
+  'opening-6': {
+    line: 'Play the opening by its principles, not by memory: develop, the centre, king safety.',
+    look: 'Which move does the most?',
+  },
+  'tactics-6': {
+    line: 'Combinations one move deeper: lure, deflect and sacrifice together.',
+    look: 'What is the first move of the combination?',
+  },
+  'pawn-ending-6': {
+    line: 'Hard pawn endings and studies: count, and look for the surprising tempo.',
+    look: 'Count it before you move.',
+  },
+  'bishop-or-knight': {
+    line: 'A knight loves closed positions and outposts; a bishop wants open lines. Choose which to keep.',
+    look: 'Which minor piece belongs here?',
+  },
+  'kings-attack-6': {
+    line: 'Lead an attack on the king to mate, three moves deep.',
+    look: 'What starts the attack?',
+  },
+  'advantage-ending': {
+    line: 'Turn an endgame advantage into a win: improve slowly, give nothing away.',
+    look: 'What improves your position most?',
+  },
+  bishops: {
+    line: 'Good bishop, bad bishop: pawns on its colour block it. The bishop pair rules open positions.',
+    look: 'Is this bishop good or bad?',
+  },
+  'defending-6': {
+    line: 'Find the defensive resources: the counter-attack, the fortress, the only move.',
+    look: 'What is their threat, and your resource?',
+  },
+  'rook-endgame-6': {
+    line: 'Theoretical rook endings: Lucena to win, Philidor to draw.',
+    look: 'Which known position is this?',
+  },
 };
 
 /** A lesson's intro words; a lesson the app does not know yet gets plain ones. */

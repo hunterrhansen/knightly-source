@@ -253,7 +253,9 @@ the original frontend on October 20, 2026, which still runs unrouted for rollbac
 
 Checked on the VM on October 23, 2026.
 
-- **Backend:** staging and production both run `sha-25e3c95` (main after
+- **Backend:** staging and production both run `sha-aac022f` (main after
+  #349, October 23: the Steps-style lesson intros, #326, and the back rank
+  folded into Mate in two). Before it, `sha-25e3c95` (main after
   #346, the Steps Method curriculum; deployed October 23 around 13:27 UTC).
   Before it, `sha-91bff6b` (main after #338) brought the core-20% watch mix (#330, migration 0031; production dump
   `knightly-2026-10-23T0216Z.dump` taken first), the Gatehouse safety check
@@ -264,7 +266,7 @@ Checked on the VM on October 23, 2026.
   [GitHub Actions is blocked](runtime-verification.md#ci-and-pre-push), so they
   are not in ghcr and a rebuilt VM cannot re-pull them. A deploy from a commit
   older than `8024db2` would drop the `db` service: deploy from current `main` only.
-- **Web:** staging and production serve Expo exports of main `25e3c95`,
+- **Web:** staging and production serve Expo exports of main `aac022f`,
   each built for its own host (uploaded October 23 around 13:27 UTC; the previous
   exports kept beside them as `expo-web.before-<epoch>`). Both bundles carry the
   review's legal-move dots (#343) and the **Live engine in reviews** setting
@@ -273,7 +275,11 @@ Checked on the VM on October 23, 2026.
   walk on the web are unchecked. The original
   frontend (`legacy-web`) still runs unrouted for rollback
   ([deployment](deploy.md#rolling-back-the-web-cutover)).
-- **iPhone:** TestFlight `beta` build 64 (standalone, production API) is from
+- **iPhone:** TestFlight `beta` build 65 (standalone, production API) is from
+  main `aac022f` (through #349, the lesson intros), uploaded October 23; source
+  published as
+  [knightly-source@ios-build-65](https://github.com/hunterrhansen/knightly-source/tree/ios-build-65).
+  Build 64 is from
   main `25e3c95` (through #346), uploaded October 23, with the Steps bar's
   progress text; source published as
   [knightly-source@ios-build-64](https://github.com/hunterrhansen/knightly-source/tree/ios-build-64).
@@ -286,8 +292,8 @@ Checked on the VM on October 23, 2026.
   the user checked the dots and the live engine setting. Build 61
   (`91bff6b`) carried #338; builds 58 and earlier break against this backend.
   **None of the ward path, the walk, the new watch mix, the safety-check labels,
-  the endgame drills, the tappable badges or the Steps bar has been
-  seen on a phone.** Keeping a watch on build 64 is the open gate.
+  the endgame drills, the tappable badges, the Steps bar or the lesson intros
+  has been seen on a phone.** Keeping a watch on build 65 is the open gate.
 - **Production learner data:** #309 reset production's posts-reached record to
   the Gatehouse so every post is walked; the record before the walk is kept as
   the setting `wards_reached_before_walk`.

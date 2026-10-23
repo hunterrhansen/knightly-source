@@ -106,7 +106,7 @@ export const journeyMapSchema = journeySummarySchema.extend({
       z.object({
         key: z.string().min(1).max(40),
         name: z.string().min(1).max(40),
-        /** Null for Page (the first night) and the Keep (no post reaches it yet). */
+        /** Null for Page (the first night). */
         post: z.number().int().positive().nullable(),
         reached_on: day.nullable(),
       }),

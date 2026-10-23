@@ -50,9 +50,9 @@ export type MapCastle = {
   toGo: number | null;
   /** The post the castle stands after, whose clearing reaches its rank
    * (docs/specs/2026-10-20-ward-path-design.md). Absent for Page, reached with
-   * the first watch, and for the keep. */
+   * the first watch. */
   after?: number;
-  /** A post castle beyond the curriculum (the keep). */
+  /** A post castle beyond the posts the server sent. */
   beyond?: boolean;
 };
 
@@ -103,7 +103,7 @@ function openPosts(journey: JourneyMap, post: number) {
 /** The path's section: a section is a rank, the stretch between two castles,
  * so its number is the current rank's place (1 for Page, which counts from
  * before the first watch), and it ends when the next castle's posts are
- * cleared. `next` is null when no post reaches another rank (the keep). */
+ * cleared. `next` is null when no post reaches another rank. */
 export function journeySection(journey: JourneyMap) {
   const current = Math.max(0, lastReached(journey));
   const next = journey.ranks.find((rank, i) => i > current && !rank.reached_on);

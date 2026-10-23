@@ -386,7 +386,7 @@ def current_drills(conn, at: int | None = None) -> list[str]:
 # the method deepens calculation on purpose, half a move in Step 1 (one move wins), one and a
 # half in Step 2, two and a half by Step 4. Our generated endgame drills are technique lines
 # and keep their length.
-DEPTH = {"1": 1, "1+": 1, "2": 2, "2+": 2, "2ta": 2, "3": 2, "3+": 3, "4": 3}
+DEPTH = {"1": 1, "1+": 1, "2": 2, "2+": 2, "2ta": 2, "3": 2, "3+": 3, "4": 3, "4+": 3, "5": 3, "5+": 3, "6": 4}
 
 
 def depth(lesson: curriculum.Lesson, theme: str) -> int | None:
@@ -468,10 +468,33 @@ def review_puzzle(conn, today: date | None = None, at: int | None = None) -> dic
 # only, never unset, so a rank stays reached and a ward that slipped and cleared again is
 # not news.
 REACHED_SETTING = "wards_reached"
-# A rank castle stands after every third ward (watch.RANKS keys, Squire I onward). Knight
-# III stands at the keep, beyond the wards built so far, and no ward reaches it.
+# A rank castle stands after every third post (watch.RANKS keys, Squire I onward), and the
+# last, Castellan, when the Citadel's final post is held.
 POSTS_PER_RANK = 3
-POST_RANKS = ("squire-1", "squire-2", "squire-3", "knight-1", "knight-2")
+POST_RANKS = (
+    "squire-1",
+    "squire-2",
+    "squire-3",
+    "knight-1",
+    "knight-2",
+    "knight-3",
+    "banneret-1",
+    "banneret-2",
+    "banneret-3",
+    "captain-1",
+    "captain-2",
+    "captain-3",
+    "warden-1",
+    "warden-2",
+    "warden-3",
+)
+FINAL_RANK = "castellan"
+
+
+def rank_posts() -> dict[str, int]:
+    """{rank key: the post whose clearing reaches it}, Squire I onward."""
+    out = {key: i * POSTS_PER_RANK for i, key in enumerate(POST_RANKS, start=1)}
+    return {**out, FINAL_RANK: len(curriculum.WARDS)}
 
 
 def record(conn, states: list[WardState], today: date) -> dict:
@@ -499,8 +522,8 @@ def post_ranks(conn) -> dict[str, str]:
     against a rank; the day is the last of those wards' first clears."""
     reached = db.get_setting(conn, REACHED_SETTING) or {}
     out: dict[str, str] = {}
-    for i, key in enumerate(POST_RANKS, start=1):
-        before = [w for w in curriculum.WARDS[: i * POSTS_PER_RANK] if any(lesson.servable for lesson in w.lessons)]
+    for key, post in rank_posts().items():
+        before = [w for w in curriculum.WARDS[:post] if any(lesson.servable for lesson in w.lessons)]
         days = [(reached.get(w.key) or {}).get("cleared") for w in before]
         if not before or not all(days):
             break

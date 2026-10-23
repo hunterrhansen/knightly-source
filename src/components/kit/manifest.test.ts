@@ -228,7 +228,15 @@ describe('the nightWatch kit', () => {
       expect(rankEmblemOf({ key, name })).toEqual({ tier, level });
       expect(rankEmblemOf({ name })).toEqual({ tier, level });
     }
-    expect(rankEmblemOf({ key: 'warden-1', name: 'Warden I' })).toEqual({
+    // The ranks past Knight III wear the full knight's emblem until they have art.
+    expect(
+      rankEmblemOf({ key: 'warden-1', name: 'Warden of the March I' }),
+    ).toEqual({ tier: 'knight', level: 3 });
+    expect(rankEmblemOf({ key: 'castellan', name: 'Castellan' })).toEqual({
+      tier: 'knight',
+      level: 3,
+    });
+    expect(rankEmblemOf({ key: 'herald-1', name: 'Herald I' })).toEqual({
       tier: 'page',
       level: 1,
     });

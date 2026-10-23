@@ -13,6 +13,8 @@ import type {
 import type { ActionIconName } from '../../ui';
 import { introCopy } from './lesson-intro-copy';
 
+const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
 // A lesson's intro (issue #326), the Steps Method's order of teaching: the
 // knight explains, the wall demonstrates, then the learner's first try. Its
 // guided move is judged here and never sent to the server, so it never counts
@@ -198,8 +200,25 @@ export function useLessonIntro(
     return () => clearTimeout(timer);
   }, [ready, hinted]);
 
-  if (!intro || (!intro.example && !intro.guided)) return undefined;
+  if (!intro) return undefined;
   const words = introCopy(intro.lesson, intro.name);
+  // A lesson taught by explanation alone (a positional one, with no
+  // positions yet): the knight says it over the starting position.
+  if (!intro.example && !intro.guided)
+    return {
+      board: boardAt(
+        `intro:${intro.lesson}:explain`,
+        START_FEN,
+        'w',
+        undefined,
+      ),
+      title: intro.name,
+      body: words.line,
+      tone: 'plain',
+      actions: [
+        { label: 'Continue', icon: 'forward', primary: true, onPress: finish },
+      ],
+    };
   const skip: IntroAction = { label: 'Skip', icon: 'forward', onPress: finish };
   const example = intro.example ?? intro.guided;
   if (!example) return undefined;
