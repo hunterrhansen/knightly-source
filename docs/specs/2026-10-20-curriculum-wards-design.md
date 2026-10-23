@@ -132,8 +132,14 @@ answer keys; the method has no controlled outcome study, so this is expert conse
 - **Volume and mastery.** A Steps lesson is about three workbook pages of twelve positions,
   and 80% of a page right means the pupil is at the level. A lesson is held at
   `wards.BASIC_VOLUME` (36) answered since its post was reached with `PAGE_RIGHT` (10) of the
-  last `PAGE` (12) right. Steps' real gate is the games: a lesson your games already show
-  needs one page here. This replaces three first-try solves plus an Elo check.
+  last `PAGE` (12) right. This replaces three first-try solves plus an Elo check.
+- **The games are the real gate** (built 2026-10-23). Over the clear chances in the learner's
+  rated games of the last 90 days (`patterns.chance_rates`, or a drill's own game record),
+  taking `GAMES_SHOW` (80%) of 10 or more holds a lesson with one page here, and taking under
+  `GAMES_AGAINST` (50%) of 20 or more means practice alone cannot hold it: the post waits until
+  the idea starts showing at the board. Only motifs the tagger recognises well count
+  (`wards.GAME_MOTIF`: fork, pin, skewer, discovered attack, mates, trapped piece), never the
+  unreliable loose-piece tag.
 - **Spaced review of lessons.** Steps uses its Mix books during the next step. A lesson from a
   passed post comes back in the watch's mixed-review slots on `wards.REVIEW_DAYS` (2, 4, 8 …
   128 days), each right review pushing it out and a miss starting it over, always as a fresh

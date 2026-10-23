@@ -900,6 +900,18 @@
               }
             ]
           },
+          "challenge": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Challenge"
+          },
           "extra": {
             "anyOf": [
               {
@@ -959,7 +971,8 @@
                   "volume",
                   "defend",
                   "unannounced",
-                  "review"
+                  "review",
+                  "challenge"
                 ],
                 "type": "string"
               },
@@ -5258,6 +5271,31 @@
             "title": "Bar",
             "type": "integer"
           },
+          "game_chances": {
+            "default": 0,
+            "title": "Game Chances",
+            "type": "integer"
+          },
+          "game_found": {
+            "default": 0,
+            "title": "Game Found",
+            "type": "integer"
+          },
+          "games": {
+            "anyOf": [
+              {
+                "enum": [
+                  "yes",
+                  "not_yet"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Games"
+          },
           "held": {
             "title": "Held",
             "type": "boolean"
@@ -5362,6 +5400,16 @@
             ],
             "title": "State",
             "type": "string"
+          },
+          "suggest_test_out": {
+            "default": false,
+            "title": "Suggest Test Out",
+            "type": "boolean"
+          },
+          "tested_out": {
+            "default": false,
+            "title": "Tested Out",
+            "type": "boolean"
           }
         },
         "required": [
@@ -5664,7 +5712,7 @@
             "required": false,
             "schema": {
               "default": "lesson",
-              "pattern": "^(lesson|extra)$",
+              "pattern": "^(lesson|extra|challenge)$",
               "title": "Mode",
               "type": "string"
             }
@@ -6705,6 +6753,25 @@
           }
         },
         "summary": "What You Blunder"
+      }
+    },
+    "/api/posts/challenge": {
+      "post": {
+        "description": "Test out of the current post (or resume the open test) and serve it as\n`/api/deck?mode=challenge` does: PAGE positions from its lessons at its own\ndifficulty. PAGE_RIGHT or more right clears the post, unless a lesson's games say not\nyet (challenge.py). 409 when the post has nothing to test.",
+        "operationId": "post_challenge_api_posts_challenge_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeckOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Post Challenge"
       }
     },
     "/api/puzzles/answer": {

@@ -326,13 +326,6 @@ def _prepare_vision(conn: db.Connection, room: int, today: date | None = None) -
     return added
 
 
-# A lesson taught by a drill can also be held by the games themselves. The bar is the share
-# of chances taken, and the floor is how many chances it takes before a share means anything
-# (a rate on fewer chances is noise).
-IN_GAME_BAR = 0.8
-IN_GAME_ENOUGH = 10
-
-
 def in_game_rate(conn, kind: str = "vision") -> tuple[int, int]:
     """(taken, chances) for a drill kind, from the games the items came from.
 
@@ -350,13 +343,6 @@ def in_game_rate(conn, kind: str = "vision") -> tuple[int, int]:
         (kind,),
     ).fetchone()
     return int(row["taken"]), int(row["chances"])
-
-
-def held_in_games(conn, kind: str = "vision") -> bool:
-    """Whether the learner's own games already show they do this, so the drill has nothing
-    to teach them. Needs enough chances for the share to mean anything."""
-    taken, chances = in_game_rate(conn, kind)
-    return chances >= IN_GAME_ENOUGH and taken / chances >= IN_GAME_BAR
 
 
 def _reviewed_today(conn, today: date) -> set[tuple[int, int]]:

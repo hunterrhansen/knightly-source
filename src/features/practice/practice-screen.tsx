@@ -60,7 +60,11 @@ import { LineSteps } from './line-steps';
 import { heldBoard, practiceBoard } from './practice-board';
 import { practiceProgress } from './practice-progress';
 import { raidOf } from './practice-raid';
-import { practiceResults, raidsTurnedBack } from './practice-results';
+import {
+  challengeEnd,
+  practiceResults,
+  raidsTurnedBack,
+} from './practice-results';
 import {
   cardPrompt,
   NO_THREAT,
@@ -95,12 +99,15 @@ const sessions: ScopedSessions<string, PracticeSession> = new WeakMap();
 
 export function PracticeScreen({
   extra = false,
+  challenge = false,
 }: {
   /** An extra watch after tonight's is kept: the same lesson from the wall,
    * never the streak's beats. Otherwise tonight's watch (the daily lesson). */
   extra?: boolean;
+  /** The current post's test (backend challenge.py): it never keeps the night. */
+  challenge?: boolean;
 }) {
-  const mode = extra ? 'extra' : 'lesson';
+  const mode = challenge ? 'challenge' : extra ? 'extra' : 'lesson';
   const { session, state } = useScopedSession(
     sessions,
     mode,
@@ -108,7 +115,12 @@ export function PracticeScreen({
       new PracticeSession(
         scope.api,
         scope.isCurrent,
-        undefined,
+        // A finished test may have cleared the post (written by this read):
+        // the path and Home learn it now rather than on the next answer.
+        (deck) => {
+          if (deck.challenge?.passed != null && scope.isCurrent())
+            void invalidateAccount(scope, 'answer');
+        },
         undefined,
         () => {
           if (scope.isCurrent()) void invalidateAccount(scope, 'answer');
@@ -123,8 +135,9 @@ export function PracticeScreen({
       session={session}
       state={state}
       onExit={() => router.replace('/')}
-      lesson={!extra}
+      lesson={!extra && !challenge}
       extra={extra}
+      challenge={challenge}
       end={end}
       canHide
       // Tonight's watch, and an extra watch another: seen from the castle wall.
@@ -142,6 +155,7 @@ export function PracticeLayout({
   onExit,
   lesson = false,
   extra = false,
+  challenge = false,
   end,
   canHide = false,
   watch = false,
@@ -153,6 +167,8 @@ export function PracticeLayout({
   /** An extra watch: its own progress and results; it never keeps the night,
    * so its end has no streak beat. */
   extra?: boolean;
+  /** The post's test: its own page, no intros and never the streak's beats. */
+  challenge?: boolean;
   end?: PracticeEnd;
   /** "Don't show this again" in a card's verdict: it saves to the account,
    * so only the signed-in screen offers it (not the Storybook preview). */
@@ -181,6 +197,7 @@ export function PracticeLayout({
     [session],
   );
   const pendingIntro =
+    !challenge &&
     state.phase !== 'complete' &&
     state.deck?.intro &&
     !introduced.has(state.deck.intro.lesson)
@@ -459,6 +476,7 @@ export function PracticeLayout({
     deck: state.deck,
     lesson,
     extra,
+    challenge,
     // A first answer saved on this position already counts.
     answered: !!shown?.acknowledged,
   });
@@ -479,6 +497,8 @@ export function PracticeLayout({
   // is mixed review, never which idea, so finding it is the learner's.
   const review =
     shownItem?.kind === 'puzzle' && !sameIdea && shownItem.mode === 'review';
+  // A position of the post's test (deck mode `challenge`).
+  const test = shownItem?.kind === 'puzzle' && shownItem.mode === 'challenge';
   // The safety check, named every time it is practised: a question of its own, or
   // a card's threat step. Which part (threats, captures, their reply) it trains.
   const safety =
@@ -493,13 +513,15 @@ export function PracticeLayout({
     ? { kind: 'safety', part: safety }
     : shownItem?.kind !== 'puzzle'
       ? null
-      : sameIdea
-        ? { kind: 'same-idea' }
-        : taught
-          ? { kind: 'taught', place: taught.place, lesson: taught.lesson }
-          : review
-            ? { kind: 'review' }
-            : { kind: 'rated', rating: shownItem.rating };
+      : test
+        ? { kind: 'test' }
+        : sameIdea
+          ? { kind: 'same-idea' }
+          : taught
+            ? { kind: 'taught', place: taught.place, lesson: taught.lesson }
+            : review
+              ? { kind: 'review' }
+              : { kind: 'rated', rating: shownItem.rating };
   const about = badge && explained === shown ? badgeAbout(badge) : null;
 
   const label = !intro && shown && badge && (
@@ -509,13 +531,15 @@ export function PracticeLayout({
       accessibilityLabel={
         safety
           ? `Safety check: ${safety.toLowerCase()}`
-          : sameIdea
-            ? 'Same idea as the position you just solved'
-            : taught
-              ? `Lesson at ${taught.place}: ${taught.lesson}`
-              : review
-                ? 'Mixed review'
-                : `Puzzle rated ${shownItem?.kind === 'puzzle' ? shownItem.rating : ''}`
+          : test
+            ? 'The post’s test'
+            : sameIdea
+              ? 'Same idea as the position you just solved'
+              : taught
+                ? `Lesson at ${taught.place}: ${taught.lesson}`
+                : review
+                  ? 'Mixed review'
+                  : `Puzzle rated ${shownItem?.kind === 'puzzle' ? shownItem.rating : ''}`
       }
       accessibilityHint="Explains this label"
       accessibilityState={{ expanded: !!about }}
@@ -535,13 +559,15 @@ export function PracticeLayout({
         <Text style={styles.labelText}>
           {safety
             ? `Safety check · ${safety}`
-            : sameIdea
-              ? 'Same idea'
-              : taught
-                ? `At ${taught.place.replace(/^The /, 'the ')}`
-                : review
-                  ? 'Mixed review'
-                  : `Rated ${shownItem?.kind === 'puzzle' ? shownItem.rating : ''}`}
+            : test
+              ? 'The post’s test'
+              : sameIdea
+                ? 'Same idea'
+                : taught
+                  ? `At ${taught.place.replace(/^The /, 'the ')}`
+                  : review
+                    ? 'Mixed review'
+                    : `Rated ${shownItem?.kind === 'puzzle' ? shownItem.rating : ''}`}
         </Text>
       </Animated.View>
     </Pressable>
@@ -584,6 +610,25 @@ export function PracticeLayout({
 
   const finish = { label: 'Done', onPress: onExit };
   const ended = state.deck;
+  if (phase === 'complete' && ended && challenge && ended.challenge) {
+    const words = challengeEnd(ended.challenge, taughtAt(ended.ward)?.place);
+    return (
+      <Animated.View key="end" entering={summaryIn} style={motion.fill}>
+        <SessionBeats
+          results={{
+            ...practiceResults(ended, elapsed, session.pointsSummary()),
+            ...words,
+          }}
+          // The test never keeps the night; a castle reached still rises.
+          streak={null}
+          rankUp={end?.rankUp}
+          posts={end?.posts}
+          pending={end?.pending}
+          finish={finish}
+        />
+      </Animated.View>
+    );
+  }
   if (
     phase === 'complete' &&
     ended &&

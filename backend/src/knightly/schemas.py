@@ -463,6 +463,11 @@ class WardLessonOut(BaseModel):
     # wards.PAGE: held at wards.BASIC_VOLUME answered with wards.PAGE_RIGHT of a page right.
     answered: int = 0
     page_right: int = 0
+    # Clear chances for it in your rated games and how many you took, and what that says:
+    # "yes" (your games show it), "not_yet" (practice alone cannot hold it) or null.
+    game_found: int = 0
+    game_chances: int = 0
+    games: Literal["yes", "not_yet"] | None = None
     # The learner's estimated ability on this idea, how unsure that estimate is, and the
     # difficulty of its drills, in rating points on the corpus's scale: what orders the
     # lessons worth serving, not what holds them.
@@ -485,6 +490,10 @@ class WardOut(BaseModel):
     # ward that slipped since keeps them. Null while it never has been.
     entered_on: str | None = None
     cleared_on: str | None = None
+    # True when it was cleared by testing out (challenge.py) rather than lesson by lesson.
+    tested_out: bool = False
+    # The current post only: the puzzle rating is well above its level, so offer a test.
+    suggest_test_out: bool = False
     lessons: list[WardLessonOut]
 
 
@@ -522,7 +531,7 @@ class DeckOut(OpenOut):
     # what they threaten or what your move allowed, `unannounced` with no sign anything is
     # there, `review` an earlier post's idea served unannounced for mixed review. Null for a
     # review card, which is the learner's own position rather than a way of serving an idea.
-    mode: Literal["taught", "volume", "defend", "unannounced", "review"] | None = None
+    mode: Literal["taught", "volume", "defend", "unannounced", "review", "challenge"] | None = None
     games: AnalysedGamesOut
     results: list[dict]
     lesson: DoneTotalOut
@@ -534,6 +543,9 @@ class DeckOut(OpenOut):
     threat_item: dict | None
     unannounced_item: dict | None
     extra: ExtraWatchOut | None = None  # mode=extra and POST /api/lesson/extra only
+    # mode=challenge and POST /api/posts/challenge only: {done, right, total, passed, ward,
+    # games_not_yet}; passed is null until the page is answered.
+    challenge: dict | None = None
     # A lesson to introduce before this item (intros.py): absent once every lesson of the
     # post has been introduced.
     intro: "LessonIntroOut | None" = None

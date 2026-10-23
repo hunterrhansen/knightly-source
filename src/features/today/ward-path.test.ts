@@ -2,7 +2,7 @@ import { firstNights, scheduled } from './journey-samples';
 import { findCard } from './node-card';
 import { comingUp, pathModel, postKey } from './path-model';
 import { todaySamples } from './today-samples';
-import { postMoment, postRankLine } from './ward-path';
+import { lessonDetail, postMoment, postRankLine } from './ward-path';
 import { atTheLists, sampleWards } from './ward-samples';
 
 // The ward path (docs/specs/2026-10-20-ward-path-design.md, "Home: the ward
@@ -274,4 +274,30 @@ test('a post behind keeps the watches kept while it was current', () => {
   expect(keys.indexOf(postKey('loose-pieces'))).toBeGreaterThan(
     keys.indexOf(armoury[1]?.key ?? ''),
   );
+});
+
+test('a lesson your games keep missing says so, and one your games show needs only a page', () => {
+  const lesson = {
+    ward: 'pin',
+    key: 'pin',
+    name: 'The pin',
+    track: 'tactic',
+    held: false,
+    teachable: true,
+    answered: 40,
+    pageRight: 12,
+  };
+  expect(
+    lessonDetail({
+      ...lesson,
+      games: { verdict: 'not_yet', found: 6, chances: 20 },
+    }),
+  ).toBe('Your games: 6 of 20 found, not yet');
+  expect(
+    lessonDetail({
+      ...lesson,
+      answered: 5,
+      games: { verdict: 'yes', found: 9, chances: 10 },
+    }),
+  ).toBe('Your games show it · 5 of 12 answered');
 });

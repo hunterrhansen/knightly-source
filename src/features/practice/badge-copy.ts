@@ -7,6 +7,7 @@ export type Badge =
   | { kind: 'same-idea' }
   | { kind: 'taught'; place: string; lesson: string }
   | { kind: 'review' }
+  | { kind: 'test' }
   | { kind: 'rated'; rating: number };
 
 const SAFETY_PART: Record<string, string> = {
@@ -32,6 +33,11 @@ export function badgeAbout(badge: Badge): BadgeAbout {
       return {
         title: `At ${badge.place.replace(/^The /, 'the ')}`,
         body: `Tonight’s lesson: ${badge.lesson}. Holding it moves you on.`,
+      };
+    case 'test':
+      return {
+        title: 'The post’s test',
+        body: 'Twelve positions from this post at its own level. Ten right and the post is yours; your games still have the last word.',
       };
     case 'review':
       return {

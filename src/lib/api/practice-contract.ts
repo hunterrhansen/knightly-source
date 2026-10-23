@@ -302,10 +302,10 @@ export const deckSchema = z.object({
   /** What kind of practice this serving is (backend routes/practice.py): `taught`
    * a puzzle of the current post's idea, `volume` more of an idea already met,
    * `defend` a threat question, `unannounced` "Your move", `review` a puzzle
-   * of an earlier post's idea, unannounced, for mixed review. Null for a review
-   * card; older servers omit it. */
+   * of an earlier post's idea, unannounced, for mixed review, `challenge` a
+   * position of the post's test. Null for a review card; older servers omit it. */
   mode: z
-    .enum(['taught', 'volume', 'defend', 'unannounced', 'review'])
+    .enum(['taught', 'volume', 'defend', 'unannounced', 'review', 'challenge'])
     .nullable()
     .optional()
     .catch(null),
@@ -358,6 +358,20 @@ export const deckSchema = z.object({
   extra: z
     .object({ done: count, total: count, kept: count })
     .refine((t) => t.done <= t.total, 'More done than the watch holds')
+    .nullish(),
+  /** The post's test (`mode=challenge`, backend challenge.py): `passed` is
+   * null until all `total` positions are answered; `games_not_yet` says a
+   * lesson's games kept the post from clearing. */
+  challenge: z
+    .object({
+      done: count,
+      right: count,
+      total: count,
+      passed: z.boolean().nullable(),
+      ward: z.string(),
+      games_not_yet: z.boolean().optional(),
+    })
+    .refine((t) => t.right <= t.done && t.done <= t.total, 'Impossible test')
     .nullish(),
   results: z.array(
     z.object({

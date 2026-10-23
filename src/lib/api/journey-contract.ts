@@ -70,6 +70,10 @@ export const wardSchema = z.object({
    * of posts reached; absent from servers before it. */
   entered_on: day.nullable().optional(),
   cleared_on: day.nullable().optional(),
+  /** Cleared by the post's test rather than lesson by lesson. */
+  tested_out: z.boolean().optional(),
+  /** The current post only: the puzzle rating is well above its level. */
+  suggest_test_out: z.boolean().optional(),
   lessons: z
     .array(
       z.object({
@@ -86,6 +90,12 @@ export const wardSchema = z.object({
          * Steps Method's bar). Absent from servers before it. */
         answered: count.optional(),
         page_right: count.optional(),
+        /** Clear chances for it in your rated games and how many you took,
+         * and what that says: `yes` holds it with one page, `not_yet` means
+         * practice alone can't (the Steps Method's real gate is the games). */
+        game_found: count.optional(),
+        game_chances: count.optional(),
+        games: z.enum(['yes', 'not_yet']).nullable().optional(),
         /** False while no drills exist for it: never held, never blocking. */
         teachable: z.boolean(),
       }),

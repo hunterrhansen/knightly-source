@@ -219,3 +219,88 @@ test('a deck with a lesson to introduce shows the knight’s intro first, and Sk
   expect(screen.getByRole('button', { name: 'Mixed review' })).toBeTruthy();
   expect(screen.queryByText(/One move, two threats/)).toBeNull();
 });
+
+const testing: Deck = {
+  ...reviewing,
+  mode: 'challenge',
+  lesson: undefined,
+  challenge: {
+    done: 0,
+    right: 0,
+    total: 12,
+    passed: null,
+    ward: 'mate-in-one',
+  },
+};
+
+function testSession(deck: Deck) {
+  const api = {
+    deck: jest.fn(async () => deck),
+    extraWatch: jest.fn(),
+    startChallenge: jest.fn(async () => deck),
+    answerLine: jest.fn(),
+    lineHint: jest.fn(),
+    puzzleAnswer: jest.fn(),
+    puzzleHint: jest.fn(),
+    unannouncedAnswer: jest.fn(),
+    threatAnswer: jest.fn(),
+  };
+  const session = new PracticeSession(
+    api,
+    () => true,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    'challenge',
+  );
+  return { api, session };
+}
+
+test('a post’s test is started on the server and its positions carry the test’s badge', async () => {
+  const { api, session } = testSession(testing);
+  await session.load();
+  expect(api.startChallenge).toHaveBeenCalledTimes(1);
+  render(
+    <PracticeLayout
+      session={session}
+      state={session.getSnapshot()}
+      onExit={jest.fn()}
+      challenge
+      watch
+    />,
+  );
+  await act(async () => {});
+  fireEvent.press(screen.getByRole('button', { name: 'The post’s test' }));
+  expect(screen.getByText(/Ten right and the post is yours/)).toBeTruthy();
+});
+
+test('a passed test ends on “Post cleared” with the score, and never the streak', async () => {
+  const { session } = testSession({
+    ...testing,
+    mode: null,
+    puzzle: null,
+    challenge: {
+      done: 12,
+      right: 11,
+      total: 12,
+      passed: true,
+      ward: 'mate-in-one',
+    },
+  });
+  await session.load();
+  render(
+    <PracticeLayout
+      session={session}
+      state={session.getSnapshot()}
+      onExit={jest.fn()}
+      challenge
+      watch
+      end={{ streak }}
+    />,
+  );
+  await act(async () => {});
+  expect(screen.getByRole('header', { name: 'Post cleared' })).toBeTruthy();
+  expect(screen.getByText('11 of 12 right')).toBeTruthy();
+  expect(screen.queryByText(/streak/i)).toBeNull();
+});

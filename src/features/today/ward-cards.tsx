@@ -3,7 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { createStyles, useTheme } from '../../theme/theme';
 import { tokens } from '../../theme/tokens';
-import { Card, usePressSquish } from '../../ui';
+import { Button, Card, usePressSquish } from '../../ui';
 import type { comingUp } from './path-model';
 import { TrackGlyph } from './track-glyph';
 import {
@@ -32,7 +32,7 @@ const trackName = (track: string) => TRACK_NAMES[track] ?? track;
 // Four of every watch's ten items are the post's (backend mix.SLOTS), and only
 // answers since the post was reached count toward it: the Steps Method's bar.
 const CLEARS =
-  'Every watch brings four of this post’s positions. A lesson is held once you’ve answered 36 of them and got 10 of your last 12 right. If your own games already show it, one page of 12 is enough.';
+  'Every watch brings four of this post’s positions. A lesson is held once you’ve answered 36 of them and got 10 of your last 12 right. If your own games already show it, one page of 12 is enough; if your games keep missing it, it waits until they don’t.';
 // The order is theirs; every position and word here is Knightly's own.
 const CREDIT =
   'Lessons follow the order of the Steps Method by Rob Brunia and Cor van Wijgerden.';
@@ -117,12 +117,35 @@ function LessonRow({
   );
 }
 
+/** The post's test (the Steps Method's exam for a step): for a learner who may
+ * already hold its ideas. Offered more strongly when the puzzle rating says so. */
+function TestOut({ post }: { post: PathPost }) {
+  const styles = useStyles();
+  return (
+    <View style={styles.test}>
+      <Text style={styles.clears}>
+        {post.suggestTestOut
+          ? 'Your puzzles say you may be past this post. Take its test: 12 positions, 10 right clears it.'
+          : 'Already know this? Take the post’s test: 12 positions, 10 right clears it.'}
+      </Text>
+      <Button
+        variant={post.suggestTestOut ? 'primary' : 'secondary'}
+        onPress={() => router.push('/practice?mode=challenge' as Href)}
+      >
+        Test out of this post
+      </Button>
+    </View>
+  );
+}
+
 /** A post: ahead, cleared behind, or blocked. */
 export function PostCard({ post }: { post: PathPost }) {
   const styles = useStyles();
   const status =
     post.state === 'cleared'
-      ? 'Cleared'
+      ? post.testedOut
+        ? 'Cleared by its test'
+        : 'Cleared'
       : post.state === 'blocked'
         ? 'Coming soon: none of its drills are built yet. It never holds you up.'
         : post.state === 'current'
@@ -147,6 +170,9 @@ export function PostCard({ post }: { post: PathPost }) {
         </View>
         {post.state === 'current' && (
           <Text style={styles.clears}>{CLEARS}</Text>
+        )}
+        {post.state === 'current' && post.lessons.some((l) => l.teachable) && (
+          <TestOut post={post} />
         )}
         <Text style={styles.clears}>{CREDIT}</Text>
       </View>
@@ -188,6 +214,7 @@ const useStyles = createStyles((theme) => ({
     lineHeight: 18,
   },
   stack: { gap: theme.spacing.md },
+  test: { gap: theme.spacing.sm },
   rows: { gap: theme.spacing.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
   intro: {

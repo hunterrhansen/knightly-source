@@ -19,6 +19,29 @@ export function raidsTurnedBack(deck: Pick<Deck, 'results'>) {
 
 /** The Results beat for today's answers: found without help, accuracy, and
  * this visit's time (or what to revisit when the time is unknown). */
+/** The words at the end of a post's test (backend challenge.py): cleared, or
+ * the post goes on as before, saying so when its games held it back. */
+export function challengeEnd(
+  challenge: NonNullable<Deck['challenge']>,
+  place: string | undefined,
+): { title: string; coach: string; note: string } {
+  const where = place ? place.replace(/^The /, 'the ') : 'this post';
+  const score = `${challenge.right} of ${challenge.total} right`;
+  if (challenge.passed)
+    return {
+      title: 'Post cleared',
+      coach: `You hold ${where}. The walk moves on to the next post.`,
+      note: score,
+    };
+  return {
+    title: 'Not this time',
+    coach: challenge.games_not_yet
+      ? `Your games still miss one of ${where}’s ideas, so the post waits for them. It goes on as before.`
+      : `The post goes on as before. Keep watch at ${where} and try again when you’re ready.`,
+    note: score,
+  };
+}
+
 export function practiceResults(
   deck: Deck,
   elapsed: number | undefined,

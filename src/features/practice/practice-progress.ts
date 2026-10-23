@@ -12,19 +12,24 @@ export function practiceProgress({
   deck,
   lesson,
   extra = false,
+  challenge = false,
   answered,
 }: {
-  deck?: Pick<Deck, 'today' | 'puzzles' | 'lesson' | 'extra'>;
+  deck?: Pick<Deck, 'today' | 'puzzles' | 'lesson' | 'extra' | 'challenge'>;
   lesson: boolean;
   /** An extra watch: its own count, never tonight's lesson. */
   extra?: boolean;
+  /** The post's test: its own page of positions. */
+  challenge?: boolean;
   answered: boolean;
 }): Counts | undefined {
-  const counts = extra
-    ? (deck?.extra ?? undefined)
-    : lesson && deck?.lesson
-      ? deck.lesson
-      : deck && combined(deck);
+  const counts = challenge
+    ? (deck?.challenge ?? undefined)
+    : extra
+      ? (deck?.extra ?? undefined)
+      : lesson && deck?.lesson
+        ? deck.lesson
+        : deck && combined(deck);
   if (!counts || counts.total <= 0) return undefined;
   return {
     total: counts.total,

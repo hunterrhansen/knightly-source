@@ -146,3 +146,46 @@ test('malformed coaching is dropped without rejecting the answer it came with', 
     }).answerLine(lineBody),
   ).resolves.toMatchObject({ status: 'solved', explanation: null, why: null });
 });
+
+test('a post’s test is started with a POST and its result is read, an impossible one rejected', async () => {
+  const seen: Request[] = [];
+  const result = (challenge: object) =>
+    JSON.stringify({
+      server_day: '2026-10-23',
+      total: 0,
+      mastered: 0,
+      learning: 0,
+      new: 0,
+      today: { done: 0, total: 0 },
+      results: [],
+      card: null,
+      challenge,
+    });
+  const passed = {
+    done: 12,
+    right: 10,
+    total: 12,
+    passed: true,
+    ward: 'mate-in-one',
+    games_not_yet: false,
+  };
+  const api = createApi({
+    ...options,
+    fetcher: async (input) => {
+      seen.push(new Request(input));
+      return new Response(result(passed));
+    },
+  });
+  await expect(api.startChallenge()).resolves.toMatchObject({
+    challenge: passed,
+  });
+  expect(seen[0]?.method).toBe('POST');
+  expect(new URL(seen[0]?.url ?? '').pathname).toBe('/api/posts/challenge');
+  const bad = createApi({
+    ...options,
+    fetcher: async () => new Response(result({ ...passed, right: 13 })),
+  });
+  await expect(bad.deck(undefined, 'challenge')).rejects.toMatchObject({
+    kind: 'invalid-response',
+  });
+});

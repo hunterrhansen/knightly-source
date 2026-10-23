@@ -583,3 +583,48 @@ def test_a_passed_lessons_reviews_space_out_when_right_and_start_over_when_wrong
     assert due("mate-in-one") == date(2026, 10, 15), "two right in a row: eight days on"
     solved(conn, "r3", ["mateIn1"], success=False, at="2026-10-15T12:00:00Z")
     assert due("mate-in-one") == date(2026, 10, 17), "a miss starts it over"
+
+
+def chances_in_games(conn, motif, *, found, missed, gid=700):
+    """Clear chances for `motif` in a recent rated game: `found` taken, `missed` not."""
+    from conftest import insert_game
+
+    insert_game(conn, gid, rated=True, played_at=days_ago_iso(5))
+    for ply in range(1, found + missed + 1):
+        conn.execute(
+            """INSERT INTO moves (game_id, ply, move_number, color, is_user, phase, san, uci,
+                                  best_uci, classification, chance_motif, chance_found)
+               VALUES (%s, %s, %s, 'white', true, 'middlegame', 'Nf3', 'g1f3', 'g1f3', 'best', %s, %s)""",
+            (gid, ply, ply, motif, ply <= found),
+        )
+
+
+def days_ago_iso(n):
+    from datetime import UTC, datetime, timedelta
+
+    return (datetime.now(UTC) - timedelta(days=n)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def test_games_that_keep_missing_an_idea_keep_its_lesson_open_whatever_the_puzzles_say(db_url):
+    # Steps' real gate: still missing the mate at the board means not ready to move on.
+    conn = db.connect(db_url)
+    clear_ward_one(conn)
+    for i in range(wards.BASIC_VOLUME):
+        solved_at(conn, f"m{i}", ["mateIn1"], 900)
+    assert lesson_state(conn, "mate-in-one").held, "the puzzles alone would hold it"
+    chances_in_games(conn, "mate", found=5, missed=wards.GAMES_AGAINST_ENOUGH - 5)
+    state = lesson_state(conn, "mate-in-one")
+    assert (state.games, state.game_found, state.game_chances) == ("not_yet", 5, wards.GAMES_AGAINST_ENOUGH)
+    assert not state.held
+
+
+def test_games_that_show_an_idea_hold_its_lesson_with_one_page(db_url):
+    conn = db.connect(db_url)
+    clear_ward_one(conn)
+    chances_in_games(conn, "mate", found=9, missed=1)
+    for i in range(wards.PAGE - 1):
+        solved_at(conn, f"m{i}", ["mateIn1"], 900)
+    assert not lesson_state(conn, "mate-in-one").held, "less than a page"
+    solved_at(conn, "m-last", ["mateIn1"], 900)
+    state = lesson_state(conn, "mate-in-one")
+    assert state.games == "yes" and state.held

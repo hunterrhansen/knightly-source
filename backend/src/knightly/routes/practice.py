@@ -6,6 +6,7 @@ from contextlib import contextmanager
 from fastapi import APIRouter, HTTPException, Query, Response
 
 from .. import (
+    challenge,
     curriculum,
     daily,
     db,
@@ -48,6 +49,7 @@ from ..schemas import (
 from ..web import Context
 
 NO_EXTRA = "Start an extra watch first."
+NO_CHALLENGE = "Start a test of this post first."
 
 
 def _deck_today(ctx: Context, mode: str) -> dict:
@@ -86,7 +88,15 @@ def _deck_today(ctx: Context, mode: str) -> dict:
                 "mix", mix.serve, conn, today, n, asked, moves, remaining, extra_watch=watching is not None
             )
 
-        if watching:
+        challenging = challenge.current(conn, ward_state) if mode == "challenge" else None
+        if mode == "challenge" and challenging is None:
+            raise HTTPException(409, NO_CHALLENGE)
+        if challenging:
+            # Testing out of the post (challenge.py): one page at its own difficulty.
+            info["challenge"] = progress = challenge.progress(conn, challenging, today)
+            test = challenge.next_puzzle(conn, challenging, today) if progress["passed"] is None else None
+            item = {"card": None, "threat": None, "move": None, "puzzle": test, "mode": "challenge" if test else None}
+        elif watching:
             item, info["extra"] = timing.call("extra", extra.serve, conn, today, watching, pick)
         else:
             empty = {"card": None, "threat": None, "move": None, "puzzle": None, "mode": None}
@@ -162,7 +172,7 @@ def _deck_routes(ctx: Context) -> APIRouter:
     @api.get("/api/deck", response_model=DeckOut, response_model_exclude_unset=True)
     def deck_today(
         response: Response,
-        mode: str = Query("lesson", pattern="^(lesson|extra)$"),
+        mode: str = Query("lesson", pattern="^(lesson|extra|challenge)$"),
     ):
         """Tonight's watch: the deck's counts and the watch's next item, by its job in the
         watch's mix (mix.py): a review card, a threat question, a "Your move" or a puzzle (all
@@ -193,6 +203,19 @@ def _deck_routes(ctx: Context) -> APIRouter:
                 result = _deck_today(ctx, "extra")
         response.headers["Server-Timing"] = timing.header(sample)
         return result
+
+    @api.post("/api/posts/challenge", response_model=DeckOut, response_model_exclude_unset=True)
+    def post_challenge():
+        """Test out of the current post (or resume the open test) and serve it as
+        `/api/deck?mode=challenge` does: PAGE positions from its lessons at its own
+        difficulty. PAGE_RIGHT or more right clears the post, unless a lesson's games say not
+        yet (challenge.py). 409 when the post has nothing to test."""
+        with ctx.connect() as conn, conn:
+            try:
+                challenge.start(conn, db.today(conn))
+            except challenge.NotOpen as error:
+                raise HTTPException(409, str(error)) from None
+        return _deck_today(ctx, "challenge")
 
     @api.post("/api/deck/suspend", response_model=SuspendedOut, response_model_exclude_unset=True)
     def deck_suspend(body: SuspendIn):

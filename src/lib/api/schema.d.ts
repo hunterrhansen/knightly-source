@@ -641,6 +641,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/posts/challenge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Post Challenge
+         * @description Test out of the current post (or resume the open test) and serve it as
+         *     `/api/deck?mode=challenge` does: PAGE positions from its lessons at its own
+         *     difficulty. PAGE_RIGHT or more right clears the post, unless a lesson's games say not
+         *     yet (challenge.py). 409 when the post has nothing to test.
+         */
+        post: operations["post_challenge_api_posts_challenge_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/puzzles/answer": {
         parameters: {
             query?: never;
@@ -1180,6 +1203,10 @@ export interface components {
          */
         DeckOut: {
             card: components["schemas"]["DeckCardOut"] | null;
+            /** Challenge */
+            challenge?: {
+                [key: string]: unknown;
+            } | null;
             extra?: components["schemas"]["ExtraWatchOut"] | null;
             focus: components["schemas"]["FocusOut"] | null;
             games: components["schemas"]["AnalysedGamesOut"];
@@ -1194,7 +1221,7 @@ export interface components {
             /** Mastered */
             mastered: number;
             /** Mode */
-            mode?: ("taught" | "volume" | "defend" | "unannounced" | "review") | null;
+            mode?: ("taught" | "volume" | "defend" | "unannounced" | "review" | "challenge") | null;
             /** New */
             new: number;
             /** Puzzle */
@@ -2514,6 +2541,18 @@ export interface components {
              * @default 0
              */
             bar: number;
+            /**
+             * Game Chances
+             * @default 0
+             */
+            game_chances: number;
+            /**
+             * Game Found
+             * @default 0
+             */
+            game_found: number;
+            /** Games */
+            games?: ("yes" | "not_yet") | null;
             /** Held */
             held: boolean;
             /** Key */
@@ -2562,6 +2601,16 @@ export interface components {
              * @enum {string}
              */
             state: "cleared" | "current" | "ahead" | "blocked";
+            /**
+             * Suggest Test Out
+             * @default false
+             */
+            suggest_test_out: boolean;
+            /**
+             * Tested Out
+             * @default false
+             */
+            tested_out: boolean;
         };
         /** WatchIn */
         WatchIn: {
@@ -3501,6 +3550,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_challenge_api_posts_challenge_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeckOut"];
                 };
             };
         };

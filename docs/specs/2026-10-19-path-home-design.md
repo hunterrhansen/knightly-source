@@ -237,6 +237,17 @@ puzzle owed, **new slips** not yet in a lesson (newest games first), then
 **family puzzles for held moves**, closest to the 11-day bar first, since solving
 one is what lets such a move stop slipping. Nothing answered tonight comes back.
 
+## Testing out of a post (issue #325)
+
+The current post's card offers **Test out of this post**: the post's exam, as Steps has one
+per step. It is twelve positions from the post's lessons at the post's own level
+(`challenge.py`), with the badge "The post's test". Ten right clears the post for good (the
+card then says "Cleared by its test"), unless a lesson's games say not yet, since the games
+have the last word. Fewer right changes nothing and the post goes on as before. The test
+never keeps the night, so its end has no streak beat, only "Post cleared" or "Not this time"
+with the score and any castle reached. When the puzzle rating is well above the post's level
+(`suggest_test_out`), the card offers it first: "Your puzzles say you may be past this post."
+
 ## One screen, no tab bar
 
 The journey is the whole app. There is no tab bar; the path (the `(main)`

@@ -263,14 +263,15 @@ export class PracticeSession extends LessonStore<
       | 'threatAnswer'
       | 'unannouncedAnswer'
     > &
-      Partial<Pick<ApiClient, 'lessonIntroduced'>>,
+      Partial<Pick<ApiClient, 'lessonIntroduced' | 'startChallenge'>>,
     isCurrent: () => boolean,
     private onDeck: (deck: Deck) => void = () => {},
     private now = () => Date.now(),
     private onSaved: () => void = () => {},
     run: Schedule = schedule,
     /** `lesson` (the daily lesson) ends when the server says so. `extra` (an
-     * extra watch) likewise, started fresh on each visit that opens it. */
+     * extra watch) and `challenge` (the post's test) likewise, started (or
+     * resumed) on the server by the visit that opens them. */
     private mode: DeckMode = 'lesson',
   ) {
     super(
@@ -284,11 +285,21 @@ export class PracticeSession extends LessonStore<
   introduced(key: string) {
     void this.api.lessonIntroduced?.(key).catch(() => {});
   }
-  /** Whether this visit's extra watch was started (or resumed) on the server. */
+  /** Whether this visit's extra watch or post test was started (or resumed)
+   * on the server. */
   private extraStarted = false;
   private async fetchDeck() {
     if (this.mode === 'extra' && !this.extraStarted) {
       const deck = await this.api.extraWatch();
+      this.extraStarted = true;
+      return deck;
+    }
+    if (
+      this.mode === 'challenge' &&
+      !this.extraStarted &&
+      this.api.startChallenge
+    ) {
+      const deck = await this.api.startChallenge();
       this.extraStarted = true;
       return deck;
     }
@@ -426,9 +437,15 @@ export class PracticeSession extends LessonStore<
               ? deck.lesson?.total && deck.lesson.done >= deck.lesson.total
                 ? 'Lesson complete'
                 : 'Nothing to answer right now'
-              : deck.extra?.done
-                ? 'Extra watch complete'
-                : 'Nothing to answer right now',
+              : this.mode === 'challenge'
+                ? deck.challenge?.passed
+                  ? 'Post cleared'
+                  : deck.challenge?.passed === false
+                    ? 'Not this time'
+                    : 'Nothing to answer right now'
+                : deck.extra?.done
+                  ? 'Extra watch complete'
+                  : 'Nothing to answer right now',
         });
     } catch (error) {
       this.set({

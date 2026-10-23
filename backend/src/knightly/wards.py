@@ -54,6 +54,27 @@ from . import curriculum, db, deck, drill, endgame_drills, endgames, patterns, p
 BASIC_VOLUME = 36
 PAGE = 12
 PAGE_RIGHT = 10
+# Steps' real gate is the games. Over the clear chances in your rated games (patterns
+# .chance_rates, RECENT_DAYS), taking GAMES_SHOW of GAMES_SHOW_ENOUGH or more holds a lesson
+# with one page here; taking under GAMES_AGAINST of GAMES_AGAINST_ENOUGH or more means practice
+# alone cannot hold it -- the idea has to start showing at the board.
+GAMES_SHOW, GAMES_SHOW_ENOUGH = 0.8, 10
+GAMES_AGAINST, GAMES_AGAINST_ENOUGH = 0.5, 20
+# The game motifs the tagger recognises well enough to judge a lesson by, keyed by the lesson
+# themes they stand for. Not hangingPiece: as a chance tag it is the least reliable we have
+# (0.17 precision); the Gatehouse is judged on its vision drill's own games instead.
+GAME_MOTIF = {
+    "fork": "fork",
+    "pin": "pin",
+    "skewer": "skewer",
+    "discoveredAttack": "discoveredAttack",
+    "backRankMate": "backRankMate",
+    "smotheredMate": "smotheredMate",
+    "trappedPiece": "trappedPiece",
+    "mateIn1": "mate",
+    "mateIn2": "mate",
+    "mateIn3": "mate",
+}
 # An idea's own Elo, seeded from the learner's overall puzzle ability. Absent evidence about
 # forks specifically, assume they are as good at forks as they are at everything, which is
 # the same prior `patterns.weakness` shrinks toward.
@@ -91,6 +112,11 @@ class LessonState:
     theta: float = 0.0
     sigma: float = SIGMA_0
     bar: float = 0.0
+    # Clear chances for it in the learner's rated games, how many were taken, and what that
+    # says (games_say): "yes", "not_yet" or None (too few chances to tell).
+    game_found: int = 0
+    game_chances: int = 0
+    games: str | None = None
 
     @property
     def probe(self) -> float:
@@ -165,6 +191,27 @@ def _drill_answers(conn, today: date | None = None) -> list[tuple[str, str, bool
         (since,),
     ).fetchall()
     return [(r["reviewed_at"], r["kind"], bool(r["correct"])) for r in rows]
+
+
+def game_evidence(conn, lesson: curriculum.Lesson, rates: dict[str, dict[str, int]]) -> tuple[int, int]:
+    """(found, chances) for a lesson in the learner's rated games: its drill's own record for a
+    drill-taught lesson, else the chances of the game motifs its themes stand for."""
+    if lesson.drill:
+        return drill.in_game_rate(conn, lesson.drill)
+    motifs = {GAME_MOTIF[t] for t in lesson.themes if t in GAME_MOTIF}
+    return (
+        sum(rates.get(m, {}).get("found", 0) for m in motifs),
+        sum(rates.get(m, {}).get("chances", 0) for m in motifs),
+    )
+
+
+def games_say(found: int, chances: int) -> str | None:
+    """ "yes" when your games show the idea, "not_yet" when they clearly do not, else None."""
+    if chances >= GAMES_SHOW_ENOUGH and found / chances >= GAMES_SHOW:
+        return "yes"
+    if chances >= GAMES_AGAINST_ENOUGH and found / chances < GAMES_AGAINST:
+        return "not_yet"
+    return None
 
 
 def page(results: list[bool]) -> tuple[int, int, int]:
@@ -265,6 +312,7 @@ def entry(conn, at: int | None = None) -> int:
 def state(conn, at: int | None = None, today: date | None = None) -> list[WardState]:
     """Every ward with its lessons' evidence: cleared behind, one current, the rest ahead."""
     answers, held_tactics, drills = _answers(conn), _held_tactics(conn), _drill_answers(conn)
+    rates = patterns.chance_rates(conn, today or db.today(conn))
     attempts, overall, band = _attempts(conn), float(puzzles.ability(conn)), bands(conn)
     reached = db.get_setting(conn, REACHED_SETTING) or {}
     start = entry(conn, at)
@@ -290,15 +338,16 @@ def state(conn, at: int | None = None, today: date | None = None) -> list[WardSt
             # what is worth serving (`priority`).
             theta, sigma, _ = estimate(attempts, lesson.themes, overall)
             bar = band.get(ward.key, 0.0)
-            by_practice = lesson.servable and held_at_bar(answered, page_right)
-            # Held by the games themselves: a card carrying the tactic for a themed lesson,
-            # or -- for a lesson taught by a drill -- the learner already doing it at the
-            # board. Those still show one page here, at the bar.
-            by_game = any(theme in held_tactics for theme in lesson.themes)
-            if not by_game and lesson.drill:
-                by_game = drill.held_in_games(conn, lesson.drill)
+            found, chances = game_evidence(conn, lesson, rates)
+            says = games_say(found, chances)
+            by_practice = lesson.servable and held_at_bar(answered, page_right) and says != "not_yet"
+            # Held by the games themselves: a card carrying the tactic, or the idea taken at
+            # the board often enough. Those still show one page here, at the bar.
+            by_game = says == "yes" or any(theme in held_tactics for theme in lesson.themes)
             held = by_practice or (by_game and held_at_bar(answered, page_right, PAGE))
-            lessons.append(LessonState(lesson, held, answered, solves, page_right, theta, sigma, bar))
+            lessons.append(
+                LessonState(lesson, held, answered, solves, page_right, theta, sigma, bar, found, chances, says)
+            )
         teachable = [lesson for lesson in lessons if lesson.lesson.servable]
         done = bool(teachable) and all(lesson.held for lesson in teachable)
         servable = bool(teachable)
@@ -551,6 +600,9 @@ def as_json(ward: WardState, reached: dict | None = None) -> dict:
                 "solves": lesson.solves,
                 "answered": lesson.answered,
                 "page_right": lesson.page_right,
+                "game_found": lesson.game_found,
+                "game_chances": lesson.game_chances,
+                "games": lesson.games,
                 "ability": round(lesson.theta),
                 "uncertainty": round(lesson.sigma),
                 "bar": round(lesson.bar),
@@ -567,4 +619,11 @@ def path(conn, today: date | None = None, at: int | None = None) -> list[dict]:
     today = today or db.today(conn)
     states = state(conn, at, today)
     reached = record(conn, states, today)
-    return [as_json(w, reached) for w in states]
+    from . import challenge  # it reads this module
+
+    out = [as_json(w, reached) for w in states]
+    for ward, row in zip(states, out, strict=True):
+        row["tested_out"] = bool((reached.get(ward.ward.key) or {}).get("tested_out"))
+        if ward.state == "current":
+            row["suggest_test_out"] = challenge.suggested(conn, ward)
+    return out

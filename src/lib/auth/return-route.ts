@@ -5,9 +5,10 @@ export function parseReturnRoute(input: string | undefined): string {
       input,
     ) ||
     /^\/account-settings\?section=appearance&choice=board$/.test(input) ||
-    // Tonight's watch and an extra watch keep their mode on reload.
+    // Tonight's watch, an extra watch and a post's test keep their mode on reload.
     input === '/practice?mode=lesson' ||
-    input === '/practice?mode=extra'
+    input === '/practice?mode=extra' ||
+    input === '/practice?mode=challenge'
   )
     return input;
   if (/[?#%\\]/.test(input)) return '/';

@@ -30,6 +30,8 @@ export type PathLesson = {
   answered: number;
   /** Right first try among the last PAGE answered. */
   pageRight: number;
+  /** What your games say about it, with the chances behind it. */
+  games: { verdict: 'yes' | 'not_yet' | null; found: number; chances: number };
   teachable: boolean;
 };
 
@@ -49,6 +51,10 @@ export type PathPost = {
   /** The day the learner reached it, once the server records it: the watches
    * kept since then are this post's nodes. */
   enteredOn: string | null;
+  /** Cleared by the post's test rather than lesson by lesson. */
+  testedOut: boolean;
+  /** The current post only: the puzzle rating says it may already be known. */
+  suggestTestOut: boolean;
   lessons: readonly PathLesson[];
 };
 
@@ -61,6 +67,11 @@ const pathLesson = (ward: string, lesson: JourneyLesson): PathLesson => ({
   // A server before the Steps bar sends only solves.
   answered: lesson.answered ?? lesson.solves,
   pageRight: lesson.page_right ?? Math.min(PAGE, lesson.solves),
+  games: {
+    verdict: lesson.games ?? null,
+    found: lesson.game_found ?? 0,
+    chances: lesson.game_chances ?? 0,
+  },
   teachable: lesson.teachable,
 });
 
@@ -78,6 +89,8 @@ function pathPost(ward: JourneyWard): PathPost {
     rank: rankOfPost(ward.index).name,
     clearedOn: ward.cleared_on ?? null,
     enteredOn: ward.entered_on ?? null,
+    testedOut: ward.tested_out ?? false,
+    suggestTestOut: ward.suggest_test_out ?? false,
     lessons: ward.lessons.map((l) => pathLesson(ward.key, l)),
   };
 }
@@ -103,6 +116,12 @@ export function heldLine(post: PathPost) {
 export function lessonDetail(lesson: PathLesson) {
   if (!lesson.teachable) return 'Coming soon';
   if (lesson.held) return 'Held';
+  const { verdict, found, chances } = lesson.games;
+  // The Steps Method's real gate: what the learner does at the board.
+  if (verdict === 'not_yet')
+    return `Your games: ${found} of ${chances} found, not yet`;
+  if (verdict === 'yes')
+    return `Your games show it · ${Math.min(lesson.answered, PAGE)} of ${PAGE} answered`;
   if (lesson.answered < BASIC_VOLUME)
     return `${lesson.answered} of ${BASIC_VOLUME} answered`;
   return `${lesson.pageRight} of ${PAGE} right lately, ${PAGE_RIGHT} needed`;

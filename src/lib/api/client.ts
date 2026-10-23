@@ -87,7 +87,7 @@ export type ApiOptions = {
 };
 /** `lesson` is tonight's watch; `extra` continues tonight's extra watch
  * (started by `extraWatch`). */
-export type DeckMode = 'lesson' | 'extra';
+export type DeckMode = 'lesson' | 'extra' | 'challenge';
 export type ApiClient = {
   exportData: (signal?: AbortSignal) => Promise<Blob>;
   deleteAccount: (signal?: AbortSignal) => Promise<void>;
@@ -167,6 +167,9 @@ export type ApiClient = {
   /** Starts tonight's next extra watch (or resumes the open one) and serves
    * it as `deck(signal, 'extra')` does. 409 until tonight's watch is kept. */
   extraWatch: (signal?: AbortSignal) => Promise<Deck>;
+  /** Starts (or resumes) the current post's test and serves it as
+   * `deck(signal, 'challenge')` does. 409 when the post has nothing to test. */
+  startChallenge: (signal?: AbortSignal) => Promise<Deck>;
   /** A lesson's intro, to replay it from its post's card. */
   lessonIntro: (key: string, signal?: AbortSignal) => Promise<LessonIntro>;
   /** Marks a lesson's intro seen: the watch stops offering it. */
@@ -557,6 +560,13 @@ export function createApi({
         deckSchema,
         (headers, signal) =>
           client.POST('/api/lesson/extra', { headers, signal }),
+        signal,
+      ),
+    startChallenge: (signal) =>
+      request(
+        deckSchema,
+        (headers, signal) =>
+          client.POST('/api/posts/challenge', { headers, signal }),
         signal,
       ),
     lessonIntro: (key, signal) =>
