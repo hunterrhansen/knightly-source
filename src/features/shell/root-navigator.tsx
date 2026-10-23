@@ -109,6 +109,7 @@ export function RootNavigator() {
           <Stack.Screen name="review/[gameId]" />
           <Stack.Screen name="connect-games" />
           <Stack.Screen name="watch" />
+          <Stack.Screen name="lesson-intro" options={modal} />
         </Stack.Protected>
         <Stack.Screen name="privacy" />
         <Stack.Protected guard={__DEV__}>

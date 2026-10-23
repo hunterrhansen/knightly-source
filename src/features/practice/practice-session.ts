@@ -262,7 +262,8 @@ export class PracticeSession extends LessonStore<
       | 'puzzleHint'
       | 'threatAnswer'
       | 'unannouncedAnswer'
-    >,
+    > &
+      Partial<Pick<ApiClient, 'lessonIntroduced'>>,
     isCurrent: () => boolean,
     private onDeck: (deck: Deck) => void = () => {},
     private now = () => Date.now(),
@@ -277,6 +278,11 @@ export class PracticeSession extends LessonStore<
       isCurrent,
       run,
     );
+  }
+  /** Marks a lesson's intro seen (intros.py). Best effort: if it fails, the
+   * next visit offers the intro again. */
+  introduced(key: string) {
+    void this.api.lessonIntroduced?.(key).catch(() => {});
   }
   /** Whether this visit's extra watch was started (or resumed) on the server. */
   private extraStarted = false;

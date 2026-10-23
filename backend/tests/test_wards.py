@@ -159,10 +159,11 @@ def test_unheld_lessons_are_drilled_before_held_ones(db_url):
         for i in range(wards.BASIC_VOLUME):
             solved(conn, f"{key}{i}", [theme])  # clear wards 2, 3 and 4
     ward = wards.current(conn)
-    assert ward.ward.key == "mate-in-two"  # mateIn2 and backRankMate, both teachable
+    assert ward.ward.key == "mate-in-two"  # mate in two (with the back rank) and the rook mate
     for i in range(wards.BASIC_VOLUME):
         solved(conn, f"b{i}", ["backRankMate"])
-    # backRankMate is held now, so it must not be drilled first -- but it stays in the list,
+    # Mate in two is held now (by its back-rank puzzles), so it must not be drilled first --
+    # but it stays in the list,
     # since a nearly finished ward still has to have something to serve.
     themes = [theme for theme, _ in wards.drill_themes(conn)]
     assert themes[0] != "backRankMate" and "backRankMate" in themes

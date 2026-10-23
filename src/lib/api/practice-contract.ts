@@ -187,6 +187,37 @@ const puzzleSchema = z
       leadsTo(p.fen_prev, p.prev_uci, p.fen_before),
     'Inconsistent puzzle',
   );
+/** A position a lesson's intro shows (backend intros.py): the opponent's move in,
+ * then the line, yours first. Shaped like a puzzle, without its rating. */
+const introExerciseSchema = z
+  .object({
+    id: z.string().optional(),
+    fen_prev: fen,
+    prev_uci: uci,
+    fen_before: fen,
+    color,
+    line: z.array(uci).min(1).max(40),
+    line_key: lineKey,
+  })
+  .refine(
+    (p) =>
+      sideToMove(p.fen_before, p.color) &&
+      leadsTo(p.fen_prev, p.prev_uci, p.fen_before),
+    'Inconsistent intro position',
+  );
+/** A lesson's intro: the Steps Method's "explain, demonstrate, try one". The
+ * words are the app's (lesson-intro-copy.ts); either position may be missing. */
+export const lessonIntroSchema = z.object({
+  lesson: z.string().min(1).max(60),
+  name: z.string().min(1).max(80),
+  example: introExerciseSchema.nullable(),
+  guided: introExerciseSchema.nullable(),
+});
+export type LessonIntro = z.infer<typeof lessonIntroSchema>;
+export type IntroExercise = NonNullable<LessonIntro['example']>;
+/** `POST /api/lessons/{key}/introduced`. */
+export const introducedSchema = z.object({ introduced: z.boolean() });
+
 /** A card's prepared map: grades for its first moves, and the coaching. */
 const cardFeedbackSchema = z.object({
   grades: z.record(z.string(), z.enum(['best', 'excellent', 'good', 'wrong'])),
@@ -319,6 +350,9 @@ export const deckSchema = z.object({
       }),
     )
     .optional(),
+  /** A lesson to introduce before this response's item; an unreadable one
+   * is skipped rather than blocking practice. */
+  intro: lessonIntroSchema.nullish().catch(null),
   /** Tonight's extra watch (`mode=extra`): its progress, and the extra
    * watches kept tonight (this one once done). */
   extra: z

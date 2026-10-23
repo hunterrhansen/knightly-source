@@ -125,8 +125,8 @@ WARDS: tuple[Ward, ...] = (
     _w(
         "mate-in-two",
         "Mate in two",
-        _l("mate-in-two", "Mate in two", "mate", "2", "mateIn2"),
-        _l("back-rank", "The back rank", "mate", "2", "backRankMate"),
+        # Steps teaches the back rank inside its mate lessons, not as a lesson of its own.
+        _l("mate-in-two", "Mate in two", "mate", "2", "mateIn2", "backRankMate"),
         _l("mating-rook", "Mating with the rook", "mate", "2", "rookMate"),
     ),
     _w(
@@ -226,6 +226,7 @@ WARDS: tuple[Ward, ...] = (
 )
 
 BY_WARD = {ward.key: ward for ward in WARDS}
+LESSONS = {lesson.key: lesson for ward in WARDS for lesson in ward.lessons}
 
 
 def derive(conn) -> list[dict]:

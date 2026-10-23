@@ -171,3 +171,51 @@ test('tapping a badge explains it in the coach bubble, and tapping again puts th
   fireEvent.press(badge);
   expect(screen.queryByText(/post you.ve passed/)).toBeNull();
 });
+
+test('a deck with a lesson to introduce shows the knight’s intro first, and Skip marks it seen and opens the item', async () => {
+  const intro = {
+    lesson: 'double-attack',
+    name: 'Double attack',
+    example: {
+      fen_prev: 'r3k3/8/8/1N6/8/8/8/4K3 b - - 0 1',
+      prev_uci: 'e8d8',
+      fen_before: 'r2k4/8/8/1N6/8/8/8/4K3 w - - 1 2',
+      color: 'white' as const,
+      line: ['b5c7'],
+      line_key: 'fedcba9876543210',
+    },
+    guided: null,
+  };
+  const api = {
+    deck: jest.fn(async () => ({ ...reviewing, intro })),
+    extraWatch: jest.fn(),
+    answerLine: jest.fn(),
+    lineHint: jest.fn(),
+    puzzleAnswer: jest.fn(),
+    puzzleHint: jest.fn(),
+    unannouncedAnswer: jest.fn(),
+    threatAnswer: jest.fn(),
+    lessonIntroduced: jest.fn(async () => ({ introduced: true })),
+  };
+  const session = new PracticeSession(api, () => true);
+  await session.load();
+  render(
+    <PracticeLayout
+      session={session}
+      state={session.getSnapshot()}
+      onExit={jest.fn()}
+      watch
+    />,
+  );
+  await act(async () => {});
+  // The knight explains first; the item's badge waits.
+  expect(screen.getByText('Double attack')).toBeTruthy();
+  expect(screen.getByText(/One move, two threats/)).toBeTruthy();
+  expect(screen.queryByRole('button', { name: 'Mixed review' })).toBeNull();
+  fireEvent.press(screen.getByRole('button', { name: 'Skip' }));
+  await act(async () => {});
+  expect(api.lessonIntroduced).toHaveBeenCalledWith('double-attack');
+  // Tonight's item follows, with its own badge.
+  expect(screen.getByRole('button', { name: 'Mixed review' })).toBeTruthy();
+  expect(screen.queryByText(/One move, two threats/)).toBeNull();
+});

@@ -31,15 +31,17 @@ def slot(n: int) -> str:
 
 
 def serve(conn, today: date, n: int, asked: dict, moves: dict, remaining: list, *, extra_watch: bool) -> dict:
-    """Item `n` of a watch: {card, threat, move, puzzle, mode}, at most one of the four set
-    (all None when nothing at all can be served). `card` is a (game_id, ply) key; `mode` says
-    why it was served (DeckOut.mode), None for a review card."""
+    """Item `n` of a watch: {card, threat, move, puzzle, mode, slot}, at most one of the four
+    set (all None when nothing at all can be served). `card` is a (game_id, ply) key; `mode`
+    says why it was served (DeckOut.mode), None for a review card; `slot` is the job item `n`
+    has in the mix, and `kind` the job that actually filled it."""
     first = slot(n)
+    empty = {"card": None, "threat": None, "move": None, "puzzle": None, "mode": None, "slot": first}
     for kind in (first, *(k for k in FALLBACK if k != first)):
         found = _kind(conn, today, kind, n, asked, moves, remaining, extra_watch)
         if found:
-            return {"card": None, "threat": None, "move": None, "puzzle": None, "mode": None, **found}
-    return {"card": None, "threat": None, "move": None, "puzzle": None, "mode": None}
+            return {**empty, **found, "kind": kind}
+    return empty
 
 
 def _kind(conn, today, kind, n, asked, moves, remaining, extra_watch) -> dict | None:

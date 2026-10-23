@@ -24,6 +24,9 @@ import {
   deckSchema,
   type HintInput,
   hintSchema,
+  introducedSchema,
+  type LessonIntro,
+  lessonIntroSchema,
   type PracticeAnswer,
   type PracticeStep,
   type PuzzleAnswerInput,
@@ -164,6 +167,13 @@ export type ApiClient = {
   /** Starts tonight's next extra watch (or resumes the open one) and serves
    * it as `deck(signal, 'extra')` does. 409 until tonight's watch is kept. */
   extraWatch: (signal?: AbortSignal) => Promise<Deck>;
+  /** A lesson's intro, to replay it from its post's card. */
+  lessonIntro: (key: string, signal?: AbortSignal) => Promise<LessonIntro>;
+  /** Marks a lesson's intro seen: the watch stops offering it. */
+  lessonIntroduced: (
+    key: string,
+    signal?: AbortSignal,
+  ) => Promise<{ introduced: boolean }>;
   answer: (body: AnswerInput, signal?: AbortSignal) => Promise<PracticeAnswer>;
   /** A "Your move" answer: judged like a card's first move, never scheduled. */
   unannouncedAnswer: (
@@ -547,6 +557,28 @@ export function createApi({
         deckSchema,
         (headers, signal) =>
           client.POST('/api/lesson/extra', { headers, signal }),
+        signal,
+      ),
+    lessonIntro: (key, signal) =>
+      request(
+        lessonIntroSchema,
+        (headers, signal) =>
+          client.GET('/api/lessons/{key}/intro', {
+            headers,
+            params: { path: { key } },
+            signal,
+          }),
+        signal,
+      ),
+    lessonIntroduced: (key, signal) =>
+      request(
+        introducedSchema,
+        (headers, signal) =>
+          client.POST('/api/lessons/{key}/introduced', {
+            headers,
+            params: { path: { key } },
+            signal,
+          }),
         signal,
       ),
     answer: (body, signal) =>

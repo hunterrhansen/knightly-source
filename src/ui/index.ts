@@ -28,7 +28,7 @@ export {
   WatchEndScene,
 } from '../components/kit/watch-end';
 export { ActionBar, ActionButton } from '../components/ui/action-bar';
-export { ActionIcon } from '../components/ui/action-icon';
+export { ActionIcon, type ActionIconName } from '../components/ui/action-icon';
 export { Avatar } from '../components/ui/avatar';
 export { BrandMark } from '../components/ui/brand-mark';
 export { Button } from '../components/ui/button';

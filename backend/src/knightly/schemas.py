@@ -488,6 +488,21 @@ class WardOut(BaseModel):
     lessons: list[WardLessonOut]
 
 
+class LessonIntroOut(BaseModel):
+    """A lesson's intro (intros.payload): the demonstration played out from the wall and the
+    guided first position, each in a puzzle's shape (fen_prev, prev_uci, fen_before, color,
+    line, line_key), or null when nothing can supply it. The words are the app's."""
+
+    lesson: str
+    name: str
+    example: dict | None
+    guided: dict | None
+
+
+class IntroducedOut(BaseModel):
+    introduced: bool
+
+
 class DeckOut(OpenOut):
     """A practice session's state and its next item (`card`, `threat_item`,
     `unannounced_item` or `puzzle`; none when today's are done)."""
@@ -519,6 +534,9 @@ class DeckOut(OpenOut):
     threat_item: dict | None
     unannounced_item: dict | None
     extra: ExtraWatchOut | None = None  # mode=extra and POST /api/lesson/extra only
+    # A lesson to introduce before this item (intros.py): absent once every lesson of the
+    # post has been introduced.
+    intro: "LessonIntroOut | None" = None
 
 
 class AnswerLineOut(OpenOut):

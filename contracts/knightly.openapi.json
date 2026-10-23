@@ -923,6 +923,16 @@
           "games": {
             "$ref": "#/components/schemas/AnalysedGamesOut"
           },
+          "intro": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LessonIntroOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "kinds": {
             "additionalProperties": {
               "type": "integer"
@@ -2457,6 +2467,19 @@
         "title": "ImportSummaryOut",
         "type": "object"
       },
+      "IntroducedOut": {
+        "properties": {
+          "introduced": {
+            "title": "Introduced",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "introduced"
+        ],
+        "title": "IntroducedOut",
+        "type": "object"
+      },
       "JourneyMapOut": {
         "description": "The Progress map and the home path (GET /api/journey).",
         "properties": {
@@ -2685,6 +2708,51 @@
           "day"
         ],
         "title": "LearnMoreOut",
+        "type": "object"
+      },
+      "LessonIntroOut": {
+        "description": "A lesson's intro (intros.payload): the demonstration played out from the wall and the\nguided first position, each in a puzzle's shape (fen_prev, prev_uci, fen_before, color,\nline, line_key), or null when nothing can supply it. The words are the app's.",
+        "properties": {
+          "example": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Example"
+          },
+          "guided": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Guided"
+          },
+          "lesson": {
+            "title": "Lesson",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lesson",
+          "name",
+          "example",
+          "guided"
+        ],
+        "title": "LessonIntroOut",
         "type": "object"
       },
       "LinkedAccountOut": {
@@ -6377,6 +6445,86 @@
           }
         },
         "summary": "Lesson Extra"
+      }
+    },
+    "/api/lessons/{key}/intro": {
+      "get": {
+        "description": "A lesson's intro, to replay it from its post's card.",
+        "operationId": "lesson_intro_api_lessons__key__intro_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonIntroOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Lesson Intro"
+      }
+    },
+    "/api/lessons/{key}/introduced": {
+      "post": {
+        "description": "The learner has seen a lesson's intro: the watch stops offering it.",
+        "operationId": "lesson_introduced_api_lessons__key__introduced_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntroducedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Lesson Introduced"
       }
     },
     "/api/lookup": {

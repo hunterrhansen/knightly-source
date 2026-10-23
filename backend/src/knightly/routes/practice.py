@@ -6,12 +6,14 @@ from contextlib import contextmanager
 from fastapi import APIRouter, HTTPException, Query, Response
 
 from .. import (
+    curriculum,
     daily,
     db,
     deck,
     drill,
     extra,
     game_trend,
+    intros,
     jobs,
     mix,
     positions,
@@ -32,7 +34,9 @@ from ..schemas import (
     FeedbackOut,
     HintIn,
     HintOut,
+    IntroducedOut,
     LearnMoreOut,
+    LessonIntroOut,
     SuspendedCardOut,
     SuspendedOut,
     SuspendIn,
@@ -60,7 +64,8 @@ def _deck_today(ctx: Context, mode: str) -> dict:
         info = timing.call("stats", deck.stats, conn, today=today, remaining=remaining, asked=asked, moves=moves)
         info["server_day"] = today.isoformat()
         # The ward tonight's new material comes from (wards.py). Never gates a due review.
-        info["ward"] = timing.call("ward", lambda c: wards.as_json(wards.current(c)), conn)
+        ward_state = timing.call("ward", wards.current, conn)
+        info["ward"] = wards.as_json(ward_state)
         info["games"] = deck.game_counts(conn)
         info["results"] = results = timing.call("results", deck.today_results, conn, today=today)
         if watching:
@@ -87,6 +92,11 @@ def _deck_today(ctx: Context, mode: str) -> dict:
             empty = {"card": None, "threat": None, "move": None, "puzzle": None, "mode": None}
             item = pick(saved["done"]) if saved["done"] < saved["total"] else empty
         info["puzzle"], info["mode"] = item["puzzle"], item["mode"]
+        # A post's lessons are introduced in Steps order before its practice: the knight
+        # explains, the wall demonstrates, the learner tries one (intros.py). The app shows
+        # it before this item and marks it seen.
+        if item.get("kind") == mix.IDEA and (lesson := intros.pending(conn, ward_state.lessons)):
+            info["intro"] = timing.call("intro", intros.payload, conn, lesson)
         threat_next, move_next = item["threat"], item["move"]
         nxt = [{"game_id": item["card"][0], "ply": item["card"][1]}] if item["card"] else []
         if move_next and move_next["feedback"] is None:
@@ -331,8 +341,34 @@ def _answer_routes(ctx: Context) -> APIRouter:
     return api
 
 
+def _lesson_routes(ctx: Context) -> APIRouter:
+    """Lesson intros (intros.py): replaying one, and marking one seen."""
+    api = APIRouter()
+
+    @api.get("/api/lessons/{key}/intro", response_model=LessonIntroOut)
+    def lesson_intro(key: str):
+        """A lesson's intro, to replay it from its post's card."""
+        lesson = curriculum.LESSONS.get(key)
+        if lesson is None:
+            raise HTTPException(404, "No such lesson.")
+        with ctx.connect() as conn:
+            return intros.payload(conn, lesson)
+
+    @api.post("/api/lessons/{key}/introduced", response_model=IntroducedOut)
+    def lesson_introduced(key: str):
+        """The learner has seen a lesson's intro: the watch stops offering it."""
+        if key not in curriculum.LESSONS:
+            raise HTTPException(404, "No such lesson.")
+        with ctx.connect() as conn, conn:
+            intros.mark(conn, key, db.today(conn))
+        return {"introduced": True}
+
+    return api
+
+
 def router(ctx: Context) -> APIRouter:
     api = APIRouter()
     api.include_router(_deck_routes(ctx))
+    api.include_router(_lesson_routes(ctx))
     api.include_router(_answer_routes(ctx))
     return api

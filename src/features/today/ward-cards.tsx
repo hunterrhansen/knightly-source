@@ -1,6 +1,9 @@
-import { Text, View } from 'react-native';
+import { type Href, router } from 'expo-router';
+import { Pressable, Text, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { createStyles, useTheme } from '../../theme/theme';
-import { Card } from '../../ui';
+import { tokens } from '../../theme/tokens';
+import { Card, usePressSquish } from '../../ui';
 import type { comingUp } from './path-model';
 import { TrackGlyph } from './track-glyph';
 import {
@@ -50,15 +53,21 @@ function PostStory({ post }: { post: PathPost }) {
   );
 }
 
-function LessonRow({ lesson }: { lesson: PathLesson }) {
+/** A lesson of the post. On a post reached, it replays the lesson's intro
+ * (the knight's explanation, the demonstration and a first try). */
+function LessonRow({
+  lesson,
+  replay,
+}: {
+  lesson: PathLesson;
+  replay: boolean;
+}) {
   const styles = useStyles();
   const { theme } = useTheme();
-  return (
-    <View
-      style={styles.row}
-      accessible
-      accessibilityLabel={`${lesson.name}, ${trackName(lesson.track)}. ${lessonDetail(lesson)}`}
-    >
+  const squish = usePressSquish({ squash: tokens.motion.squash.surface });
+  const label = `${lesson.name}, ${trackName(lesson.track)}. ${lessonDetail(lesson)}`;
+  const content = (
+    <>
       <TrackGlyph
         track={lesson.track}
         size={20}
@@ -79,7 +88,32 @@ function LessonRow({ lesson }: { lesson: PathLesson }) {
       >
         {lessonDetail(lesson)}
       </Text>
-    </View>
+      {replay && <Text style={styles.intro}>Intro ›</Text>}
+    </>
+  );
+  if (!replay)
+    return (
+      <View style={styles.row} accessible accessibilityLabel={label}>
+        {content}
+      </View>
+    );
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityHint="Plays the lesson’s intro"
+      onPress={() =>
+        router.push(
+          `/lesson-intro?key=${encodeURIComponent(lesson.key)}` as Href,
+        )
+      }
+      onPressIn={squish.onPressIn}
+      onPressOut={squish.onPressOut}
+    >
+      <Animated.View style={[styles.row, squish.style]}>
+        {content}
+      </Animated.View>
+    </Pressable>
   );
 }
 
@@ -104,7 +138,11 @@ export function PostCard({ post }: { post: PathPost }) {
         <PostStory post={post} />
         <View style={styles.rows}>
           {post.lessons.map((lesson) => (
-            <LessonRow key={lesson.key} lesson={lesson} />
+            <LessonRow
+              key={lesson.key}
+              lesson={lesson}
+              replay={post.state === 'current' || post.state === 'cleared'}
+            />
           ))}
         </View>
         {post.state === 'current' && (
@@ -152,6 +190,11 @@ const useStyles = createStyles((theme) => ({
   stack: { gap: theme.spacing.md },
   rows: { gap: theme.spacing.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm },
+  intro: {
+    color: theme.colors.brandText,
+    fontFamily: theme.typography.bold,
+    fontSize: 13,
+  },
   rowName: {
     flex: 1,
     color: theme.colors.ink,

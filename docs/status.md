@@ -253,8 +253,9 @@ the original frontend on October 20, 2026, which still runs unrouted for rollbac
 
 Checked on the VM on October 23, 2026.
 
-- **Backend:** staging and production both run `sha-91bff6b` (main after
-  #338): the core-20% watch mix (#330, migration 0031; production dump
+- **Backend:** staging and production both run `sha-25e3c95` (main after
+  #346, the Steps Method curriculum; deployed October 23 around 13:27 UTC).
+  Before it, `sha-91bff6b` (main after #338) brought the core-20% watch mix (#330, migration 0031; production dump
   `knightly-2026-10-23T0216Z.dump` taken first), the Gatehouse safety check
   (#333), basic endgames (#337) and the redo-round removal (#335). The 1,500
   endgame drills are loaded in both (`knightly endgames`; staging's
@@ -263,24 +264,30 @@ Checked on the VM on October 23, 2026.
   [GitHub Actions is blocked](runtime-verification.md#ci-and-pre-push), so they
   are not in ghcr and a rebuilt VM cannot re-pull them. A deploy from a commit
   older than `8024db2` would drop the `db` service: deploy from current `main` only.
-- **Web:** staging and production serve Expo exports of main `91bff6b`,
-  each built for its own host (uploaded October 23 around 04:15 UTC; the previous
-  exports kept beside them as `expo-web.before-<epoch>`). Production
+- **Web:** staging and production serve Expo exports of main `25e3c95`,
+  each built for its own host (uploaded October 23 around 13:27 UTC; the previous
+  exports kept beside them as `expo-web.before-<epoch>`). Both bundles carry the
+  review's legal-move dots (#343) and the **Live engine in reviews** setting
+  (#344), and serve `/stockfish/stockfish.wasm` as `application/wasm`. Production
   answers HTTP 200 with `/api/health` ok; its console and signed-in use of the
   walk on the web are unchecked. The original
   frontend (`legacy-web`) still runs unrouted for rollback
   ([deployment](deploy.md#rolling-back-the-web-cutover)).
-- **iPhone:** TestFlight `beta` build 63 (standalone, production API) is from
-  main `2ad269f` (through #344), uploaded October 23: build 62 plus legal-move
+- **iPhone:** TestFlight `beta` build 64 (standalone, production API) is from
+  main `25e3c95` (through #346), uploaded October 23, with the Steps bar's
+  progress text; source published as
+  [knightly-source@ios-build-64](https://github.com/hunterrhansen/knightly-source/tree/ios-build-64).
+  Build 63 (`2ad269f`, through #344) was build 62 plus legal-move
   dots on review positions (#343) and the optional **Live engine in reviews**
   setting (#344). Its source is published as
   [knightly-source@ios-build-63](https://github.com/hunterrhansen/knightly-source/tree/ios-build-63).
   Build 62 (`f06db78`) was the first with on-device Stockfish (#336); on it a
-  review side line played and evaluated on the user's iPhone. Build 61
+  review side line played and evaluated on the user's iPhone, and on build 63
+  the user checked the dots and the live engine setting. Build 61
   (`91bff6b`) carried #338; builds 58 and earlier break against this backend.
   **None of the ward path, the walk, the new watch mix, the safety-check labels,
-  the endgame drills, the tappable badges or the live engine setting has been
-  seen on a phone.** Keeping a watch on build 63 is the open gate.
+  the endgame drills, the tappable badges or the Steps bar has been
+  seen on a phone.** Keeping a watch on build 64 is the open gate.
 - **Production learner data:** #309 reset production's posts-reached record to
   the Gatehouse so every post is walked; the record before the walk is kept as
   the setting `wards_reached_before_walk`.

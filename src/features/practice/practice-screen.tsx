@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   StyleSheet as NativeStyleSheet,
   Platform,
@@ -21,6 +21,7 @@ import {
 } from '../../lib/use-scoped-session';
 import { createStyles, useTheme } from '../../theme/theme';
 import { tokens } from '../../theme/tokens';
+import { useSystemReducedMotion } from '../../theme/use-reduced-motion';
 import { useTextBlock } from '../../theme/use-text-block';
 import {
   ActionBar,
@@ -54,6 +55,7 @@ import {
 } from '../today/today-api';
 import { type Badge, badgeAbout } from './badge-copy';
 import { HideCard } from './hide-card';
+import { useLessonIntro } from './lesson-intro';
 import { LineSteps } from './line-steps';
 import { heldBoard, practiceBoard } from './practice-board';
 import { practiceProgress } from './practice-progress';
@@ -167,6 +169,24 @@ export function PracticeLayout({
   // The lesson label's row above the coach, kept whether or not it shows.
   const labelHeight = Math.max(24, text.height(theme.typography.size.small, 1));
   const board = practiceBoard(state, session);
+  // A lesson to introduce before tonight's item (the Steps Method's explain,
+  // demonstrate, try one): shown in this same frame, so the board never moves.
+  const reduced = useSystemReducedMotion();
+  const [introduced, setIntroduced] = useState<ReadonlySet<string>>(new Set());
+  const onIntroDone = useCallback(
+    (key: string) => {
+      session.introduced(key);
+      setIntroduced((seen) => new Set(seen).add(key));
+    },
+    [session],
+  );
+  const pendingIntro =
+    state.phase !== 'complete' &&
+    state.deck?.intro &&
+    !introduced.has(state.deck.intro.lesson)
+      ? state.deck.intro
+      : undefined;
+  const intro = useLessonIntro(pendingIntro, onIntroDone, reduced);
   // While the next position loads, keep the last board in place (read-only)
   // rather than collapsing the layout.
   const lastBoard = useRef<BoardProps | undefined>(undefined);
@@ -482,7 +502,7 @@ export function PracticeLayout({
             : { kind: 'rated', rating: shownItem.rating };
   const about = badge && explained === shown ? badgeAbout(badge) : null;
 
-  const label = shown && badge && (
+  const label = !intro && shown && badge && (
     // A lesson label above the prompt, as Duolingo marks a hard puzzle.
     <Pressable
       accessibilityRole="button"
@@ -528,18 +548,24 @@ export function PracticeLayout({
   );
   const bubble = (
     <CoachBubble
-      title={firstLoad ? loadingCoach.title : (about?.title ?? title)}
-      body={firstLoad ? loadingCoach.body : (about?.body ?? body)}
+      title={
+        firstLoad ? loadingCoach.title : (intro?.title ?? about?.title ?? title)
+      }
+      body={
+        firstLoad ? loadingCoach.body : (intro?.body ?? about?.body ?? body)
+      }
       mood={firstLoad ? loadingCoach.mood : undefined}
       // An error fills the screen on its own: no board to keep still under it,
       // so the plaque takes the height its reason needs instead of clipping it.
       lines={phase === 'error' ? undefined : 2}
       tone={
-        phase === 'wrong' || (threatShown && !e?.threat?.correct)
-          ? 'wrong'
-          : solved || threatShown
-            ? 'right'
-            : 'plain'
+        intro
+          ? intro.tone
+          : phase === 'wrong' || (threatShown && !e?.threat?.correct)
+            ? 'wrong'
+            : solved || threatShown
+              ? 'right'
+              : 'plain'
       }
     />
   );
@@ -612,7 +638,7 @@ export function PracticeLayout({
       <LessonFrame
         watch={watch}
         plaque={watch ? label : undefined}
-        raid={raid}
+        raid={intro ? undefined : raid}
         bars={
           <>
             <LessonHeader
@@ -655,7 +681,7 @@ export function PracticeLayout({
           </>
         }
         coach={coach}
-        board={shownBoard}
+        board={intro?.board ?? shownBoard}
         fallback={
           <ScrollView
             style={styles.fill}
@@ -672,7 +698,7 @@ export function PracticeLayout({
             )}
           </ScrollView>
         }
-        orientation={shownBoard?.orientation ?? 'w'}
+        orientation={(intro?.board ?? shownBoard)?.orientation ?? 'w'}
         award={state.award}
         reserve={belowHeight}
         below={
@@ -682,7 +708,7 @@ export function PracticeLayout({
                 <SkeletonLine width="55%" />
               </View>
             )}
-            {shown && (
+            {shown && !intro && (
               <View style={styles.meta}>
                 <View style={styles.who}>
                   <Avatar
@@ -708,7 +734,7 @@ export function PracticeLayout({
                 )}
               </View>
             )}
-            {e && line && (
+            {e && line && !intro && (
               <LineSteps
                 view={e.view ?? line.uci.length}
                 san={line.san}
@@ -718,7 +744,24 @@ export function PracticeLayout({
           </>
         }
         sheet={sheet}
-        actions={actions && <ActionBar>{actions}</ActionBar>}
+        actions={
+          intro ? (
+            <ActionBar>
+              {intro.actions.map((a) => (
+                <ActionButton
+                  key={a.label}
+                  icon={a.icon}
+                  label={a.label}
+                  primary={a.primary}
+                  disabled={a.disabled}
+                  onPress={a.onPress}
+                />
+              ))}
+            </ActionBar>
+          ) : (
+            actions && <ActionBar>{actions}</ActionBar>
+          )
+        }
         fadeSheet
       />
     </Screen>

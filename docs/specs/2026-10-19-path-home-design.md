@@ -216,6 +216,18 @@ ten items; without them it is every position there is.
 Reviews due beyond the nightly watch's two slots wait for an extra watch or the
 next night; nothing reorders the schedule.
 
+### Lesson intros (issue #326)
+
+Before a post's practice, each of its lessons is introduced once, in Steps order, the
+way a Steps trainer teaches: the knight's line explains (bubble titled with the lesson),
+"Watch from the wall" plays the lesson's easiest position out, and "Your turn on watch"
+gives a guided first try with a moment to think before the piece is marked. The try is
+judged in the app and never saved, so it never counts toward holding the lesson. The
+deck carries `intro` on the item tonight's idea fills (`intros.py`); the app shows it in
+the same frame (the board never moves) and posts `/api/lessons/{key}/introduced` when it
+is finished or skipped. A lesson row on a reached post's card replays it
+(`/lesson-intro?key=`). The words live in `lesson-intro-copy.ts`.
+
 ## What an extra watch holds
 
 As many extra watches as the learner wants, each ten items in the same mix. Its

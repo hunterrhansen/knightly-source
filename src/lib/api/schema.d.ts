@@ -500,6 +500,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/lessons/{key}/intro": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Lesson Intro
+         * @description A lesson's intro, to replay it from its post's card.
+         */
+        get: operations["lesson_intro_api_lessons__key__intro_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/lessons/{key}/introduced": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Lesson Introduced
+         * @description The learner has seen a lesson's intro: the watch stops offering it.
+         */
+        post: operations["lesson_introduced_api_lessons__key__introduced_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/lookup": {
         parameters: {
             query?: never;
@@ -1143,6 +1183,7 @@ export interface components {
             extra?: components["schemas"]["ExtraWatchOut"] | null;
             focus: components["schemas"]["FocusOut"] | null;
             games: components["schemas"]["AnalysedGamesOut"];
+            intro?: components["schemas"]["LessonIntroOut"] | null;
             /** Kinds */
             kinds: {
                 [key: string]: number;
@@ -1560,6 +1601,11 @@ export interface components {
             /** Positions */
             positions: number;
         };
+        /** IntroducedOut */
+        IntroducedOut: {
+            /** Introduced */
+            introduced: boolean;
+        };
         /**
          * JourneyMapOut
          * @description The Progress map and the home path (GET /api/journey).
@@ -1633,6 +1679,26 @@ export interface components {
             added: number;
             /** Day */
             day: string;
+        };
+        /**
+         * LessonIntroOut
+         * @description A lesson's intro (intros.payload): the demonstration played out from the wall and the
+         *     guided first position, each in a puzzle's shape (fen_prev, prev_uci, fen_before, color,
+         *     line, line_key), or null when nothing can supply it. The words are the app's.
+         */
+        LessonIntroOut: {
+            /** Example */
+            example: {
+                [key: string]: unknown;
+            } | null;
+            /** Guided */
+            guided: {
+                [key: string]: unknown;
+            } | null;
+            /** Lesson */
+            lesson: string;
+            /** Name */
+            name: string;
         };
         /** LinkedAccountOut */
         LinkedAccountOut: {
@@ -3230,6 +3296,68 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DeckOut"];
+                };
+            };
+        };
+    };
+    lesson_intro_api_lessons__key__intro_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LessonIntroOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lesson_introduced_api_lessons__key__introduced_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IntroducedOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
