@@ -1,0 +1,24 @@
+appId: app.knightlychess
+name: Board measured drag smoke
+---
+- runFlow: open-board.yaml
+- swipe:
+    from:
+      text: Bot demo
+    direction: UP
+- scrollUntilVisible:
+    element:
+      id: square-a8
+    direction: UP
+    timeout: 15000
+- assertVisible: 'e2, White pawn'
+- assertVisible: 'e4, empty'
+- takeScreenshot: drag-before
+# Screen coordinates must be measured after this scroll, on the selected device.
+- swipe:
+    start: ${DRAG_START}
+    end: ${DRAG_END}
+    duration: 500
+- assertVisible: 'e4, White pawn'
+- assertVisible: 'e2, empty'
+- takeScreenshot: drag-e2-e4

@@ -1,0 +1,7009 @@
+{
+  "components": {
+    "schemas": {
+      "AccountIn": {
+        "properties": {
+          "handle": {
+            "title": "Handle",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "handle"
+        ],
+        "title": "AccountIn",
+        "type": "object"
+      },
+      "AccountLimitsOut": {
+        "properties": {
+          "history_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "History Months"
+          },
+          "max_accounts": {
+            "title": "Max Accounts",
+            "type": "integer"
+          },
+          "max_analysed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Analysed"
+          }
+        },
+        "required": [
+          "history_months",
+          "max_analysed",
+          "max_accounts"
+        ],
+        "title": "AccountLimitsOut",
+        "type": "object"
+      },
+      "AdminOut": {
+        "additionalProperties": true,
+        "properties": {
+          "database_bytes": {
+            "title": "Database Bytes",
+            "type": "integer"
+          },
+          "failed": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Failed",
+            "type": "array"
+          },
+          "last_day": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Last Day",
+            "type": "object"
+          },
+          "queued": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Queued",
+            "type": "array"
+          },
+          "running": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Running",
+            "type": "array"
+          },
+          "users": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Users",
+            "type": "array"
+          }
+        },
+        "required": [
+          "queued",
+          "running",
+          "failed",
+          "last_day",
+          "database_bytes",
+          "users"
+        ],
+        "title": "AdminOut",
+        "type": "object"
+      },
+      "AheadDayOut": {
+        "description": "A day of the schedule ahead (path.ahead): the moves due then by their FSRS due date.",
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "due": {
+            "title": "Due",
+            "type": "integer"
+          },
+          "last_checks": {
+            "title": "Last Checks",
+            "type": "integer"
+          },
+          "moves": {
+            "items": {
+              "$ref": "#/components/schemas/AheadMoveOut"
+            },
+            "maxItems": 3,
+            "title": "Moves",
+            "type": "array"
+          }
+        },
+        "required": [
+          "date",
+          "due",
+          "last_checks",
+          "moves"
+        ],
+        "title": "AheadDayOut",
+        "type": "object"
+      },
+      "AheadMoveOut": {
+        "properties": {
+          "color": {
+            "enum": [
+              "white",
+              "black"
+            ],
+            "title": "Color",
+            "type": "string"
+          },
+          "fen": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fen"
+          },
+          "game_id": {
+            "title": "Game Id",
+            "type": "integer"
+          },
+          "held": {
+            "title": "Held",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "last_check": {
+            "title": "Last Check",
+            "type": "boolean"
+          },
+          "opponent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          },
+          "san": {
+            "title": "San",
+            "type": "string"
+          }
+        },
+        "required": [
+          "game_id",
+          "ply",
+          "san",
+          "label",
+          "opponent",
+          "color",
+          "fen",
+          "held",
+          "last_check"
+        ],
+        "title": "AheadMoveOut",
+        "type": "object"
+      },
+      "AnalysedGamesOut": {
+        "additionalProperties": true,
+        "properties": {
+          "analyzed": {
+            "title": "Analyzed",
+            "type": "integer"
+          },
+          "pending": {
+            "title": "Pending",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "analyzed",
+          "pending"
+        ],
+        "title": "AnalysedGamesOut",
+        "type": "object"
+      },
+      "AnalysisIn": {
+        "properties": {
+          "nodes": {
+            "maximum": 5000000.0,
+            "minimum": 50000.0,
+            "title": "Nodes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "nodes"
+        ],
+        "title": "AnalysisIn",
+        "type": "object"
+      },
+      "AnalysisOut": {
+        "properties": {
+          "nodes": {
+            "title": "Nodes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "nodes"
+        ],
+        "title": "AnalysisOut",
+        "type": "object"
+      },
+      "AnswerIn": {
+        "properties": {
+          "expected_day": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Day"
+          },
+          "game_id": {
+            "title": "Game Id",
+            "type": "integer"
+          },
+          "hinted": {
+            "default": false,
+            "title": "Hinted",
+            "type": "boolean"
+          },
+          "line_key": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{16}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Key"
+          },
+          "moves": {
+            "anyOf": [
+              {
+                "items": {
+                  "pattern": "^([a-h][1-8][a-h][1-8][qrbn]?|0000)$",
+                  "type": "string"
+                },
+                "maxItems": 31,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Moves"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          },
+          "redo": {
+            "default": false,
+            "title": "Redo",
+            "type": "boolean"
+          },
+          "seconds": {
+            "anyOf": [
+              {
+                "maximum": 86400.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seconds"
+          },
+          "uci": {
+            "anyOf": [
+              {
+                "pattern": "^([a-h][1-8][a-h][1-8][qrbn]?|0000)$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uci"
+          }
+        },
+        "required": [
+          "game_id",
+          "ply"
+        ],
+        "title": "AnswerIn",
+        "type": "object"
+      },
+      "AnswerLineOut": {
+        "additionalProperties": true,
+        "properties": {
+          "san": {
+            "items": {
+              "type": "string"
+            },
+            "title": "San",
+            "type": "array"
+          },
+          "uci": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Uci",
+            "type": "array"
+          }
+        },
+        "required": [
+          "uci",
+          "san"
+        ],
+        "title": "AnswerLineOut",
+        "type": "object"
+      },
+      "CardIn": {
+        "properties": {
+          "game_id": {
+            "title": "Game Id",
+            "type": "integer"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "game_id",
+          "ply"
+        ],
+        "title": "CardIn",
+        "type": "object"
+      },
+      "DeckAnswerOut": {
+        "additionalProperties": true,
+        "properties": {
+          "best_san": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best San"
+          },
+          "best_uci": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Uci"
+          },
+          "candidates": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidates"
+          },
+          "correct": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correct"
+          },
+          "due": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "line": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnswerLineOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mastered": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mastered"
+          },
+          "quality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quality"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "reply_san": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reply San"
+          },
+          "reply_uci": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reply Uci"
+          },
+          "status": {
+            "enum": [
+              "continue",
+              "solved",
+              "failed",
+              "shown"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "step": {
+            "title": "Step",
+            "type": "integer"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "status",
+          "step"
+        ],
+        "title": "DeckAnswerOut",
+        "type": "object"
+      },
+      "DeckCardOut": {
+        "additionalProperties": true,
+        "properties": {
+          "classification": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Classification"
+          },
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
+          "fen_before": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fen Before"
+          },
+          "fen_prev": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fen Prev"
+          },
+          "game_id": {
+            "title": "Game Id",
+            "type": "integer"
+          },
+          "lapses": {
+            "title": "Lapses",
+            "type": "integer"
+          },
+          "leech": {
+            "title": "Leech",
+            "type": "boolean"
+          },
+          "line": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Line",
+            "type": "array"
+          },
+          "line_key": {
+            "title": "Line Key",
+            "type": "string"
+          },
+          "mastered": {
+            "title": "Mastered",
+            "type": "boolean"
+          },
+          "move_number": {
+            "title": "Move Number",
+            "type": "integer"
+          },
+          "next": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/RatingPreviewOut"
+            },
+            "title": "Next",
+            "type": "object"
+          },
+          "opponent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent"
+          },
+          "opponent_avatar": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent Avatar"
+          },
+          "pattern": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pattern"
+          },
+          "played_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Played At"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          },
+          "prev_uci": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prev Uci"
+          },
+          "reviews": {
+            "title": "Reviews",
+            "type": "integer"
+          },
+          "san": {
+            "title": "San",
+            "type": "string"
+          },
+          "speed": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speed"
+          },
+          "threat": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Threat"
+          },
+          "time_control": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Control"
+          },
+          "uci": {
+            "title": "Uci",
+            "type": "string"
+          },
+          "user_outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Outcome"
+          },
+          "win_pct_before": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Win Pct Before"
+          }
+        },
+        "required": [
+          "game_id",
+          "ply",
+          "reviews",
+          "lapses",
+          "color",
+          "san",
+          "uci",
+          "move_number",
+          "classification",
+          "pattern",
+          "win_pct_before",
+          "prev_uci",
+          "opponent",
+          "played_at",
+          "time_control",
+          "speed",
+          "user_outcome",
+          "leech",
+          "fen_before",
+          "fen_prev",
+          "feedback",
+          "line",
+          "line_key",
+          "threat",
+          "mastered",
+          "next"
+        ],
+        "title": "DeckCardOut",
+        "type": "object"
+      },
+      "DeckCardStateOut": {
+        "description": "A review card of a game, for \"What slipped past you\" (watch.deck_cards).",
+        "properties": {
+          "due": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due"
+          },
+          "held": {
+            "title": "Held",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "state": {
+            "enum": [
+              "on_watch",
+              "held",
+              "stopped"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ply",
+          "state",
+          "due",
+          "label",
+          "reason",
+          "held"
+        ],
+        "title": "DeckCardStateOut",
+        "type": "object"
+      },
+      "DeckOut": {
+        "additionalProperties": true,
+        "description": "A practice session's state and its next item (`card`, `threat_item`,\n`unannounced_item` or `puzzle`; none when today's are done).",
+        "properties": {
+          "card": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeckCardOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extra": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExtraWatchOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "focus": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FocusOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "games": {
+            "$ref": "#/components/schemas/AnalysedGamesOut"
+          },
+          "kinds": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Kinds",
+            "type": "object"
+          },
+          "learning": {
+            "title": "Learning",
+            "type": "integer"
+          },
+          "lesson": {
+            "$ref": "#/components/schemas/DoneTotalOut"
+          },
+          "mastered": {
+            "title": "Mastered",
+            "type": "integer"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "enum": [
+                  "taught",
+                  "volume",
+                  "defend",
+                  "unannounced",
+                  "review"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mode"
+          },
+          "new": {
+            "title": "New",
+            "type": "integer"
+          },
+          "puzzle": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Puzzle"
+          },
+          "puzzle_results": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Puzzle Results",
+            "type": "array"
+          },
+          "puzzles": {
+            "$ref": "#/components/schemas/PuzzleSessionOut"
+          },
+          "results": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "server_day": {
+            "title": "Server Day",
+            "type": "string"
+          },
+          "suspended": {
+            "title": "Suspended",
+            "type": "integer"
+          },
+          "threat_item": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Threat Item"
+          },
+          "today": {
+            "$ref": "#/components/schemas/DoneTotalOut"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "unannounced_item": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unannounced Item"
+          },
+          "ward": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WardOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "total",
+          "new",
+          "learning",
+          "mastered",
+          "suspended",
+          "kinds",
+          "today",
+          "server_day",
+          "games",
+          "results",
+          "lesson",
+          "focus",
+          "puzzle",
+          "puzzles",
+          "puzzle_results",
+          "card",
+          "threat_item",
+          "unannounced_item"
+        ],
+        "title": "DeckOut",
+        "type": "object"
+      },
+      "DoneTotalOut": {
+        "additionalProperties": true,
+        "properties": {
+          "done": {
+            "title": "Done",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "done",
+          "total"
+        ],
+        "title": "DoneTotalOut",
+        "type": "object"
+      },
+      "EngineLineOut": {
+        "additionalProperties": true,
+        "properties": {
+          "moves": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Moves",
+            "type": "array"
+          },
+          "start_fen": {
+            "title": "Start Fen",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          }
+        },
+        "required": [
+          "start_fen",
+          "moves",
+          "summary"
+        ],
+        "title": "EngineLineOut",
+        "type": "object"
+      },
+      "EngineLinesOut": {
+        "additionalProperties": true,
+        "properties": {
+          "best": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EngineLineOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "why": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EngineLineOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "EngineLinesOut",
+        "type": "object"
+      },
+      "ExtraWatchOut": {
+        "description": "An extra watch's progress, and the extra watches kept tonight (this one once done).",
+        "properties": {
+          "done": {
+            "title": "Done",
+            "type": "integer"
+          },
+          "kept": {
+            "title": "Kept",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "done",
+          "total",
+          "kept"
+        ],
+        "title": "ExtraWatchOut",
+        "type": "object"
+      },
+      "FeedbackOut": {
+        "properties": {
+          "feedback": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          }
+        },
+        "required": [
+          "feedback"
+        ],
+        "title": "FeedbackOut",
+        "type": "object"
+      },
+      "FirstStarOut": {
+        "description": "Before any star: the held move closest to stopping slipping (path.first_star).",
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "number"
+          },
+          "game_id": {
+            "title": "Game Id",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "needs_family": {
+            "title": "Needs Family",
+            "type": "boolean"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          },
+          "san": {
+            "title": "San",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "game_id",
+          "ply",
+          "san",
+          "label",
+          "days",
+          "target",
+          "needs_family"
+        ],
+        "title": "FirstStarOut",
+        "type": "object"
+      },
+      "FocusOut": {
+        "additionalProperties": true,
+        "properties": {
+          "cost": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "Cost"
+          },
+          "key": {
+            "enum": [
+              "safety",
+              "tactics",
+              "calculation"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "window": {
+            "title": "Window",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "cost",
+          "window"
+        ],
+        "title": "FocusOut",
+        "type": "object"
+      },
+      "GameDetailOut": {
+        "additionalProperties": true,
+        "properties": {
+          "account": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Account"
+          },
+          "accuracy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy"
+          },
+          "analysed": {
+            "title": "Analysed",
+            "type": "boolean"
+          },
+          "black": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Black"
+          },
+          "black_elo": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Black Elo"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "enum": [
+                  "white",
+                  "black"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "deck_cards": {
+            "items": {
+              "$ref": "#/components/schemas/DeckCardStateOut"
+            },
+            "title": "Deck Cards",
+            "type": "array"
+          },
+          "deck_plies": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Deck Plies",
+            "type": "array"
+          },
+          "eco": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eco"
+          },
+          "engine_accuracy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engine Accuracy"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "opening": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opening"
+          },
+          "opponent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent"
+          },
+          "opponent_accuracy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent Accuracy"
+          },
+          "opponent_avatar": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent Avatar"
+          },
+          "opponent_rating": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent Rating"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "played_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Played At"
+          },
+          "plies": {
+            "items": {
+              "$ref": "#/components/schemas/GameMoveOut"
+            },
+            "title": "Plies",
+            "type": "array"
+          },
+          "review_marks": {
+            "items": {
+              "$ref": "#/components/schemas/ReviewMarkOut"
+            },
+            "title": "Review Marks",
+            "type": "array"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "san": {
+            "items": {
+              "type": "string"
+            },
+            "title": "San",
+            "type": "array"
+          },
+          "slips": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SlipsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "speed": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speed"
+          },
+          "start_fen": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Fen"
+          },
+          "time_control": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Control"
+          },
+          "user_avatar": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Avatar"
+          },
+          "white": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "White"
+          },
+          "white_elo": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "White Elo"
+          }
+        },
+        "required": [
+          "id",
+          "opponent",
+          "played_at",
+          "speed",
+          "outcome",
+          "analysed",
+          "color",
+          "opponent_rating",
+          "opening",
+          "eco",
+          "time_control",
+          "accuracy",
+          "reviewed_at",
+          "account",
+          "white",
+          "black",
+          "white_elo",
+          "black_elo",
+          "start_fen",
+          "san",
+          "engine_accuracy",
+          "opponent_accuracy",
+          "plies",
+          "deck_plies",
+          "deck_cards",
+          "review_marks"
+        ],
+        "title": "GameDetailOut",
+        "type": "object"
+      },
+      "GameListItemOut": {
+        "additionalProperties": true,
+        "properties": {
+          "accuracy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy"
+          },
+          "analysed": {
+            "title": "Analysed",
+            "type": "boolean"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "enum": [
+                  "white",
+                  "black"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "eco": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eco"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "opening": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opening"
+          },
+          "opponent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent"
+          },
+          "opponent_avatar": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent Avatar"
+          },
+          "opponent_rating": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent Rating"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "played_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Played At"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "slips": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SlipsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "speed": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speed"
+          },
+          "time_control": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Control"
+          }
+        },
+        "required": [
+          "id",
+          "opponent",
+          "played_at",
+          "speed",
+          "outcome",
+          "analysed",
+          "color",
+          "opponent_rating",
+          "opening",
+          "eco",
+          "time_control",
+          "accuracy",
+          "reviewed_at"
+        ],
+        "title": "GameListItemOut",
+        "type": "object"
+      },
+      "GameMoveOut": {
+        "additionalProperties": true,
+        "properties": {
+          "best_san": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best San"
+          },
+          "best_uci": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Uci"
+          },
+          "cause": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cause"
+          },
+          "classification": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Classification"
+          },
+          "clock_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clock Left"
+          },
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "eval_after": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eval After"
+          },
+          "is_user": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is User"
+          },
+          "layer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Layer"
+          },
+          "mate_after": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mate After"
+          },
+          "pattern": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pattern"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          },
+          "principle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Principle"
+          },
+          "san": {
+            "title": "San",
+            "type": "string"
+          },
+          "time_spent": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Spent"
+          },
+          "time_trouble": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Trouble"
+          },
+          "uci": {
+            "title": "Uci",
+            "type": "string"
+          },
+          "win_pct_after": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Win Pct After"
+          },
+          "win_pct_before": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Win Pct Before"
+          }
+        },
+        "required": [
+          "ply",
+          "color",
+          "is_user",
+          "san",
+          "uci",
+          "best_san",
+          "best_uci",
+          "eval_after",
+          "mate_after",
+          "win_pct_before",
+          "win_pct_after",
+          "classification",
+          "clock_left",
+          "time_spent",
+          "pattern",
+          "layer",
+          "time_trouble",
+          "cause",
+          "principle"
+        ],
+        "title": "GameMoveOut",
+        "type": "object"
+      },
+      "GameReviewCountsOut": {
+        "properties": {
+          "all": {
+            "title": "All",
+            "type": "integer"
+          },
+          "reviewed": {
+            "title": "Reviewed",
+            "type": "integer"
+          },
+          "to_review": {
+            "title": "To Review",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "all",
+          "to_review",
+          "reviewed"
+        ],
+        "title": "GameReviewCountsOut",
+        "type": "object"
+      },
+      "GameTrendOut": {
+        "properties": {
+          "games": {
+            "title": "Games",
+            "type": "integer"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "const": "few_games",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "since": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Since"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/TrendSkillOut"
+            },
+            "maxItems": 3,
+            "minItems": 3,
+            "title": "Skills",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "window": {
+            "title": "Window",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "window",
+          "games",
+          "reason",
+          "since",
+          "skills"
+        ],
+        "title": "GameTrendOut",
+        "type": "object"
+      },
+      "GamesListOut": {
+        "properties": {
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Counts",
+            "type": "object"
+          },
+          "games": {
+            "items": {
+              "$ref": "#/components/schemas/GameListItemOut"
+            },
+            "title": "Games",
+            "type": "array"
+          },
+          "next_review": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GameListItemOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "review_counts": {
+            "$ref": "#/components/schemas/GameReviewCountsOut"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "week": {
+            "$ref": "#/components/schemas/WeekOut"
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "page_size",
+          "counts",
+          "games",
+          "review_counts",
+          "next_review",
+          "week"
+        ],
+        "title": "GamesListOut",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HeldOut": {
+        "description": "What a watch held: answers right, answers wrong and moves that stopped slipping.",
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "held": {
+            "title": "Held",
+            "type": "integer"
+          },
+          "slipped": {
+            "title": "Slipped",
+            "type": "integer"
+          },
+          "stopped": {
+            "title": "Stopped",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "date",
+          "held",
+          "slipped",
+          "stopped"
+        ],
+        "title": "HeldOut",
+        "type": "object"
+      },
+      "HintIn": {
+        "properties": {
+          "game_id": {
+            "title": "Game Id",
+            "type": "integer"
+          },
+          "line_key": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{16}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Key"
+          },
+          "moves": {
+            "anyOf": [
+              {
+                "items": {
+                  "pattern": "^([a-h][1-8][a-h][1-8][qrbn]?|0000)$",
+                  "type": "string"
+                },
+                "maxItems": 30,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Moves"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "game_id",
+          "ply"
+        ],
+        "title": "HintIn",
+        "type": "object"
+      },
+      "HintOut": {
+        "properties": {
+          "best_uci": {
+            "title": "Best Uci",
+            "type": "string"
+          },
+          "from": {
+            "title": "From",
+            "type": "string"
+          }
+        },
+        "required": [
+          "best_uci",
+          "from"
+        ],
+        "title": "HintOut",
+        "type": "object"
+      },
+      "HomeOut": {
+        "properties": {
+          "journey": {
+            "$ref": "#/components/schemas/JourneyOut"
+          },
+          "today": {
+            "$ref": "#/components/schemas/TodayOut"
+          }
+        },
+        "required": [
+          "today",
+          "journey"
+        ],
+        "title": "HomeOut",
+        "type": "object"
+      },
+      "HomePuzzlesOut": {
+        "additionalProperties": true,
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "done": {
+            "title": "Done",
+            "type": "integer"
+          },
+          "session": {
+            "title": "Session",
+            "type": "integer"
+          },
+          "share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share"
+          },
+          "theme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Theme"
+          }
+        },
+        "required": [
+          "done",
+          "session",
+          "available",
+          "theme",
+          "share"
+        ],
+        "title": "HomePuzzlesOut",
+        "type": "object"
+      },
+      "HttpErrorOut": {
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          }
+        },
+        "required": [
+          "detail"
+        ],
+        "title": "HttpErrorOut",
+        "type": "object"
+      },
+      "ImportFindingOut": {
+        "properties": {
+          "best_san": {
+            "title": "Best San",
+            "type": "string"
+          },
+          "classification": {
+            "title": "Classification",
+            "type": "string"
+          },
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "move_number": {
+            "title": "Move Number",
+            "type": "integer"
+          },
+          "opponent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent"
+          },
+          "played_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Played At"
+          },
+          "san": {
+            "title": "San",
+            "type": "string"
+          }
+        },
+        "required": [
+          "opponent",
+          "played_at",
+          "move_number",
+          "color",
+          "san",
+          "best_san",
+          "classification"
+        ],
+        "title": "ImportFindingOut",
+        "type": "object"
+      },
+      "ImportStatusOut": {
+        "properties": {
+          "accounts": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Accounts",
+            "type": "array"
+          },
+          "current_run": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Run"
+          },
+          "last_run": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Run"
+          },
+          "queued": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Queued",
+            "type": "array"
+          }
+        },
+        "required": [
+          "accounts",
+          "queued",
+          "current_run",
+          "last_run"
+        ],
+        "title": "ImportStatusOut",
+        "type": "object"
+      },
+      "ImportSummaryOut": {
+        "properties": {
+          "blunders": {
+            "title": "Blunders",
+            "type": "integer"
+          },
+          "misses": {
+            "title": "Misses",
+            "type": "integer"
+          },
+          "mistakes": {
+            "title": "Mistakes",
+            "type": "integer"
+          },
+          "pattern": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pattern"
+          },
+          "positions": {
+            "title": "Positions",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "blunders",
+          "mistakes",
+          "misses",
+          "positions",
+          "pattern"
+        ],
+        "title": "ImportSummaryOut",
+        "type": "object"
+      },
+      "JourneyMapOut": {
+        "description": "The Progress map and the home path (GET /api/journey).",
+        "properties": {
+          "ahead": {
+            "items": {
+              "$ref": "#/components/schemas/AheadDayOut"
+            },
+            "title": "Ahead",
+            "type": "array"
+          },
+          "dimmed": {
+            "title": "Dimmed",
+            "type": "integer"
+          },
+          "first_star": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FirstStarOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "history": {
+            "$ref": "#/components/schemas/PathHistoryOut"
+          },
+          "moves": {
+            "$ref": "#/components/schemas/SlipsOut"
+          },
+          "next_post": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Post"
+          },
+          "next_rank": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Rank"
+          },
+          "nights": {
+            "$ref": "#/components/schemas/NightsOut"
+          },
+          "rank": {
+            "title": "Rank",
+            "type": "string"
+          },
+          "rank_reached_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank Reached On"
+          },
+          "ranks": {
+            "items": {
+              "$ref": "#/components/schemas/RankOut"
+            },
+            "title": "Ranks",
+            "type": "array"
+          },
+          "star_list": {
+            "items": {
+              "$ref": "#/components/schemas/StarOut"
+            },
+            "title": "Star List",
+            "type": "array"
+          },
+          "stars": {
+            "title": "Stars",
+            "type": "integer"
+          },
+          "wards": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/WardOut"
+            },
+            "title": "Wards",
+            "type": "array"
+          }
+        },
+        "required": [
+          "stars",
+          "rank",
+          "rank_reached_on",
+          "next_rank",
+          "next_post",
+          "dimmed",
+          "ranks",
+          "star_list",
+          "nights",
+          "ahead",
+          "history",
+          "first_star",
+          "moves"
+        ],
+        "title": "JourneyMapOut",
+        "type": "object"
+      },
+      "JourneyOut": {
+        "description": "Stars and rank (watch.journey_summary).",
+        "properties": {
+          "next_post": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Post"
+          },
+          "next_rank": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Rank"
+          },
+          "rank": {
+            "title": "Rank",
+            "type": "string"
+          },
+          "rank_reached_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank Reached On"
+          },
+          "stars": {
+            "title": "Stars",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "stars",
+          "rank",
+          "rank_reached_on",
+          "next_rank",
+          "next_post"
+        ],
+        "title": "JourneyOut",
+        "type": "object"
+      },
+      "KeptNightOut": {
+        "description": "A kept night's watch (GET /api/journey/night): its moves and where each stands now.",
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "held": {
+            "title": "Held",
+            "type": "integer"
+          },
+          "moves": {
+            "items": {
+              "$ref": "#/components/schemas/NightMoveOut"
+            },
+            "title": "Moves",
+            "type": "array"
+          },
+          "night": {
+            "title": "Night",
+            "type": "integer"
+          },
+          "slipped": {
+            "title": "Slipped",
+            "type": "integer"
+          },
+          "stopped": {
+            "title": "Stopped",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "date",
+          "held",
+          "slipped",
+          "stopped",
+          "night",
+          "moves"
+        ],
+        "title": "KeptNightOut",
+        "type": "object"
+      },
+      "LearnMoreOut": {
+        "properties": {
+          "added": {
+            "title": "Added",
+            "type": "integer"
+          },
+          "day": {
+            "title": "Day",
+            "type": "string"
+          }
+        },
+        "required": [
+          "added",
+          "day"
+        ],
+        "title": "LearnMoreOut",
+        "type": "object"
+      },
+      "LinkedAccountOut": {
+        "properties": {
+          "handle": {
+            "title": "Handle",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "handle"
+        ],
+        "title": "LinkedAccountOut",
+        "type": "object"
+      },
+      "LookupAccountOut": {
+        "properties": {
+          "games": {
+            "title": "Games",
+            "type": "integer"
+          },
+          "handle": {
+            "title": "Handle",
+            "type": "string"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "rating_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating Kind"
+          },
+          "since": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Since"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "handle",
+          "rating",
+          "rating_kind",
+          "games",
+          "since"
+        ],
+        "title": "LookupAccountOut",
+        "type": "object"
+      },
+      "MeOut": {
+        "properties": {
+          "admin": {
+            "title": "Admin",
+            "type": "boolean"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/AccountLimitsOut"
+          }
+        },
+        "required": [
+          "admin",
+          "limits"
+        ],
+        "title": "MeOut",
+        "type": "object"
+      },
+      "NightMilestoneOut": {
+        "properties": {
+          "nights": {
+            "title": "Nights",
+            "type": "integer"
+          },
+          "reached_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reached On"
+          }
+        },
+        "required": [
+          "nights",
+          "reached_on"
+        ],
+        "title": "NightMilestoneOut",
+        "type": "object"
+      },
+      "NightMoveOut": {
+        "properties": {
+          "color": {
+            "enum": [
+              "white",
+              "black"
+            ],
+            "title": "Color",
+            "type": "string"
+          },
+          "due": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due"
+          },
+          "fen": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fen"
+          },
+          "game_id": {
+            "title": "Game Id",
+            "type": "integer"
+          },
+          "held_then": {
+            "title": "Held Then",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "opponent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          },
+          "san": {
+            "title": "San",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "on_watch",
+              "held",
+              "stopped",
+              "hidden"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "game_id",
+          "ply",
+          "san",
+          "label",
+          "opponent",
+          "color",
+          "fen",
+          "held_then",
+          "state",
+          "due"
+        ],
+        "title": "NightMoveOut",
+        "type": "object"
+      },
+      "NightsOut": {
+        "properties": {
+          "milestones": {
+            "items": {
+              "$ref": "#/components/schemas/NightMilestoneOut"
+            },
+            "title": "Milestones",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "milestones"
+        ],
+        "title": "NightsOut",
+        "type": "object"
+      },
+      "OkOut": {
+        "properties": {
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "title": "OkOut",
+        "type": "object"
+      },
+      "OnboardingOut": {
+        "properties": {
+          "accounts": {
+            "items": {
+              "$ref": "#/components/schemas/LinkedAccountOut"
+            },
+            "title": "Accounts",
+            "type": "array"
+          },
+          "analysed": {
+            "title": "Analysed",
+            "type": "integer"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/ImportFindingOut"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "games": {
+            "title": "Games",
+            "type": "integer"
+          },
+          "step": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/ImportSummaryOut"
+          },
+          "target": {
+            "title": "Target",
+            "type": "integer"
+          },
+          "working": {
+            "title": "Working",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "accounts",
+          "games",
+          "analysed",
+          "target",
+          "working",
+          "step",
+          "findings",
+          "summary"
+        ],
+        "title": "OnboardingOut",
+        "type": "object"
+      },
+      "OverviewOut": {
+        "additionalProperties": true,
+        "description": "Only `skill_shape` and `game_trend` are typed so far; the other overview fields pass\nthrough as they are.",
+        "properties": {
+          "game_trend": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GameTrendOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "skill_shape": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SkillShapeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "OverviewOut",
+        "type": "object"
+      },
+      "PathHistoryOut": {
+        "description": "Every kept night, oldest first (night N is the Nth), and every finished extra watch.",
+        "properties": {
+          "extra": {
+            "items": {
+              "$ref": "#/components/schemas/HeldOut"
+            },
+            "title": "Extra",
+            "type": "array"
+          },
+          "nights": {
+            "items": {
+              "$ref": "#/components/schemas/HeldOut"
+            },
+            "title": "Nights",
+            "type": "array"
+          }
+        },
+        "required": [
+          "nights",
+          "extra"
+        ],
+        "title": "PathHistoryOut",
+        "type": "object"
+      },
+      "PatternCountOut": {
+        "additionalProperties": true,
+        "description": "A tactic's tagged moves in the range, by label (blunder, mistake, miss and any other).",
+        "properties": {
+          "pattern": {
+            "title": "Pattern",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "pattern",
+          "total"
+        ],
+        "title": "PatternCountOut",
+        "type": "object"
+      },
+      "PatternsOut": {
+        "additionalProperties": true,
+        "properties": {
+          "deck_health": {
+            "additionalProperties": true,
+            "title": "Deck Health",
+            "type": "object"
+          },
+          "memory": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Memory",
+            "type": "array"
+          },
+          "patterns": {
+            "items": {
+              "$ref": "#/components/schemas/PatternCountOut"
+            },
+            "title": "Patterns",
+            "type": "array"
+          },
+          "pending": {
+            "title": "Pending",
+            "type": "integer"
+          },
+          "range": {
+            "enum": [
+              "30d",
+              "90d",
+              "all"
+            ],
+            "title": "Range",
+            "type": "string"
+          },
+          "strength": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Strength",
+            "type": "array"
+          }
+        },
+        "required": [
+          "range",
+          "patterns",
+          "pending",
+          "strength",
+          "memory",
+          "deck_health"
+        ],
+        "title": "PatternsOut",
+        "type": "object"
+      },
+      "PositionPreviewIn": {
+        "properties": {
+          "fen": {
+            "maxLength": 200,
+            "title": "Fen",
+            "type": "string"
+          },
+          "moves": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 256,
+            "title": "Moves",
+            "type": "array"
+          }
+        },
+        "required": [
+          "fen"
+        ],
+        "title": "PositionPreviewIn",
+        "type": "object"
+      },
+      "PositionPreviewOut": {
+        "additionalProperties": true,
+        "properties": {
+          "eval_cp": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eval Cp"
+          },
+          "mate": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mate"
+          },
+          "moves": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Moves",
+            "type": "array"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "san": {
+            "items": {
+              "type": "string"
+            },
+            "title": "San",
+            "type": "array"
+          },
+          "start_fen": {
+            "title": "Start Fen",
+            "type": "string"
+          },
+          "white_win": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "title": "White Win"
+          }
+        },
+        "required": [
+          "start_fen",
+          "moves",
+          "san",
+          "result",
+          "eval_cp",
+          "mate",
+          "white_win"
+        ],
+        "title": "PositionPreviewOut",
+        "type": "object"
+      },
+      "PracticeIn": {
+        "properties": {
+          "pace": {
+            "enum": [
+              "light",
+              "standard",
+              "intense"
+            ],
+            "title": "Pace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pace"
+        ],
+        "title": "PracticeIn",
+        "type": "object"
+      },
+      "PracticeOut": {
+        "properties": {
+          "pace": {
+            "enum": [
+              "light",
+              "standard",
+              "intense"
+            ],
+            "title": "Pace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pace"
+        ],
+        "title": "PracticeOut",
+        "type": "object"
+      },
+      "PublicConfigOut": {
+        "properties": {
+          "clerk_publishable_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clerk Publishable Key"
+          },
+          "contact": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact"
+          }
+        },
+        "required": [
+          "clerk_publishable_key",
+          "contact"
+        ],
+        "title": "PublicConfigOut",
+        "type": "object"
+      },
+      "PuzzleAnswerIn": {
+        "properties": {
+          "expected_day": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Day"
+          },
+          "hinted": {
+            "default": false,
+            "title": "Hinted",
+            "type": "boolean"
+          },
+          "id": {
+            "pattern": "^[A-Za-z0-9]{1,16}$",
+            "title": "Id",
+            "type": "string"
+          },
+          "line_key": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{16}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Key"
+          },
+          "moves": {
+            "items": {
+              "pattern": "^([a-h][1-8][a-h][1-8][qrbn]?|0000)$",
+              "type": "string"
+            },
+            "maxItems": 31,
+            "minItems": 1,
+            "title": "Moves",
+            "type": "array"
+          },
+          "redo": {
+            "default": false,
+            "title": "Redo",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "moves"
+        ],
+        "title": "PuzzleAnswerIn",
+        "type": "object"
+      },
+      "PuzzleAnswerOut": {
+        "additionalProperties": true,
+        "properties": {
+          "best_san": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best San"
+          },
+          "best_uci": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Uci"
+          },
+          "correct": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correct"
+          },
+          "done_today": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Done Today"
+          },
+          "due": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "line": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnswerLineOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mastered": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mastered"
+          },
+          "quality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quality"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "recorded": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recorded"
+          },
+          "reply_san": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reply San"
+          },
+          "reply_uci": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reply Uci"
+          },
+          "status": {
+            "enum": [
+              "continue",
+              "solved",
+              "failed",
+              "shown"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "step": {
+            "title": "Step",
+            "type": "integer"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "status",
+          "step"
+        ],
+        "title": "PuzzleAnswerOut",
+        "type": "object"
+      },
+      "PuzzleHintIn": {
+        "properties": {
+          "id": {
+            "pattern": "^[A-Za-z0-9]{1,16}$",
+            "title": "Id",
+            "type": "string"
+          },
+          "line_key": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{16}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Key"
+          },
+          "moves": {
+            "items": {
+              "pattern": "^([a-h][1-8][a-h][1-8][qrbn]?|0000)$",
+              "type": "string"
+            },
+            "maxItems": 30,
+            "title": "Moves",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "PuzzleHintIn",
+        "type": "object"
+      },
+      "PuzzleSessionOut": {
+        "additionalProperties": true,
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "done": {
+            "title": "Done",
+            "type": "integer"
+          },
+          "session": {
+            "title": "Session",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "done",
+          "session",
+          "available"
+        ],
+        "title": "PuzzleSessionOut",
+        "type": "object"
+      },
+      "RankOut": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "post": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Post"
+          },
+          "reached_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reached On"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "post",
+          "reached_on"
+        ],
+        "title": "RankOut",
+        "type": "object"
+      },
+      "RatingPreviewOut": {
+        "additionalProperties": true,
+        "properties": {
+          "due": {
+            "title": "Due",
+            "type": "string"
+          },
+          "mastered": {
+            "title": "Mastered",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "due",
+          "mastered"
+        ],
+        "title": "RatingPreviewOut",
+        "type": "object"
+      },
+      "ReviewIn": {
+        "properties": {
+          "marks": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/StepMarkIn"
+            },
+            "maxItems": 200,
+            "title": "Marks",
+            "type": "array"
+          }
+        },
+        "title": "ReviewIn",
+        "type": "object"
+      },
+      "ReviewMarkOut": {
+        "additionalProperties": true,
+        "description": "A stored review mark (StepMarkIn when it was saved).",
+        "properties": {
+          "mark": {
+            "title": "Mark",
+            "type": "string"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "ply",
+          "mark"
+        ],
+        "title": "ReviewMarkOut",
+        "type": "object"
+      },
+      "ReviewedOut": {
+        "properties": {
+          "reviewed_at": {
+            "title": "Reviewed At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reviewed_at"
+        ],
+        "title": "ReviewedOut",
+        "type": "object"
+      },
+      "SettingsAccountOut": {
+        "additionalProperties": true,
+        "properties": {
+          "handle": {
+            "title": "Handle",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "synced_through": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Synced Through"
+          }
+        },
+        "required": [
+          "source",
+          "handle",
+          "synced_through"
+        ],
+        "title": "SettingsAccountOut",
+        "type": "object"
+      },
+      "SettingsOut": {
+        "additionalProperties": true,
+        "properties": {
+          "accounts": {
+            "items": {
+              "$ref": "#/components/schemas/SettingsAccountOut"
+            },
+            "title": "Accounts",
+            "type": "array"
+          },
+          "backups": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Backups"
+          },
+          "current_run": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Run"
+          },
+          "database": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Database"
+          },
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "earlier_runs": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Earlier Runs",
+            "type": "array"
+          },
+          "engine": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engine"
+          },
+          "fsrs": {
+            "additionalProperties": true,
+            "title": "Fsrs",
+            "type": "object"
+          },
+          "last_run": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Run"
+          },
+          "lichess_token": {
+            "title": "Lichess Token",
+            "type": "boolean"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/AccountLimitsOut"
+          },
+          "nodes": {
+            "title": "Nodes",
+            "type": "integer"
+          },
+          "pace": {
+            "title": "Pace",
+            "type": "string"
+          },
+          "running": {
+            "title": "Running",
+            "type": "boolean"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          },
+          "watch": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WatchOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "your_data": {
+            "additionalProperties": true,
+            "title": "Your Data",
+            "type": "object"
+          }
+        },
+        "required": [
+          "fsrs",
+          "accounts",
+          "lichess_token",
+          "last_run",
+          "earlier_runs",
+          "current_run",
+          "running",
+          "engine",
+          "nodes",
+          "pace",
+          "timezone",
+          "day",
+          "watch",
+          "your_data",
+          "limits",
+          "database",
+          "backups"
+        ],
+        "title": "SettingsOut",
+        "type": "object"
+      },
+      "SkillAxisOut": {
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "excluded": {
+            "title": "Excluded",
+            "type": "integer"
+          },
+          "games": {
+            "title": "Games",
+            "type": "integer"
+          },
+          "key": {
+            "enum": [
+              "safety",
+              "tactics",
+              "calculation",
+              "converting",
+              "defending"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "parts": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SkillPartsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "previous": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SkillPeriodOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "few_games",
+                  "few_chances"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "successes": {
+            "title": "Successes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "score",
+          "reason",
+          "successes",
+          "attempts",
+          "games",
+          "excluded",
+          "key",
+          "previous"
+        ],
+        "title": "SkillAxisOut",
+        "type": "object"
+      },
+      "SkillGamePartOut": {
+        "properties": {
+          "chances": {
+            "title": "Chances",
+            "type": "integer"
+          },
+          "found": {
+            "title": "Found",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "found",
+          "chances"
+        ],
+        "title": "SkillGamePartOut",
+        "type": "object"
+      },
+      "SkillPartsOut": {
+        "properties": {
+          "games": {
+            "$ref": "#/components/schemas/SkillGamePartOut"
+          },
+          "practice": {
+            "$ref": "#/components/schemas/SkillPracticePartOut"
+          }
+        },
+        "required": [
+          "games",
+          "practice"
+        ],
+        "title": "SkillPartsOut",
+        "type": "object"
+      },
+      "SkillPeriodOut": {
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "excluded": {
+            "title": "Excluded",
+            "type": "integer"
+          },
+          "games": {
+            "title": "Games",
+            "type": "integer"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "few_games",
+                  "few_chances"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "successes": {
+            "title": "Successes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "score",
+          "reason",
+          "successes",
+          "attempts",
+          "games",
+          "excluded"
+        ],
+        "title": "SkillPeriodOut",
+        "type": "object"
+      },
+      "SkillPracticePartOut": {
+        "properties": {
+          "solved": {
+            "title": "Solved",
+            "type": "integer"
+          },
+          "tries": {
+            "title": "Tries",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "solved",
+          "tries"
+        ],
+        "title": "SkillPracticePartOut",
+        "type": "object"
+      },
+      "SkillShapeOut": {
+        "properties": {
+          "axes": {
+            "items": {
+              "$ref": "#/components/schemas/SkillAxisOut"
+            },
+            "maxItems": 5,
+            "minItems": 5,
+            "title": "Axes",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "axes"
+        ],
+        "title": "SkillShapeOut",
+        "type": "object"
+      },
+      "SlipsOut": {
+        "description": "A game's moves that slipped past (its review cards) by where they are on the watch\n(watch.py).",
+        "properties": {
+          "held": {
+            "title": "Held",
+            "type": "integer"
+          },
+          "on_watch": {
+            "title": "On Watch",
+            "type": "integer"
+          },
+          "stopped": {
+            "title": "Stopped",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "on_watch",
+          "held",
+          "stopped"
+        ],
+        "title": "SlipsOut",
+        "type": "object"
+      },
+      "StarOut": {
+        "properties": {
+          "dimmed": {
+            "title": "Dimmed",
+            "type": "boolean"
+          },
+          "earned_on": {
+            "title": "Earned On",
+            "type": "string"
+          },
+          "game_id": {
+            "title": "Game Id",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          },
+          "san": {
+            "title": "San",
+            "type": "string"
+          }
+        },
+        "required": [
+          "game_id",
+          "ply",
+          "san",
+          "label",
+          "earned_on",
+          "dimmed"
+        ],
+        "title": "StarOut",
+        "type": "object"
+      },
+      "StepMarkIn": {
+        "properties": {
+          "mark": {
+            "enum": [
+              "found",
+              "good",
+              "helped",
+              "missed",
+              "praise",
+              "seen"
+            ],
+            "title": "Mark",
+            "type": "string"
+          },
+          "ply": {
+            "minimum": 1.0,
+            "title": "Ply",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "ply",
+          "mark"
+        ],
+        "title": "StepMarkIn",
+        "type": "object"
+      },
+      "StreakDayOut": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "night": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Night"
+          },
+          "state": {
+            "enum": [
+              "done",
+              "frozen",
+              "rest",
+              "missed",
+              "none",
+              "today",
+              "upcoming"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "state"
+        ],
+        "title": "StreakDayOut",
+        "type": "object"
+      },
+      "StreakDaysOut": {
+        "properties": {
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/StreakDayOut"
+            },
+            "title": "Days",
+            "type": "array"
+          }
+        },
+        "required": [
+          "days"
+        ],
+        "title": "StreakDaysOut",
+        "type": "object"
+      },
+      "StreakOut": {
+        "additionalProperties": true,
+        "description": "The streak as of today (daily.streak).",
+        "properties": {
+          "best": {
+            "title": "Best",
+            "type": "integer"
+          },
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "freezes": {
+            "title": "Freezes",
+            "type": "integer"
+          },
+          "last_kept": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Kept"
+          },
+          "nights_total": {
+            "title": "Nights Total",
+            "type": "integer"
+          },
+          "safe_today": {
+            "title": "Safe Today",
+            "type": "boolean"
+          },
+          "week": {
+            "items": {
+              "$ref": "#/components/schemas/StreakDayOut"
+            },
+            "title": "Week",
+            "type": "array"
+          }
+        },
+        "required": [
+          "count",
+          "best",
+          "freezes",
+          "safe_today",
+          "last_kept",
+          "nights_total",
+          "week"
+        ],
+        "title": "StreakOut",
+        "type": "object"
+      },
+      "SuspendIn": {
+        "properties": {
+          "game_id": {
+            "title": "Game Id",
+            "type": "integer"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          },
+          "reason": {
+            "enum": [
+              "engine_wrong",
+              "not_useful",
+              "already_known"
+            ],
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "game_id",
+          "ply",
+          "reason"
+        ],
+        "title": "SuspendIn",
+        "type": "object"
+      },
+      "SuspendedCardOut": {
+        "properties": {
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "game_id": {
+            "title": "Game Id",
+            "type": "integer"
+          },
+          "move_number": {
+            "title": "Move Number",
+            "type": "integer"
+          },
+          "opponent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent"
+          },
+          "pattern": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pattern"
+          },
+          "played_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Played At"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "engine_wrong",
+                  "not_useful",
+                  "already_known"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "san": {
+            "title": "San",
+            "type": "string"
+          },
+          "suspended_at": {
+            "title": "Suspended At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "game_id",
+          "ply",
+          "suspended_at",
+          "reason",
+          "san",
+          "move_number",
+          "color",
+          "pattern",
+          "opponent",
+          "played_at"
+        ],
+        "title": "SuspendedCardOut",
+        "type": "object"
+      },
+      "SuspendedOut": {
+        "properties": {
+          "suspended": {
+            "title": "Suspended",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "suspended"
+        ],
+        "title": "SuspendedOut",
+        "type": "object"
+      },
+      "ThreatAnswerIn": {
+        "properties": {
+          "answer": {
+            "pattern": "^([a-h][1-8][a-h][1-8][qrbn]?|none)$",
+            "title": "Answer",
+            "type": "string"
+          },
+          "expected_day": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Day"
+          },
+          "game_id": {
+            "title": "Game Id",
+            "type": "integer"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          },
+          "seconds": {
+            "anyOf": [
+              {
+                "maximum": 86400.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seconds"
+          }
+        },
+        "required": [
+          "game_id",
+          "ply",
+          "answer"
+        ],
+        "title": "ThreatAnswerIn",
+        "type": "object"
+      },
+      "ThreatAnswerOut": {
+        "additionalProperties": true,
+        "properties": {
+          "correct": {
+            "title": "Correct",
+            "type": "boolean"
+          },
+          "due": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "threats": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Threats",
+            "type": "array"
+          }
+        },
+        "required": [
+          "correct",
+          "rating",
+          "due",
+          "threats"
+        ],
+        "title": "ThreatAnswerOut",
+        "type": "object"
+      },
+      "TimezoneIn": {
+        "properties": {
+          "timezone": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Timezone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "timezone"
+        ],
+        "title": "TimezoneIn",
+        "type": "object"
+      },
+      "TimezoneOut": {
+        "properties": {
+          "day": {
+            "title": "Day",
+            "type": "string"
+          },
+          "timezone": {
+            "title": "Timezone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "timezone",
+          "day"
+        ],
+        "title": "TimezoneOut",
+        "type": "object"
+      },
+      "TodayOut": {
+        "additionalProperties": true,
+        "description": "Today's goal, with the daily review's plan, streak and memory (daily.py).",
+        "properties": {
+          "deck_total": {
+            "title": "Deck Total",
+            "type": "integer"
+          },
+          "game": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GameListItemOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "new_games": {
+            "title": "New Games",
+            "type": "integer"
+          },
+          "new_games_slipped": {
+            "title": "New Games Slipped",
+            "type": "integer"
+          },
+          "positions": {
+            "$ref": "#/components/schemas/DoneTotalOut"
+          },
+          "puzzles": {
+            "$ref": "#/components/schemas/HomePuzzlesOut"
+          },
+          "reviewed_today": {
+            "title": "Reviewed Today",
+            "type": "integer"
+          },
+          "streak": {
+            "$ref": "#/components/schemas/StreakOut"
+          },
+          "tonight": {
+            "$ref": "#/components/schemas/TonightOut"
+          },
+          "watch": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WatchOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "game",
+          "new_games",
+          "new_games_slipped",
+          "reviewed_today",
+          "positions",
+          "deck_total",
+          "puzzles",
+          "watch",
+          "streak",
+          "tonight"
+        ],
+        "title": "TodayOut",
+        "type": "object"
+      },
+      "TonightCardOut": {
+        "description": "A move row on the Watch page's tonight card (watch.tonight).",
+        "properties": {
+          "chip": {
+            "anyOf": [
+              {
+                "enum": [
+                  "new",
+                  "again",
+                  "almost"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chip"
+          },
+          "color": {
+            "enum": [
+              "white",
+              "black"
+            ],
+            "title": "Color",
+            "type": "string"
+          },
+          "fen": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fen"
+          },
+          "game_id": {
+            "title": "Game Id",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "opponent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent"
+          },
+          "played_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Played At"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          },
+          "san": {
+            "title": "San",
+            "type": "string"
+          }
+        },
+        "required": [
+          "game_id",
+          "ply",
+          "san",
+          "label",
+          "opponent",
+          "played_at",
+          "chip",
+          "color",
+          "fen"
+        ],
+        "title": "TonightCardOut",
+        "type": "object"
+      },
+      "TonightGameOut": {
+        "description": "The newly analysed game whose new slips lead tonight's lesson (deck.lead_game).",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "opponent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opponent"
+          },
+          "played_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Played At"
+          },
+          "slipped": {
+            "title": "Slipped",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "opponent",
+          "played_at",
+          "slipped"
+        ],
+        "title": "TonightGameOut",
+        "type": "object"
+      },
+      "TonightOut": {
+        "properties": {
+          "cards": {
+            "items": {
+              "$ref": "#/components/schemas/TonightCardOut"
+            },
+            "maxItems": 3,
+            "title": "Cards",
+            "type": "array"
+          },
+          "game": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TonightGameOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "remaining": {
+            "title": "Remaining",
+            "type": "integer"
+          },
+          "slipped_recent": {
+            "title": "Slipped Recent",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "slipped_recent",
+          "cards",
+          "remaining"
+        ],
+        "title": "TonightOut",
+        "type": "object"
+      },
+      "TrendPracticeOut": {
+        "properties": {
+          "earlier": {
+            "title": "Earlier",
+            "type": "integer"
+          },
+          "recent": {
+            "title": "Recent",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "recent",
+          "earlier"
+        ],
+        "title": "TrendPracticeOut",
+        "type": "object"
+      },
+      "TrendSkillOut": {
+        "properties": {
+          "change": {
+            "anyOf": [
+              {
+                "enum": [
+                  "fewer",
+                  "same",
+                  "more"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost"
+          },
+          "earlier": {
+            "title": "Earlier",
+            "type": "integer"
+          },
+          "key": {
+            "enum": [
+              "safety",
+              "tactics",
+              "calculation"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "practice": {
+            "$ref": "#/components/schemas/TrendPracticeOut"
+          },
+          "recent": {
+            "title": "Recent",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "recent",
+          "earlier",
+          "cost",
+          "change",
+          "practice"
+        ],
+        "title": "TrendSkillOut",
+        "type": "object"
+      },
+      "UnannouncedAnswerIn": {
+        "properties": {
+          "expected_day": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Day"
+          },
+          "game_id": {
+            "title": "Game Id",
+            "type": "integer"
+          },
+          "hinted": {
+            "default": false,
+            "title": "Hinted",
+            "type": "boolean"
+          },
+          "moves": {
+            "items": {
+              "pattern": "^([a-h][1-8][a-h][1-8][qrbn]?|0000)$",
+              "type": "string"
+            },
+            "maxItems": 1,
+            "minItems": 1,
+            "title": "Moves",
+            "type": "array"
+          },
+          "ply": {
+            "title": "Ply",
+            "type": "integer"
+          },
+          "seconds": {
+            "anyOf": [
+              {
+                "maximum": 3600.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seconds"
+          }
+        },
+        "required": [
+          "game_id",
+          "ply",
+          "moves"
+        ],
+        "title": "UnannouncedAnswerIn",
+        "type": "object"
+      },
+      "UnannouncedAnswerOut": {
+        "additionalProperties": true,
+        "properties": {
+          "best_san": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best San"
+          },
+          "best_uci": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best Uci"
+          },
+          "candidates": {
+            "anyOf": [
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidates"
+          },
+          "correct": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correct"
+          },
+          "due": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Due"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "line": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AnswerLineOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mastered": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mastered"
+          },
+          "quality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quality"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "reply_san": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reply San"
+          },
+          "reply_uci": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reply Uci"
+          },
+          "status": {
+            "enum": [
+              "continue",
+              "solved",
+              "failed",
+              "shown"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "step": {
+            "title": "Step",
+            "type": "integer"
+          },
+          "unannounced": {
+            "title": "Unannounced",
+            "type": "string"
+          },
+          "why": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Why"
+          }
+        },
+        "required": [
+          "status",
+          "step",
+          "unannounced"
+        ],
+        "title": "UnannouncedAnswerOut",
+        "type": "object"
+      },
+      "UpdateQueuedOut": {
+        "properties": {
+          "queued": {
+            "title": "Queued",
+            "type": "boolean"
+          },
+          "started": {
+            "title": "Started",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "started",
+          "queued"
+        ],
+        "title": "UpdateQueuedOut",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "WardLessonOut": {
+        "description": "One lesson of a ward, and whether the learner is holding it.",
+        "properties": {
+          "ability": {
+            "default": 0,
+            "title": "Ability",
+            "type": "integer"
+          },
+          "bar": {
+            "default": 0,
+            "title": "Bar",
+            "type": "integer"
+          },
+          "held": {
+            "title": "Held",
+            "type": "boolean"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "solves": {
+            "title": "Solves",
+            "type": "integer"
+          },
+          "step": {
+            "title": "Step",
+            "type": "string"
+          },
+          "teachable": {
+            "title": "Teachable",
+            "type": "boolean"
+          },
+          "track": {
+            "title": "Track",
+            "type": "string"
+          },
+          "uncertainty": {
+            "default": 0,
+            "title": "Uncertainty",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "track",
+          "step",
+          "held",
+          "solves",
+          "teachable"
+        ],
+        "title": "WardLessonOut",
+        "type": "object"
+      },
+      "WardOut": {
+        "description": "A section of the curriculum. `state` is \"cleared\", \"current\", \"ahead\", or \"blocked\"\nwhen the ward's drills do not exist yet -- blocked never clears and never blocks.",
+        "properties": {
+          "cleared_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cleared On"
+          },
+          "entered_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entered On"
+          },
+          "index": {
+            "title": "Index",
+            "type": "integer"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "lessons": {
+            "items": {
+              "$ref": "#/components/schemas/WardLessonOut"
+            },
+            "title": "Lessons",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "cleared",
+              "current",
+              "ahead",
+              "blocked"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "index",
+          "state",
+          "lessons"
+        ],
+        "title": "WardOut",
+        "type": "object"
+      },
+      "WatchIn": {
+        "properties": {
+          "anchor": {
+            "maxLength": 200,
+            "title": "Anchor",
+            "type": "string"
+          },
+          "time": {
+            "pattern": "^([01][0-9]|2[0-3]):(00|15|30|45)$",
+            "title": "Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "time",
+          "anchor"
+        ],
+        "title": "WatchIn",
+        "type": "object"
+      },
+      "WatchOut": {
+        "description": "When the learner keeps their watch, the habit it follows, and the day it was saved.",
+        "properties": {
+          "anchor": {
+            "title": "Anchor",
+            "type": "string"
+          },
+          "set_on": {
+            "title": "Set On",
+            "type": "string"
+          },
+          "time": {
+            "title": "Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "time",
+          "anchor",
+          "set_on"
+        ],
+        "title": "WatchOut",
+        "type": "object"
+      },
+      "WeekOut": {
+        "description": "The last seven days of games for the Games summary card; hidden while `analysed` is 0.",
+        "properties": {
+          "analysed": {
+            "title": "Analysed",
+            "type": "integer"
+          },
+          "games": {
+            "title": "Games",
+            "type": "integer"
+          },
+          "held": {
+            "title": "Held",
+            "type": "integer"
+          },
+          "on_watch": {
+            "title": "On Watch",
+            "type": "integer"
+          },
+          "slipped": {
+            "title": "Slipped",
+            "type": "integer"
+          },
+          "stopped": {
+            "title": "Stopped",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "on_watch",
+          "held",
+          "stopped",
+          "games",
+          "analysed",
+          "slipped"
+        ],
+        "title": "WeekOut",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "knightly",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/account": {
+      "delete": {
+        "description": "Delete you and everything of yours, right away (the web app then deletes the Clerk\naccount, and Clerk's user.deleted webhook would do this again, harmlessly).",
+        "operationId": "delete_account_api_account_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Delete Account"
+      }
+    },
+    "/api/accounts": {
+      "get": {
+        "operationId": "accounts_api_accounts_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LinkedAccountOut"
+                  },
+                  "title": "Response Accounts Api Accounts Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Accounts"
+      },
+      "post": {
+        "operationId": "add_account_api_accounts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkedAccountOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Account"
+      }
+    },
+    "/api/accounts/{source}/{handle}": {
+      "delete": {
+        "operationId": "remove_account_api_accounts__source___handle__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source",
+            "required": true,
+            "schema": {
+              "title": "Source",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "handle",
+            "required": true,
+            "schema": {
+              "title": "Handle",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove Account"
+      }
+    },
+    "/api/admin": {
+      "get": {
+        "description": "The admin page: the job queue and everyone's usage.",
+        "operationId": "admin_overview_api_admin_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Admin Overview"
+      }
+    },
+    "/api/admin/jobs/{job_id}/retry": {
+      "post": {
+        "operationId": "retry_job_api_admin_jobs__job_id__retry_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Retry Job"
+      }
+    },
+    "/api/config": {
+      "get": {
+        "description": "What the web app needs before it renders: whether to sign in with Clerk, and with\nwhich (public) key, and who to write to. Read at runtime, so one build serves staging and production.",
+        "operationId": "app_config_api_config_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicConfigOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "App Config"
+      }
+    },
+    "/api/deck": {
+      "get": {
+        "description": "Tonight's watch: the deck's counts and the watch's next item, by its job in the\nwatch's mix (mix.py): a review card, a threat question, a \"Your move\" or a puzzle (all\nnull once the watch is done). Adds cards for newly analysed games first, so the deck\nis always current. `mode=extra` continues tonight's extra watch, the same mix (POST\n/api/lesson/extra starts one; 409 before that).",
+        "operationId": "deck_today_api_deck_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "mode",
+            "required": false,
+            "schema": {
+              "default": "lesson",
+              "pattern": "^(lesson|extra)$",
+              "title": "Mode",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeckOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Deck Today"
+      }
+    },
+    "/api/deck/answer": {
+      "post": {
+        "operationId": "deck_answer_api_deck_answer_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeckAnswerOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Deck Answer"
+      }
+    },
+    "/api/deck/feedback/{game_id}/{ply}": {
+      "get": {
+        "description": "Poll a worker-prepared map; never run Stockfish or grade a card here.",
+        "operationId": "deck_feedback_api_deck_feedback__game_id___ply__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "game_id",
+            "required": true,
+            "schema": {
+              "title": "Game Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "ply",
+            "required": true,
+            "schema": {
+              "title": "Ply",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Deck Feedback"
+      }
+    },
+    "/api/deck/hint": {
+      "post": {
+        "description": "The move behind the two-step Hint: the piece to move, then the arrow.",
+        "operationId": "deck_hint_api_deck_hint_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HintIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HintOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Deck Hint"
+      }
+    },
+    "/api/deck/more": {
+      "post": {
+        "description": "Learn more: once today's queue is finished, raise today's new-position limit by\none pace's worth (fewer when the deck has fewer), for today only (deck.learn_more).\n`added` is 0 when there was nothing to add.",
+        "operationId": "deck_more_api_deck_more_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LearnMoreOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Deck More"
+      }
+    },
+    "/api/deck/suspend": {
+      "post": {
+        "description": "Don't show this again: hide a card with a reason, keeping its schedule and history.\nNo grade is recorded. Hiding a hidden card changes nothing.",
+        "operationId": "deck_suspend_api_deck_suspend_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuspendIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuspendedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Deck Suspend"
+      }
+    },
+    "/api/deck/suspended": {
+      "get": {
+        "description": "Hidden positions, most recently hidden first, for Progress's list.",
+        "operationId": "deck_suspended_api_deck_suspended_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SuspendedCardOut"
+                  },
+                  "title": "Response Deck Suspended Api Deck Suspended Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Deck Suspended"
+      }
+    },
+    "/api/deck/unsuspend": {
+      "post": {
+        "description": "Show a hidden card again; its schedule resumes where it was.",
+        "operationId": "deck_unsuspend_api_deck_unsuspend_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CardIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuspendedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Deck Unsuspend"
+      }
+    },
+    "/api/export": {
+      "get": {
+        "description": "Everything Knightly keeps about you, as a zip: your games as PGN and every table\nas CSV.",
+        "operationId": "download_data_api_export_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/zip": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Download Data"
+      }
+    },
+    "/api/games": {
+      "get": {
+        "description": "The games list. Search and the Filters popover narrow the whole list; the quick\nfilters on top (result, kpi, to_review) pick within it, and `counts` gives each quick\nfilter's number for the list as narrowed. `slips` is the scope: games with moves\nthat slipped past you, or analysed games with none (Clean).",
+        "operationId": "games_api_games_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "speed",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Speed"
+            }
+          },
+          {
+            "in": "query",
+            "name": "color",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(white|black)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Color"
+            }
+          },
+          {
+            "in": "query",
+            "name": "result",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(win|loss|draw)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Result"
+            }
+          },
+          {
+            "in": "query",
+            "name": "range",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "pattern": "^(30d|90d|all)$",
+              "title": "Range",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "analysed",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Analysed",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "unrated",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Unrated",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kpi",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kpi"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to_review",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "To Review",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "review_status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(to_review|reviewed)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Review Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "slips",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(slipped|clean)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Slips"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GamesListOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Games"
+      }
+    },
+    "/api/games/{game_id}": {
+      "get": {
+        "operationId": "game_api_games__game_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "game_id",
+            "required": true,
+            "schema": {
+              "title": "Game Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Game"
+      }
+    },
+    "/api/games/{game_id}/lines": {
+      "get": {
+        "description": "Every move's \"Why\" and \"Best line\" at once, from the lines the game's analysis\nstored (and any deeper ones computed on demand), so review opens them without a\nrequest per tap. Moves analysed before lines were stored are left out; the app asks\nfor those one at a time.",
+        "operationId": "game_lines_api_games__game_id__lines_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "game_id",
+            "required": true,
+            "schema": {
+              "title": "Game Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/EngineLinesOut"
+                  },
+                  "title": "Response Game Lines Api Games  Game Id  Lines Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Game Lines"
+      }
+    },
+    "/api/games/{game_id}/lines/{ply}": {
+      "get": {
+        "description": "The \"Why\" and \"Best line\" for one move: from the game's stored analysis when it\nhas them, else computed with Stockfish (about a second, at depth 18, counted\nagainst the engine quota) and served from the engine_lines table after that.",
+        "operationId": "engine_lines_api_games__game_id__lines__ply__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "game_id",
+            "required": true,
+            "schema": {
+              "title": "Game Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "ply",
+            "required": true,
+            "schema": {
+              "title": "Ply",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineLinesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Engine Lines"
+      }
+    },
+    "/api/games/{game_id}/review": {
+      "post": {
+        "description": "Marks a game reviewed (\"Finish review\"), with how each lesson step went for the\nsummary's marks. Finishing again moves the time forward and replaces the marks. Also\nmakes sure the game's positions are in the review deck, so the summary can say so.",
+        "operationId": "finish_review_api_games__game_id__review_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "game_id",
+            "required": true,
+            "schema": {
+              "title": "Game Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ReviewIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Finish Review"
+      }
+    },
+    "/api/home": {
+      "get": {
+        "description": "Home: today's goal and the journey. Today's game is your newest analysed game you\nhaven't reviewed, played after the newest one you have (and in the last NEW_GAME_DAYS\ndays).",
+        "operationId": "home_api_home_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HomeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Home"
+      }
+    },
+    "/api/journey": {
+      "get": {
+        "description": "The Progress map: stars (dimmed while their card has lapsed), ranks with the post\nthat reaches each and the day it was reached, and nights kept with their milestones;\nfor the home path, the week ahead by the cards' due dates, every kept night and extra\nwatch with what it held, and the first star's progress.",
+        "operationId": "journey_map_api_journey_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JourneyMapOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Journey Map"
+      }
+    },
+    "/api/journey/night": {
+      "get": {
+        "description": "A kept night's watch on the path: what it held and where each of its moves stands\nnow. 404 for a night that was not kept.",
+        "operationId": "journey_night_api_journey_night_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "Date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KeptNightOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Journey Night"
+      }
+    },
+    "/api/lesson/extra": {
+      "post": {
+        "description": "Start tonight's next extra watch, or resume the open one, and serve it as\n`/api/deck?mode=extra` does: another watch the size of tonight's, in the same mix,\nnever a card answered tonight (extra.py). As many as the learner wants. `extra` is its\nprogress and how many extra watches were kept tonight. 409 until tonight's lesson is\nfinished; it never keeps the night or the streak.",
+        "operationId": "lesson_extra_api_lesson_extra_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeckOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Lesson Extra"
+      }
+    },
+    "/api/lookup": {
+      "get": {
+        "description": "A public account, before adding it: the welcome flow's \"Is this you?\".",
+        "operationId": "lookup_account_api_lookup_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "source",
+            "required": true,
+            "schema": {
+              "title": "Source",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "handle",
+            "required": true,
+            "schema": {
+              "title": "Handle",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LookupAccountOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Lookup Account"
+      }
+    },
+    "/api/me": {
+      "get": {
+        "description": "Who's signed in, as the app needs it: whether to show the admin page, and the\nlimits that apply to them.",
+        "operationId": "me_api_me_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpErrorOut"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          }
+        },
+        "summary": "Me"
+      }
+    },
+    "/api/onboarding": {
+      "get": {
+        "description": "The welcome flow's import screen: how far the first update has got, what it has\nfound so far, and (once the newest games are in) the summary for \"Your first lesson\nis ready\".",
+        "operationId": "onboarding_api_onboarding_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Onboarding"
+      }
+    },
+    "/api/overview": {
+      "get": {
+        "operationId": "overview_api_overview_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "range",
+            "required": false,
+            "schema": {
+              "default": "90d",
+              "pattern": "^(30d|90d|all)$",
+              "title": "Range",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Overview"
+      }
+    },
+    "/api/patterns": {
+      "get": {
+        "description": "What your mistakes come down to (patterns.py): how many of your blunders, mistakes\nand misses in rated games in the range carry each tactic, most common first.",
+        "operationId": "what_you_blunder_api_patterns_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "range",
+            "required": false,
+            "schema": {
+              "default": "90d",
+              "pattern": "^(30d|90d|all)$",
+              "title": "Range",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatternsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "What You Blunder"
+      }
+    },
+    "/api/puzzles/answer": {
+      "post": {
+        "description": "Check a practice puzzle answer move by move; the first finished try is recorded.",
+        "operationId": "puzzle_answer_api_puzzles_answer_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PuzzleAnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PuzzleAnswerOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Puzzle Answer"
+      }
+    },
+    "/api/puzzles/hint": {
+      "post": {
+        "description": "The move for the puzzle's current step, for the two-step Hint.",
+        "operationId": "puzzle_hint_api_puzzles_hint_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PuzzleHintIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HintOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Puzzle Hint"
+      }
+    },
+    "/api/review/position": {
+      "post": {
+        "description": "Free review exploration: a legal history, one bounded Stockfish preview.",
+        "operationId": "position_preview_api_review_position_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PositionPreviewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PositionPreviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Position Preview"
+      }
+    },
+    "/api/settings": {
+      "get": {
+        "operationId": "settings_api_settings_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Settings"
+      }
+    },
+    "/api/settings/analysis": {
+      "put": {
+        "operationId": "set_analysis_api_settings_analysis_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalysisIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Analysis"
+      }
+    },
+    "/api/settings/practice": {
+      "put": {
+        "description": "How many new review positions a day (Light, Standard, Intense). Today's queue\nfollows it at once; positions already answered today still count.",
+        "operationId": "set_practice_api_settings_practice_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PracticeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PracticeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Practice"
+      }
+    },
+    "/api/settings/timezone": {
+      "put": {
+        "description": "The user's time zone, which decides when their review day starts: daily counts,\ndue positions and the day answers are checked against. The app sends the device's.",
+        "operationId": "set_timezone_api_settings_timezone_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimezoneIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimezoneOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Timezone"
+      }
+    },
+    "/api/settings/watch": {
+      "put": {
+        "description": "The learner's watch: the local time they keep it and the habit it follows\n(\"After I finish dinner\"). Reminders use both; saving restarts their back-off.",
+        "operationId": "set_watch_api_settings_watch_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WatchIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WatchOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Set Watch"
+      }
+    },
+    "/api/status": {
+      "get": {
+        "description": "The sidebar's account row: your accounts with their latest rating, and the daily\nupdate's state (the run in progress, else the last one).",
+        "operationId": "status_api_status_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Status"
+      }
+    },
+    "/api/streak/days": {
+      "get": {
+        "description": "Each day's streak state from `from` to `to` inclusive (at most 42 days,\nending no later than your today), as in Today's `streak.week`, for the streak calendar.",
+        "operationId": "streak_days_api_streak_days_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "From",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "To",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreakDaysOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Streak Days"
+      }
+    },
+    "/api/threats/answer": {
+      "post": {
+        "operationId": "threat_answer_api_threats_answer_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThreatAnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreatAnswerOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Threat Answer"
+      }
+    },
+    "/api/unannounced/answer": {
+      "post": {
+        "description": "Judge a \"Your move\" answer like a card's first move; logged, never scheduled.\nThe result has a card answer's shape plus its `unannounced` kind.",
+        "operationId": "unannounced_answer_api_unannounced_answer_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnannouncedAnswerIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnannouncedAnswerOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unannounced Answer"
+      }
+    },
+    "/api/update/run": {
+      "post": {
+        "description": "Queue an update (jobs.py); a worker picks it up within seconds. Asking while one\nis waiting or running changes nothing.",
+        "operationId": "run_update_api_update_run_post",
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateQueuedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Run Update"
+      }
+    }
+  }
+}

@@ -1,0 +1,71 @@
+# API, worker, their database and a frontend gateway behind the existing Cloudflare tunnel.
+# The database runs on this machine beside the API (docs/technology-decisions.md, "The
+# database lives on the VM"): a query is a local round trip, not ~44 ms to a hosted one.
+# Staging serves an Expo export. Production temporarily proxies the pinned original
+# frontend image; its source remains in the original repository.
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: knightly
+      POSTGRES_PASSWORD: ${KNIGHTLY_DB_PASSWORD:?set KNIGHTLY_DB_PASSWORD in .env}
+    # Private to this environment's Compose network: no published port.
+    volumes: ["./pgdata:/var/lib/postgresql/data"]
+    shm_size: 256mb
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "knightly"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+  api:
+    image: ${KNIGHTLY_IMAGE_REPOSITORY:-ghcr.io/hunterrhansen/knightly-backend}:${KNIGHTLY_IMAGE_TAG:-main}
+    env_file: .env
+    volumes: ["./data:/data"]
+    depends_on:
+      db: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=5)"]
+      interval: 10s
+      timeout: 10s
+      start_period: 20s
+      retries: 6
+    restart: unless-stopped
+  worker:
+    image: ${KNIGHTLY_IMAGE_REPOSITORY:-ghcr.io/hunterrhansen/knightly-backend}:${KNIGHTLY_IMAGE_TAG:-main}
+    command: ["knightly", "worker"]
+    env_file: .env
+    volumes: ["./data:/data"]
+    cpus: ${WORKER_CPUS:-2}
+    depends_on:
+      db: {condition: service_healthy}
+      api: {condition: service_healthy}
+    restart: unless-stopped
+  web:
+    image: nginx:1.28-alpine
+    volumes:
+      - ./expo-web:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8000/api/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 6
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+  legacy-web:
+    profiles: [legacy]
+    image: ${KNIGHTLY_LEGACY_WEB_IMAGE:-ghcr.io/hunterrhansen/knightly:main}
+    pull_policy: never
+    env_file: .env
+    volumes: ["./data:/data"]
+    restart: unless-stopped
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: ["tunnel", "--no-autoupdate", "run"]
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?set TUNNEL_TOKEN in .env}
+    depends_on:
+      web: {condition: service_healthy}
+    restart: unless-stopped

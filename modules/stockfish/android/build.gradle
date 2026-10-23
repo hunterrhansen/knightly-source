@@ -1,0 +1,26 @@
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+group = 'app.knightly'
+version = '0.1.0'
+
+android {
+  namespace "app.knightly.stockfish"
+  defaultConfig {
+    versionCode 1
+    versionName '0.1.0'
+    externalNativeBuild {
+      cmake {
+        cppFlags "-std=c++20 -fexceptions -frtti"
+        arguments "-DANDROID_STL=c++_shared"
+      }
+    }
+  }
+  externalNativeBuild {
+    cmake {
+      path "CMakeLists.txt"
+    }
+  }
+}

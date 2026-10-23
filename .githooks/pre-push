@@ -1,0 +1,28 @@
+#!/bin/sh
+# Quality CI runs only on main, so pushes are checked here first:
+# `npm run verify`, plus backend lint, format and pytest when the pushed commits touch backend/.
+# Skip once with `git push --no-verify`.
+set -e
+# Git exports GIT_DIR and friends to hooks; tools that run git in their own
+# temporary repositories (the tooling tests) must not inherit them.
+for variable in $(git rev-parse --local-env-vars); do unset "$variable"; done
+zero=0000000000000000000000000000000000000000
+backend=false
+while read -r _ local_sha _ remote_sha; do
+  [ "$local_sha" = "$zero" ] && continue
+  if [ "$remote_sha" = "$zero" ]; then
+    base=$(git merge-base "$local_sha" origin/main 2>/dev/null || true)
+  else
+    base=$remote_sha
+  fi
+  # Run the backend tests whenever the change can't be compared, e.g. a remote
+  # commit this clone hasn't fetched.
+  if [ -z "$base" ] || ! git cat-file -e "$base^{commit}" 2>/dev/null ||
+    git diff --name-only "$base" "$local_sha" -- backend | grep -q .; then
+    backend=true
+  fi
+done
+npm run verify
+if [ "$backend" = true ]; then
+  (cd backend && uv run ruff check && uv run ruff format --check && uv run pytest -q)
+fi

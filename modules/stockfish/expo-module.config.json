@@ -1,0 +1,10 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["KnightlyStockfishModule"],
+    "podspecPath": "KnightlyStockfish.podspec"
+  },
+  "android": {
+    "modules": ["app.knightly.stockfish.KnightlyStockfishModule"]
+  }
+}

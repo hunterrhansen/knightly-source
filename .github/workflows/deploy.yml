@@ -1,0 +1,116 @@
+# Quality must pass before automatic staging deployment. Production is manual and
+# accepts only an image previously recorded by a successful staging deployment.
+name: Deploy
+on:
+  workflow_run:
+    workflows: [Quality]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Where to deploy
+        type: choice
+        options: [staging, production]
+        default: staging
+      tag:
+        description: Image tag (sha-<commit>); required for production
+        required: false
+concurrency:
+  group: deploy-${{ inputs.environment || 'staging' }}
+  cancel-in-progress: false
+permissions:
+  contents: read
+  actions: read
+  packages: write
+env:
+  IMAGE: ghcr.io/${{ github.repository_owner }}/knightly-backend
+jobs:
+  preflight:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push') }}
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.commit.outputs.commit }}
+      tag: ${{ steps.commit.outputs.tag }}
+    steps:
+      - id: commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET: ${{ inputs.environment || 'staging' }}
+          TAG: ${{ inputs.tag }}
+          SOURCE_COMMIT: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "$TARGET" == production && -z "$TAG" ]]; then echo 'Production requires a staging-tested sha tag.' >&2; exit 1; fi
+          if [[ -n "$TAG" ]]; then
+            [[ "$TAG" =~ ^sha-[0-9a-f]{7,40}$ ]]
+            SOURCE_COMMIT=$(gh api "repos/$GITHUB_REPOSITORY/commits/${TAG#sha-}" --jq .sha)
+          else
+            TAG="sha-${SOURCE_COMMIT:0:7}"
+          fi
+          # Do not deploy an unreviewed side branch through manual dispatch.
+          gh api "repos/$GITHUB_REPOSITORY/compare/$SOURCE_COMMIT...main" --jq .status | grep -Eq '^(ahead|identical)$'
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/quality.yml/runs?head_sha=$SOURCE_COMMIT&event=push" --jq '[.workflow_runs[] | select(.conclusion == "success")] | length' | grep -Eq '^[1-9][0-9]*$'
+          echo "commit=$SOURCE_COMMIT" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+  image:
+    needs: preflight
+    if: ${{ !inputs.tag }}
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ needs.preflight.outputs.commit }}
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ needs.preflight.outputs.tag }}
+            ${{ env.IMAGE }}:main
+          cache-from: type=gha,scope=arm64
+          cache-to: type=gha,scope=arm64,mode=max
+  deploy:
+    needs: [preflight, image]
+    if: ${{ always() && needs.preflight.result == 'success' && (needs.image.result == 'success' || inputs.tag) && vars.DEPLOY_HOST != '' && vars.BACKEND_MIGRATION_VERIFIED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: read
+    environment: ${{ inputs.environment || 'staging' }}
+    env:
+      TARGET: ${{ inputs.environment || 'staging' }}
+      TAG: ${{ needs.preflight.outputs.tag }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+      - name: Deploy over SSH with temporary private registry access
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          HOST: ${{ vars.DEPLOY_HOST }}
+          REGISTRY_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          install -m 600 /dev/null ~/deploy_key
+          printf '%s\n' "$SSH_KEY" > ~/deploy_key
+          upload="/tmp/knightly-deploy-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          cleanup() {
+            ssh -i ~/deploy_key -o BatchMode=yes "knightly@$HOST" "rm -rf '$upload/registry'" || true
+            rm -f ~/deploy_key
+          }
+          trap cleanup EXIT
+          ssh -i ~/deploy_key -o BatchMode=yes -o StrictHostKeyChecking=accept-new "knightly@$HOST" "mkdir -m 700 '$upload'"
+          scp -i ~/deploy_key -o BatchMode=yes deploy/compose.yml deploy/nginx.*.conf deploy/deploy.sh "knightly@$HOST:$upload/"
+          printf '%s' "$REGISTRY_TOKEN" | ssh -i ~/deploy_key -o BatchMode=yes "knightly@$HOST" "docker --config '$upload/registry' login ghcr.io -u '$GITHUB_ACTOR' --password-stdin"
+          ssh -i ~/deploy_key -o BatchMode=yes "knightly@$HOST" "TARGET='$TARGET' TAG='$TAG' IMAGE='$IMAGE' DEPLOY_RUN='$GITHUB_RUN_ID' DEPLOY_ATTEMPT='$GITHUB_RUN_ATTEMPT' bash '$upload/deploy.sh'"

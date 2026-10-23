@@ -1,0 +1,104 @@
+appId: app.knightlychess
+name: Practice pending rejection retry and promotion cancellation
+---
+- runFlow: open-board.yaml
+- scrollUntilVisible:
+    element: Practice demo
+    direction: UP
+    timeout: 15000
+- tapOn: Practice demo
+- assertVisible: 'Board demo — simulated grading, no progress saved'
+- assertVisible: Claim the center
+- swipe:
+    from:
+      text: Switch theme
+    direction: UP
+- scrollUntilVisible:
+    element:
+      id: square-e2
+    timeout: 15000
+- tapOn:
+    id: square-e2
+- assertVisible: 'Selected e2. Choose a destination.'
+- tapOn:
+    id: square-e4
+# A second move legal in the canonical position stays blocked while pending.
+- scrollUntilVisible:
+    element:
+      id: square-g1
+    timeout: 15000
+- tapOn:
+    id: square-g1
+- tapOn:
+    id: square-f3
+- scrollUntilVisible:
+    element: 'Demo attempts: 1'
+    timeout: 15000
+- assertVisible: 'Demo state: pending'
+- assertVisible: 'Demo attempts: 1'
+- scrollUntilVisible:
+    element: Simulate rejection
+    timeout: 15000
+- tapOn: Simulate rejection
+- scrollUntilVisible:
+    element: Try again
+    direction: UP
+    timeout: 15000
+- assertVisible: Try again
+- scrollUntilVisible:
+    element: Retry position
+    timeout: 15000
+- tapOn: Retry position
+- scrollUntilVisible:
+    element:
+      id: square-e2
+    direction: UP
+    timeout: 15000
+- assertVisible: 'e2, White pawn'
+- scrollUntilVisible:
+    element:
+      id: square-e4
+    direction: UP
+    timeout: 15000
+- assertVisible: 'e4, empty'
+- scrollUntilVisible:
+    element: 'Demo attempts: 1'
+    timeout: 15000
+- assertVisible: 'Demo attempts: 1'
+# Start outside the board, whose pan gesture owns board touches.
+- swipe:
+    from:
+      text: 'Demo attempts: 1'
+    direction: UP
+- scrollUntilVisible:
+    element: Next exercise
+    timeout: 15000
+- tapOn: Next exercise
+- scrollUntilVisible:
+    element: 'Demo attempts: 0'
+    direction: UP
+    timeout: 15000
+# Return from the caption below the board without overshooting into page chrome.
+# Center the top rank so both promotion squares are inside the viewport.
+- scrollUntilVisible:
+    element:
+      id: square-a8
+    direction: UP
+    centerElement: true
+    timeout: 15000
+- assertVisible: 'a7, White pawn'
+- assertVisible: 'a8, empty'
+- tapOn:
+    id: square-a7
+- assertVisible: 'Selected a7. Choose a destination.'
+- tapOn:
+    id: square-a8
+- assertVisible: Promote to queen
+- tapOn: Cancel promotion
+- assertVisible: 'a7, White pawn'
+- assertVisible: 'a8, empty'
+- scrollUntilVisible:
+    element: 'Demo attempts: 0'
+    timeout: 15000
+- assertVisible: 'Demo attempts: 0'
+- takeScreenshot: practice-promotion-cancel

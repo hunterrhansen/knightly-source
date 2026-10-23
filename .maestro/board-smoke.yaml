@@ -1,0 +1,133 @@
+appId: app.knightlychess
+name: Board tap and promotion smoke
+---
+- runFlow: open-board.yaml
+# Scroll from page chrome, not from the board's pan recognizer.
+- swipe:
+    from:
+      text: Bot demo
+    direction: UP
+- tapOn:
+    id: square-e2
+- assertVisible: 'Selected e2. Choose a destination.'
+- tapOn:
+    id: square-e4
+- assertVisible: 'e4, White pawn'
+- assertVisible: 'e2, empty'
+- takeScreenshot: tap-e2-e4
+# The toolbar is above the board; scroll from the status chrome to avoid its pan handler.
+- runFlow:
+    when:
+      notVisible: Bot demo
+    commands:
+      - swipe:
+          from:
+            text: White at bottom
+          direction: DOWN
+- assertVisible: Bot demo
+- swipe:
+    from:
+      text: Bot demo
+    direction: UP
+- swipe:
+    from:
+      text: White at bottom
+    direction: UP
+- scrollUntilVisible:
+    element: Reset board
+    timeout: 15000
+- tapOn: Reset board
+- scrollUntilVisible:
+    element: Try promotion
+    timeout: 15000
+- tapOn: Try promotion
+- swipe:
+    from:
+      text: Try promotion
+    direction: DOWN
+- scrollUntilVisible:
+    element:
+      id: square-a7
+    direction: UP
+    timeout: 15000
+- tapOn:
+    id: square-a7
+- tapOn:
+    id: square-a8
+- assertVisible: Promote to queen
+- tapOn: Cancel promotion
+- assertVisible: 'a7, White pawn'
+- assertVisible: 'a8, empty'
+- tapOn:
+    id: square-a7
+- tapOn:
+    id: square-a8
+- tapOn: Promote to knight
+- assertVisible: 'a8, White knight'
+- assertVisible: 'a7, empty'
+- takeScreenshot: promotion-knight
+- runFlow:
+    when:
+      notVisible: Bot demo
+    commands:
+      - swipe:
+          from:
+            text: White at bottom
+          direction: DOWN
+- assertVisible: Bot demo
+- swipe:
+    from:
+      text: Bot demo
+    direction: UP
+- swipe:
+    from:
+      text: White at bottom
+    direction: UP
+- scrollUntilVisible:
+    element: Reset board
+    timeout: 15000
+- tapOn: Reset board
+- scrollUntilVisible:
+    element: Make read-only
+    timeout: 15000
+- tapOn: Make read-only
+- swipe:
+    from:
+      text: Enable moves
+    direction: DOWN
+- scrollUntilVisible:
+    element:
+      id: square-e2
+    direction: UP
+    timeout: 15000
+- tapOn:
+    id: square-e2
+- tapOn:
+    id: square-e4
+- assertVisible: 'e2, White pawn'
+- assertVisible: 'e4, empty'
+- takeScreenshot: read-only
+- runFlow:
+    when:
+      notVisible: Bot demo
+    commands:
+      - swipe:
+          from:
+            text: White at bottom
+          direction: DOWN
+- assertVisible: Bot demo
+- swipe:
+    from:
+      text: Bot demo
+    direction: UP
+- swipe:
+    from:
+      text: White at bottom
+    direction: UP
+# Restore the workshop's local sandbox state for the next flow.
+- scrollUntilVisible:
+    element: Enable moves
+    timeout: 15000
+- tapOn: Enable moves
+- tapOn: Reset board
+- runFlow: practice-smoke.yaml

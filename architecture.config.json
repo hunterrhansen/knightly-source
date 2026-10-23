@@ -1,0 +1,8 @@
+{
+  "featurePublicFiles": [
+    "src/features/practice/practice-api.ts",
+    "src/features/account/account-api.ts",
+    "src/features/games/games-api.ts",
+    "src/features/today/today-api.ts"
+  ]
+}

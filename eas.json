@@ -1,0 +1,66 @@
+{
+  "cli": {
+    "version": ">= 24.4.1",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "node": "24.21.0",
+      "environment": "development",
+      "ios": {
+        "simulator": false
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "developmentClient": false,
+      "node": "24.21.0",
+      "environment": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://knightlychess.app"
+      },
+      "ios": {
+        "simulator": false
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "testflight": {
+      "extends": "development",
+      "distribution": "store",
+      "ios": {
+        "autoIncrement": true
+      }
+    },
+    "beta": {
+      "distribution": "store",
+      "developmentClient": false,
+      "node": "24.21.0",
+      "environment": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://knightlychess.app"
+      },
+      "ios": {
+        "autoIncrement": true
+      }
+    }
+  },
+  "submit": {
+    "testflight": {
+      "ios": {
+        "ascAppId": "6822420743"
+      }
+    },
+    "beta": {
+      "ios": {
+        "ascAppId": "6822420743"
+      }
+    }
+  }
+}

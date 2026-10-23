@@ -1,0 +1,10 @@
+# Run after manual hosted sign-in on a dedicated development account.
+# APP_ID must match the locally installed development build.
+appId: ${APP_ID}
+---
+- launchApp
+- assertVisible: "Today"
+- tapOn: "Account"
+- assertVisible: "Account"
+- tapOn: "Sign out"
+- assertVisible: "Sign in"

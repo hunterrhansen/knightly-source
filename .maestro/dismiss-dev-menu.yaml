@@ -1,0 +1,15 @@
+appId: app.knightlychess
+---
+# Expo exposes the covered app in the hierarchy; visibility alone is not readiness.
+- runFlow:
+    when:
+      visible: 'This is the developer menu.*'
+    commands:
+      - tapOn: Continue
+- runFlow:
+    when:
+      visible: Reload
+    commands:
+      - tapOn: Close
+- assertNotVisible: 'This is the developer menu.*'
+- assertNotVisible: Reload

@@ -1,0 +1,36 @@
+appId: app.knightlychess
+---
+# Launch directly into this run's project, avoiding the previously loaded project.
+- stopApp
+- openLink: ${DEVCLIENT_URL}
+- repeat:
+    times: 3
+    commands:
+      - runFlow:
+          when:
+            visible: 'Open in .*Knightly.*'
+          commands:
+            - tapOn: Open
+- extendedWaitUntil:
+    visible: knightly
+    timeout: 60000
+- runFlow: dismiss-dev-menu.yaml
+- openLink: knightlydev:///
+- runFlow:
+    when:
+      visible: 'Open in .*Knightly.*'
+    commands:
+      - tapOn: Open
+- extendedWaitUntil:
+    visible: knightly
+    timeout: 60000
+- openLink: knightlydev://board-lab
+- runFlow:
+    when:
+      visible: 'Open in .*Knightly.*'
+    commands:
+      - tapOn: Open
+- extendedWaitUntil:
+    visible: Board workshop
+    timeout: 30000
+- runFlow: dismiss-dev-menu.yaml

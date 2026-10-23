@@ -1,0 +1,10 @@
+{
+  "name": "knightly-stockfish",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Stockfish 19 (Lichess's small net) compiled into the app as an Expo module",
+  "license": "GPL-3.0-only",
+  "main": "index.ts",
+  "types": "index.ts",
+  "react-native": "index.ts"
+}

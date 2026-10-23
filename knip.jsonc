@@ -1,0 +1,24 @@
+{
+  "$schema": "https://unpkg.com/knip@6.41.0/schema.json",
+  "entry": [
+    "playwright.config.ts",
+    "e2e/**/*.spec.ts",
+    // Spawned by the runtime runner; Metro resolves the production placeholder.
+    "scripts/serve-runtime.mjs",
+    "src/features/shell/production-lab-placeholder.tsx"
+  ],
+  // Vendored agent skills: their helper scripts are run by agents, not imported.
+  "ignore": [".claude/skills/**"],
+  // The local dev scripts start the Python backend with its own toolchain (uv), not npm.
+  "ignoreBinaries": ["uv"],
+  // Analyze these entries without executing the runtime-only Playwright config.
+  "playwright": false,
+  "ignoreDependencies": [
+    // Knip's Expo plugin assumes OTA updates, which this app does not configure.
+    "expo-updates",
+    // Explicit compatible pin for the native Storybook UI used transitively.
+    "@storybook/react-native-ui",
+    // scripts/generate-api.mjs launches its CLI by a node_modules file path.
+    "openapi-typescript"
+  ]
+}

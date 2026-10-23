@@ -1,0 +1,66 @@
+[project]
+name = "knightly"
+version = "0.1.0"
+description = "Knightly API, worker, chess analysis and learning services backed by Postgres."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+dependencies = [
+    "chess>=1.10",
+    "fastapi>=0.142.2",
+    "fsrs>=6.3,<7",
+    "psycopg[binary]>=3.2",
+    "pyjwt[crypto]>=2.9",
+    "sentry-sdk[fastapi]>=2.20",
+    "uvicorn>=0.30",
+]
+
+[project.optional-dependencies]
+# Tuning the review deck's FSRS to each user's answers (deck.maybe_tune, `knightly fsrs-optimize`)
+# needs PyTorch: the server image installs it, local setups opt in. torch is listed only to pin
+# Linux to PyTorch's CPU-only build: PyPI's pulls in gigabytes of CUDA the server never uses.
+optimizer = ["fsrs[optimizer]>=6.3,<7", "torch>=2.8"]
+
+[project.scripts]
+knightly = "knightly.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=8",
+    "ruff>=0.17.1",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = ["src/knightly/migrations"]
+
+[tool.ruff.format]
+quote-style = "preserve"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "C90"]
+# Formatting owns line length; long SQL strings and test literals stay readable unwrapped.
+ignore = ["E501"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Query", "fastapi.Depends", "fastapi.Header", "fastapi.Body"]
+
+[tool.ruff.lint.mccabe]
+# A route factory counts every route it defines (each nested def adds one), so a
+# routes/*.py file groups its routes into area factories that `router()` includes.
+max-complexity = 15

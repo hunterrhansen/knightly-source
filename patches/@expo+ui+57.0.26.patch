@@ -1,0 +1,223 @@
+diff --git a/node_modules/@expo/ui/build/universal/Picker/types.d.ts b/node_modules/@expo/ui/build/universal/Picker/types.d.ts
+index 8c52394..9993f47 100644
+--- a/node_modules/@expo/ui/build/universal/Picker/types.d.ts
++++ b/node_modules/@expo/ui/build/universal/Picker/types.d.ts
+@@ -34,6 +34,8 @@ export interface PickerProps<T extends PickerItemValue = PickerItemValue> {
+      * The currently selected value.
+      * Must match the `value` of one of the `<Picker.Item>` children.
+      */
++    /** Spoken name for the control; selection remains the native value. */
++  accessibilityLabel?: string;
+     selectedValue: T;
+     /**
+      * Called when the user selects an option.
+diff --git a/node_modules/@expo/ui/build/universal/TextInput/types.d.ts b/node_modules/@expo/ui/build/universal/TextInput/types.d.ts
+index 530a131..b703887 100644
+--- a/node_modules/@expo/ui/build/universal/TextInput/types.d.ts
++++ b/node_modules/@expo/ui/build/universal/TextInput/types.d.ts
+@@ -27,6 +27,14 @@ export type TextInputRef = {
+  * Props for the `TextInput` component.
+  */
+ export interface TextInputProps {
++  /** Accessible name and supplementary spoken guidance. */
++  accessibilityLabel?: string;
++  accessibilityHint?: string;
++  /** Web-only associations with visible help/validation text. */
++  'aria-describedby'?: string;
++  'aria-invalid'?: boolean;
++  'aria-disabled'?: boolean;
++
+     /**
+      * Ref exposing imperative methods (`focus`, `blur`, `clear`).
+      */
+diff --git a/node_modules/@expo/ui/src/universal/Picker/Picker.android.tsx b/node_modules/@expo/ui/src/universal/Picker/Picker.android.tsx
+index c868fc2..9c76cf8 100644
+--- a/node_modules/@expo/ui/src/universal/Picker/Picker.android.tsx
++++ b/node_modules/@expo/ui/src/universal/Picker/Picker.android.tsx
+@@ -9,7 +9,7 @@ import {
+ } from '../../jetpack-compose/ExposedDropdownMenuBox';
+ import { Text } from '../../jetpack-compose/Text';
+ import { TextField, type TextFieldRef } from '../../jetpack-compose/TextField';
+-import { menuAnchor, onVisibilityChanged } from '../../jetpack-compose/modifiers';
++import { menuAnchor, onVisibilityChanged, semantics } from '../../jetpack-compose/modifiers';
+ 
+ /**
+  * Android implementation of `Picker`.
+@@ -17,6 +17,7 @@ import { menuAnchor, onVisibilityChanged } from '../../jetpack-compose/modifiers
+  * `appearance` is accepted for API parity but ignored — Material 3 has no wheel-style picker.
+  */
+ export function Picker<T extends PickerItemValue>({
++  accessibilityLabel,
+   selectedValue,
+   onValueChange,
+   enabled = true,
+@@ -42,7 +43,7 @@ export function Picker<T extends PickerItemValue>({
+         ref={textFieldRef}
+         readOnly
+         enabled={enabled}
+-        modifiers={[menuAnchor(), onVisibilityChanged((visible) => setIsVisible(visible))]}
++        modifiers={[menuAnchor(), onVisibilityChanged((visible) => setIsVisible(visible)), ...(accessibilityLabel ? [semantics({ contentDescription: accessibilityLabel })] : [])]}
+       />
+       <ExposedDropdownMenu expanded={expanded} onDismissRequest={() => setExpanded(false)}>
+         {items.map((item) => (
+diff --git a/node_modules/@expo/ui/src/universal/Picker/Picker.ios.tsx b/node_modules/@expo/ui/src/universal/Picker/Picker.ios.tsx
+index 8432daf..b665606 100644
+--- a/node_modules/@expo/ui/src/universal/Picker/Picker.ios.tsx
++++ b/node_modules/@expo/ui/src/universal/Picker/Picker.ios.tsx
+@@ -1,5 +1,6 @@
+ import { Picker as SwiftUIPicker, Text } from '@expo/ui/swift-ui';
+ import {
++  accessibilityLabel as labelModifier,
+   disabled as disabledModifier,
+   pickerStyle,
+   tag,
+@@ -15,6 +16,7 @@ import type { PickerItemValue, PickerProps } from './types';
+  * Embed inside a parent `<Host>` (same as `Column` / `Row`).
+  */
+ export function Picker<T extends PickerItemValue>({
++  accessibilityLabel,
+   selectedValue,
+   onValueChange,
+   appearance = 'menu',
+@@ -25,6 +27,7 @@ export function Picker<T extends PickerItemValue>({
+   const items = extractPickerItems<T>(children);
+   const swiftUIStyle = appearance === 'wheel' ? 'wheel' : 'menu';
+   const modifiers: ModifierConfig[] = [pickerStyle(swiftUIStyle)];
++  if (accessibilityLabel) modifiers.push(labelModifier(accessibilityLabel));
+   if (!enabled) modifiers.push(disabledModifier(true));
+ 
+   return (
+diff --git a/node_modules/@expo/ui/src/universal/Picker/Picker.tsx b/node_modules/@expo/ui/src/universal/Picker/Picker.tsx
+index 3f1c024..ccec6ef 100644
+--- a/node_modules/@expo/ui/src/universal/Picker/Picker.tsx
++++ b/node_modules/@expo/ui/src/universal/Picker/Picker.tsx
+@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
+  * Declare options via `<Picker.Item label value />` children.
+  */
+ export function Picker<T extends PickerItemValue>({
++  accessibilityLabel,
+   selectedValue,
+   onValueChange,
+   enabled = true,
+@@ -66,6 +67,7 @@ export function Picker<T extends PickerItemValue>({
+   return (
+     <View>
+       <Select
++        aria-label={accessibilityLabel}
+         disabled={!enabled}
+         value={String(selectedValue)}
+         onFocus={onFocus}
+diff --git a/node_modules/@expo/ui/src/universal/Picker/types.ts b/node_modules/@expo/ui/src/universal/Picker/types.ts
+index 92e8919..ae50ac6 100644
+--- a/node_modules/@expo/ui/src/universal/Picker/types.ts
++++ b/node_modules/@expo/ui/src/universal/Picker/types.ts
+@@ -39,6 +39,8 @@ export interface PickerProps<T extends PickerItemValue = PickerItemValue> {
+    * The currently selected value.
+    * Must match the `value` of one of the `<Picker.Item>` children.
+    */
++  /** Spoken name for the control; selection remains the native value. */
++  accessibilityLabel?: string;
+   selectedValue: T;
+ 
+   /**
+diff --git a/node_modules/@expo/ui/src/universal/TextInput/index.android.tsx b/node_modules/@expo/ui/src/universal/TextInput/index.android.tsx
+index 1b7fd0d..b5c53c8 100644
+--- a/node_modules/@expo/ui/src/universal/TextInput/index.android.tsx
++++ b/node_modules/@expo/ui/src/universal/TextInput/index.android.tsx
+@@ -56,6 +56,8 @@ function mapKeyboardType(value: KeyboardTypeOptions): TextFieldKeyboardType {
+ 
+ export function TextInput({
+   ref,
++  accessibilityLabel,
++  accessibilityHint,
+   value,
+   onChangeText,
+   placeholder,
+@@ -161,7 +163,9 @@ export function TextInput({
+         ...(userModifiers ?? []),
+         ...transformToModifiers(style, {}),
+         ...(testID ? [testIDModifier(testID)] : []),
+-        ...(autoComplete ? [semantics({ contentType: autoComplete })] : []),
++        ...((autoComplete || accessibilityLabel || accessibilityHint)
++          ? [semantics({ contentType: autoComplete, contentDescription: [accessibilityLabel, accessibilityHint].filter(Boolean).join('. ') || undefined })]
++          : []),
+         ...(onContentSizeChange ? [onSizeChanged(onContentSizeChange)] : []),
+       ]}
+       value={state}
+diff --git a/node_modules/@expo/ui/src/universal/TextInput/index.ios.tsx b/node_modules/@expo/ui/src/universal/TextInput/index.ios.tsx
+index 1859c88..e290783 100644
+--- a/node_modules/@expo/ui/src/universal/TextInput/index.ios.tsx
++++ b/node_modules/@expo/ui/src/universal/TextInput/index.ios.tsx
+@@ -7,6 +7,8 @@ import {
+   useNativeState,
+ } from '@expo/ui/swift-ui';
+ import {
++  accessibilityLabel as labelModifier,
++  accessibilityHint as hintModifier,
+   autocorrectionDisabled,
+   disabled as disabledMod,
+   foregroundStyle,
+@@ -58,6 +60,8 @@ function mapKeyboardType(value: KeyboardTypeOptions): SwiftUIKeyboardType {
+ 
+ export function TextInput({
+   ref,
++  accessibilityLabel,
++  accessibilityHint,
+   value,
+   onChangeText,
+   placeholder,
+@@ -151,6 +155,8 @@ export function TextInput({
+     ...(userModifiers ?? []),
+     ...transformToModifiers(style, {}, undefined, { textStyle }),
+   ];
++  if (accessibilityLabel) modifiers.push(labelModifier(accessibilityLabel));
++  if (accessibilityHint) modifiers.push(hintModifier(accessibilityHint));
+   if (editable === false) modifiers.push(disabledMod(true));
+   if (keyboardType) modifiers.push(keyboardTypeMod(mapKeyboardType(keyboardType)));
+   if (autoCapitalize) {
+diff --git a/node_modules/@expo/ui/src/universal/TextInput/index.tsx b/node_modules/@expo/ui/src/universal/TextInput/index.tsx
+index 6838e9b..2895aea 100644
+--- a/node_modules/@expo/ui/src/universal/TextInput/index.tsx
++++ b/node_modules/@expo/ui/src/universal/TextInput/index.tsx
+@@ -38,6 +38,11 @@ const styles = StyleSheet.create({
+ 
+ export function TextInput({
+   ref,
++  accessibilityLabel,
++  accessibilityHint,
++  'aria-describedby': describedBy,
++  'aria-invalid': invalid,
++  'aria-disabled': ariaDisabled,
+   value,
+   onChangeText,
+   placeholder,
+@@ -104,6 +109,10 @@ export function TextInput({
+ 
+   return (
+     <RNTextInput
++      accessibilityLabel={accessibilityLabel}
++      accessibilityHint={accessibilityHint}
++      aria-disabled={ariaDisabled ?? editable === false}
++      {...{ 'aria-describedby': describedBy, 'aria-invalid': invalid }}
+       ref={innerRef}
+       value={state.value}
+       placeholder={placeholder}
+diff --git a/node_modules/@expo/ui/src/universal/TextInput/types.ts b/node_modules/@expo/ui/src/universal/TextInput/types.ts
+index 150505f..213a1ab 100644
+--- a/node_modules/@expo/ui/src/universal/TextInput/types.ts
++++ b/node_modules/@expo/ui/src/universal/TextInput/types.ts
+@@ -30,6 +30,14 @@ export type TextInputRef = {
+  * Props for the `TextInput` component.
+  */
+ export interface TextInputProps {
++  /** Accessible name and supplementary spoken guidance. */
++  accessibilityLabel?: string;
++  accessibilityHint?: string;
++  /** Web-only associations with visible help/validation text. */
++  'aria-describedby'?: string;
++  'aria-invalid'?: boolean;
++  'aria-disabled'?: boolean;
++
+   /**
+    * Ref exposing imperative methods (`focus`, `blur`, `clear`).
+    */

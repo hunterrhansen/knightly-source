@@ -1,0 +1,12 @@
+**/node_modules
+**/.venv
+**/.env
+**/.env.*
+**/__pycache__
+**/.local
+**/.terraform
+**/*.tfstate*
+**/*.tfvars
+.git
+.verification
+.expo

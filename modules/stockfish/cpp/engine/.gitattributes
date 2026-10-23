@@ -1,0 +1,3 @@
+# Third-party Stockfish copied from lichess-org/dart-multistockfish: excluded from
+# language stats and collapsed in pull request diffs.
+** linguist-vendored=true linguist-generated=true
