@@ -13,6 +13,10 @@ import { starShardLayers } from './star-shard-art';
 // the ranks are named and drawn for real. An emblem is a shield per tier
 // (Page, Squire, Knight) with one pip per level (Squire I–III); the castle
 // stands beside the map of nights with a green flag once its rank is reached.
+// The tiers past Knight (docs/specs/2026-10-20-ward-path-design.md) wear the
+// knight's gold rim and crown over a field and device of their own: a square
+// banner for the Banneret, a watch lantern for the Captain, a border tower for
+// the Warden of the March, a keep over crossed keys for the Castellan.
 
 const outline = '#24211c'; // tokens.pieces.outline
 const pip = '#f2f1ec'; // moonlight: the pips' own colour, used by nothing else here
@@ -46,7 +50,44 @@ const tiers: Readonly<
     field: '#3f8a18',
     fieldLight: '#6cc23a',
   },
+  // The knight's own field: the banner is what's new.
+  banneret: {
+    rim: '#ffc233',
+    rimShade: '#d39a00',
+    field: '#3f8a18',
+    fieldLight: '#6cc23a',
+  },
+  // Gold on deep violet: the watch's night.
+  captain: {
+    rim: '#ffc233',
+    rimShade: '#d39a00',
+    field: '#4b2f7a',
+    fieldLight: '#7a55b8',
+  },
+  // Gold on border teal.
+  warden: {
+    rim: '#ffc233',
+    rimShade: '#d39a00',
+    field: '#1d6a63',
+    fieldLight: '#2f9c90',
+  },
+  // Gold on crimson: the castle is yours.
+  castellan: {
+    rim: '#ffc233',
+    rimShade: '#d39a00',
+    field: '#8f1f2b',
+    fieldLight: '#c8394a',
+  },
 };
+
+/** The tiers that wear the knight's crown. */
+const crowned = new Set<RankTier>([
+  'knight',
+  'banneret',
+  'captain',
+  'warden',
+  'castellan',
+]);
 
 const shield = 'M50 8 L86 19 L86 48 Q86 76 50 93 Q14 76 14 48 L14 19 Z';
 const field = 'M50 16 L78 25 L78 48 Q78 70 50 84 Q22 70 22 48 L22 25 Z';
@@ -56,7 +97,252 @@ const crown = 'M35 22 L38 9 L45 17 L50 6 L55 17 L62 9 L65 22 Z';
 const rounded = (layer: Layer): Layer =>
   ({ ...layer, linejoin: 'round', linecap: 'round' }) as Layer;
 
-/** The tier's device in the shield: Page a crescent moon, the others a star. */
+const banner = '#d9483f';
+const bannerLight = '#ff7a6b';
+const wood = '#8a5a2b';
+const iron = '#3d4456';
+const glow = '#ffe48a';
+const flame = '#ff9a1f';
+const masonry = '#c9c2b0';
+const masonryLight = '#e4dfd2';
+const doorway = '#2b2219';
+
+/** A key: its bow at (bx, by), its shaft to (tx, ty), and its bit (a short
+ * tooth across the shaft) near the tip. */
+function key(bx: number, by: number, tx: number, ty: number): Layer[] {
+  const [dx, dy] = [tx - bx, ty - by];
+  const length = Math.hypot(dx, dy);
+  const [ux, uy] = [dx / length, dy / length];
+  // The bit sticks out to one side of the shaft, a little before the tip.
+  const [px, py] = [-uy, ux];
+  const [sx, sy] = [tx - ux * 8, ty - uy * 8];
+  const [ex, ey] = [sx + px * 12, sy + py * 12];
+  const line = (
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    stroke: string,
+    width: number,
+  ): Layer => ({
+    kind: 'line',
+    x1,
+    y1,
+    x2,
+    y2,
+    stroke,
+    strokeWidth: width,
+    linecap: 'round',
+  });
+  return [
+    line(bx, by, tx, ty, outline, 13),
+    line(sx, sy, ex, ey, outline, 13),
+    line(bx, by, tx, ty, moon, 6),
+    line(sx, sy, ex, ey, moon, 6),
+    {
+      kind: 'circle',
+      cx: bx,
+      cy: by,
+      r: 11,
+      fill: moon,
+      stroke: outline,
+      strokeWidth: 5,
+    },
+    {
+      kind: 'circle',
+      cx: bx,
+      cy: by,
+      r: 4,
+      fill: tiers.castellan.field,
+      stroke: outline,
+      strokeWidth: 3,
+    },
+  ];
+}
+
+/** Three merlons along a parapet from `x`, `width` wide, their tops at `y`. */
+const crenels = (x: number, width: number, y: number): Layer[] =>
+  [0, 2, 4].map((i) => ({
+    kind: 'rect',
+    x: x + (i * width) / 5,
+    y,
+    width: width / 5,
+    height: 14,
+    fill: masonry,
+    stroke: outline,
+    strokeWidth: 5,
+    linejoin: 'round',
+  }));
+
+/** The devices of the tiers past Knight, each drawn in a 100-square box
+ * centred on (50, 50), then set into the shield like the star. */
+const seniorDevices: Readonly<
+  Record<'banneret' | 'captain' | 'warden' | 'castellan', SpriteNode[]>
+> = {
+  // A square banner on a lance: a banneret led his men under his own.
+  banneret: [
+    {
+      kind: 'rect',
+      x: 24,
+      y: 8,
+      width: 9,
+      height: 88,
+      rx: 4,
+      fill: wood,
+      stroke: outline,
+      strokeWidth: 5,
+    },
+    {
+      kind: 'circle',
+      cx: 28.5,
+      cy: 9,
+      r: 7,
+      fill: moon,
+      stroke: outline,
+      strokeWidth: 5,
+    },
+    rounded({
+      d: 'M33 18 L82 18 L82 66 L33 66 Z',
+      fill: banner,
+      stroke: outline,
+      strokeWidth: 6,
+    }),
+    { kind: 'rect', x: 37, y: 22, width: 41, height: 7, fill: bannerLight },
+    rounded({
+      d: 'M33 36 L82 36 L82 48 L33 48 Z',
+      fill: moon,
+      stroke: outline,
+      strokeWidth: 4,
+    }),
+  ],
+  // The watch's lantern, lit.
+  captain: [
+    { kind: 'circle', cx: 50, cy: 11, r: 7, stroke: outline, strokeWidth: 6 },
+    rounded({
+      d: 'M29 33 L38 18 L62 18 L71 33 Z',
+      fill: iron,
+      stroke: outline,
+      strokeWidth: 6,
+    }),
+    {
+      kind: 'rect',
+      x: 32,
+      y: 33,
+      width: 36,
+      height: 45,
+      rx: 4,
+      fill: glow,
+      stroke: outline,
+      strokeWidth: 6,
+    },
+    { kind: 'ellipse', cx: 50, cy: 57, rx: 10, ry: 14, fill: moon },
+    rounded({ d: 'M50 44 Q58 56 50 68 Q42 56 50 44 Z', fill: flame }),
+    {
+      kind: 'rect',
+      x: 27,
+      y: 78,
+      width: 46,
+      height: 12,
+      rx: 3,
+      fill: iron,
+      stroke: outline,
+      strokeWidth: 6,
+    },
+  ],
+  // A border tower, its window lit.
+  warden: [
+    {
+      kind: 'rect',
+      x: 32,
+      y: 30,
+      width: 36,
+      height: 62,
+      fill: masonry,
+      stroke: outline,
+      strokeWidth: 6,
+      linejoin: 'round',
+    },
+    { kind: 'rect', x: 36, y: 38, width: 6, height: 50, fill: masonryLight },
+    ...crenels(26, 48, 10),
+    {
+      kind: 'rect',
+      x: 26,
+      y: 22,
+      width: 48,
+      height: 12,
+      fill: masonry,
+      stroke: outline,
+      strokeWidth: 5,
+      linejoin: 'round',
+    },
+    {
+      kind: 'rect',
+      x: 46,
+      y: 44,
+      width: 8,
+      height: 14,
+      rx: 4,
+      fill: glow,
+      stroke: outline,
+      strokeWidth: 4,
+    },
+    rounded({
+      d: 'M42 92 L42 78 Q50 67 58 78 L58 92 Z',
+      fill: doorway,
+      stroke: outline,
+      strokeWidth: 5,
+    }),
+  ],
+  // The keep, over the castle's keys.
+  castellan: [
+    ...key(14, 88, 84, 10),
+    ...key(86, 88, 16, 10),
+    {
+      kind: 'rect',
+      x: 35,
+      y: 42,
+      width: 30,
+      height: 44,
+      fill: masonry,
+      stroke: outline,
+      strokeWidth: 6,
+      linejoin: 'round',
+    },
+    { kind: 'rect', x: 39, y: 48, width: 5, height: 34, fill: masonryLight },
+    ...crenels(31, 38, 24),
+    {
+      kind: 'rect',
+      x: 31,
+      y: 36,
+      width: 38,
+      height: 9,
+      fill: masonry,
+      stroke: outline,
+      strokeWidth: 5,
+      linejoin: 'round',
+    },
+    {
+      kind: 'rect',
+      x: 46.5,
+      y: 50,
+      width: 7,
+      height: 11,
+      rx: 3.5,
+      fill: glow,
+      stroke: outline,
+      strokeWidth: 4,
+    },
+    rounded({
+      d: 'M43 86 L43 76 Q50 67 57 76 L57 86 Z',
+      fill: doorway,
+      stroke: outline,
+      strokeWidth: 5,
+    }),
+  ],
+};
+
+/** The tier's device in the shield: Page a crescent moon, Squire and Knight a
+ * star, and each tier past Knight its own. */
 function device(tier: RankTier, level: number): SpriteNode[] {
   if (tier === 'page')
     return [
@@ -67,6 +353,16 @@ function device(tier: RankTier, level: number): SpriteNode[] {
     ];
   // Pips below the star leave less room, so the star sits higher with them.
   const y = level > 0 ? 43 : 50;
+  if (tier !== 'squire' && tier !== 'knight') {
+    const scale = level > 0 ? 0.42 : 0.5;
+    return [
+      {
+        kind: 'group',
+        transform: `translate(50 ${y}) scale(${scale}) translate(-50 -50)`,
+        layers: seniorDevices[tier],
+      },
+    ];
+  }
   return [
     {
       kind: 'group',
@@ -114,7 +410,7 @@ export function rankEmblemSprite(tier: RankTier, level: number): Sprite {
       { d: fieldLight, fill: c.fieldLight },
       ...device(tier, shown),
       ...pips(shown),
-      ...(tier === 'knight'
+      ...(crowned.has(tier)
         ? [rounded({ d: crown, fill: moon, stroke: outline, strokeWidth: 3 })]
         : []),
     ],

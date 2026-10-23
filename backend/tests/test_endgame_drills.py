@@ -46,7 +46,7 @@ def drills():
 
 
 def test_there_are_drills_for_every_endgame_theme():
-    by_theme = {t: 0 for t in endgame_drills.THEMES}
+    by_theme = {t: 0 for t in ("keySquares", "opposition", "squareOfPawn", "rookPawn", "queenMate", "rookMate")}
     for row in drills():
         by_theme[row["Themes"].split()[0]] += 1
     assert all(n >= 100 for n in by_theme.values()), by_theme
@@ -93,7 +93,7 @@ def test_every_king_and_pawn_drill_has_only_one_right_move_each_time(table):
 
 def test_loaded_drills_teach_the_key_squares_lesson(db_url, monkeypatch):
     conn = db.connect(db_url)
-    assert endgame_drills.load(conn) == len(drills())
+    assert endgame_drills.load(conn) == len(drills()) + len(tablebase_drills())
     assert endgame_drills.load(conn) == 0, "loading again adds nothing"
     ward = next(w for w in wards.state(conn) if w.ward.key == "square-of-the-pawn")
     monkeypatch.setattr(wards, "current", lambda conn, at=None: ward)
@@ -101,3 +101,65 @@ def test_loaded_drills_teach_the_key_squares_lesson(db_url, monkeypatch):
     assert served["taught"] is True
     themes = conn.execute("SELECT themes FROM lichess_puzzles WHERE puzzle_id = %s", (served["id"],)).fetchone()[0]
     assert themes.split()[0] in ("squareOfPawn", "keySquares")
+
+
+def tablebase_drills():
+    with open(endgame_drills.TABLEBASE_DATA, newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def test_every_tablebase_drill_is_legal_ends_on_your_move_and_has_an_id_from_itself():
+    import hashlib
+
+    rows = tablebase_drills()
+    counts = {}
+    for row in rows:
+        theme = row["Themes"].split()[0]
+        counts[theme] = counts.get(theme, 0) + 1
+        board = chess.Board(row["FEN"])
+        moves = row["Moves"].split()
+        assert len(moves) % 2 == 0, row["PuzzleId"]
+        for uci in moves:
+            move = chess.Move.from_uci(uci)
+            assert move in board.legal_moves, (row["PuzzleId"], uci)
+            board.push(move)
+        assert row["PuzzleId"] == "kn" + hashlib.sha1(f"{row['FEN']} {row['Moves']}".encode()).hexdigest()[:10]
+    assert set(counts) == {"queenVsPawn", "rookVsPawn", "wrongBishop", "rookEndingWin", "rookEndingDraw"}
+    assert all(n >= 100 for n in counts.values()), counts
+
+
+SYZYGY = __import__("os").environ.get(
+    "KNIGHTLY_SYZYGY", str(__import__("pathlib").Path.home() / "Library/Caches/knightly-syzygy")
+)
+
+
+@pytest.mark.skipif(
+    not __import__("os").path.exists(f"{SYZYGY}/KRPvKR.rtbw"), reason="Syzygy tables not on this machine"
+)
+def test_every_tablebase_drill_move_is_the_only_one_that_keeps_your_result():
+    import chess.syzygy
+
+    def value(tb, b):
+        if b.is_checkmate():
+            return -2
+        if b.is_stalemate() or b.is_insufficient_material():
+            return 0
+        v = tb.probe_wdl(b)
+        return 2 if v == 2 else -2 if v == -2 else 0
+
+    with chess.syzygy.open_tablebase(SYZYGY) as tb:
+        for row in tablebase_drills():
+            board = chess.Board(row["FEN"])
+            moves = [chess.Move.from_uci(u) for u in row["Moves"].split()]
+            board.push(moves[0])
+            for i, move in enumerate(moves[1:]):
+                if i % 2 == 0:
+                    want = value(tb, board)
+                    keep = []
+                    for m in board.legal_moves:
+                        b = board.copy(stack=False)
+                        b.push(m)
+                        if -value(tb, b) == want:
+                            keep.append(m)
+                    assert keep == [move], (row["PuzzleId"], i)
+                board.push(move)

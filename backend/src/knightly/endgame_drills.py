@@ -26,8 +26,22 @@ import chess
 from . import db
 
 DATA = Path(__file__).with_name("data") / "endgame_drills.csv"
+# Four- and five-piece endings checked against the Syzygy tables (scripts/generate_tablebase_drills.py).
+TABLEBASE_DATA = Path(__file__).with_name("data") / "tablebase_drills.csv"
 # Our themes, beside Lichess's in `lichess_puzzles.themes`.
-THEMES = ("keySquares", "opposition", "squareOfPawn", "rookPawn", "queenMate", "rookMate")
+THEMES = (
+    "keySquares",
+    "opposition",
+    "squareOfPawn",
+    "rookPawn",
+    "queenMate",
+    "rookMate",
+    "queenVsPawn",
+    "rookVsPawn",
+    "wrongBishop",
+    "rookEndingWin",
+    "rookEndingDraw",
+)
 
 WIN, DRAW = 1, 0
 
@@ -150,8 +164,15 @@ def kpk_result(table: bytearray, board: chess.Board) -> int:
     return table[_index(wk, bk, p, board.turn == chess.BLACK)]
 
 
-def load(conn: db.Connection, path: Path = DATA) -> int:
+def load(conn: db.Connection, paths: tuple[Path, ...] = (DATA, TABLEBASE_DATA)) -> int:
     """Store the generated drills beside the Lichess corpus; returns how many were new."""
+    added = 0
+    for path in paths:
+        added += _load_file(conn, path)
+    return added
+
+
+def _load_file(conn: db.Connection, path: Path) -> int:
     added = 0
     with open(path, newline="") as f:
         for row in csv.DictReader(f):

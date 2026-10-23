@@ -253,7 +253,11 @@ the original frontend on October 20, 2026, which still runs unrouted for rollbac
 
 Checked on the VM on October 23, 2026.
 
-- **Backend:** staging and production both run `sha-aac022f` (main after
+- **Backend:** staging and production both run `sha-d30aea7` (main after
+  #354, October 23): the whole Steps Method beyond the Keep (#351, 47 posts),
+  the games gate (#352), testing out of a post (#353) and the Syzygy-checked
+  endgame drills (#354); all 2,800 generated drills are loaded in both
+  (`knightly endgames`). Before it, `sha-aac022f` (main after
   #349, October 23: the Steps-style lesson intros, #326, and the back rank
   folded into Mate in two). Before it, `sha-25e3c95` (main after
   #346, the Steps Method curriculum; deployed October 23 around 13:27 UTC).
@@ -266,7 +270,8 @@ Checked on the VM on October 23, 2026.
   [GitHub Actions is blocked](runtime-verification.md#ci-and-pre-push), so they
   are not in ghcr and a rebuilt VM cannot re-pull them. A deploy from a commit
   older than `8024db2` would drop the `db` service: deploy from current `main` only.
-- **Web:** staging and production serve Expo exports of main `aac022f`,
+- **Web:** staging and production serve Expo exports of main `c9bf411` (with
+  #355, history notes and rank emblems past Knight III),
   each built for its own host (uploaded October 23 around 13:27 UTC; the previous
   exports kept beside them as `expo-web.before-<epoch>`). Both bundles carry the
   review's legal-move dots (#343) and the **Live engine in reviews** setting
@@ -275,7 +280,11 @@ Checked on the VM on October 23, 2026.
   walk on the web are unchecked. The original
   frontend (`legacy-web`) still runs unrouted for rollback
   ([deployment](deploy.md#rolling-back-the-web-cutover)).
-- **iPhone:** TestFlight `beta` build 65 (standalone, production API) is from
+- **iPhone:** TestFlight `beta` build 67 (standalone, production API) is from
+  main `0f09aa1` (through #353: beyond the Keep, the games gate, test-out),
+  uploaded October 23; build 66 (`e1ef0bd`) carried #351. Sources published as
+  [knightly-source@ios-build-67](https://github.com/hunterrhansen/knightly-source/tree/ios-build-67)
+  and `ios-build-66`. Build 65 is from
   main `aac022f` (through #349, the lesson intros), uploaded October 23; source
   published as
   [knightly-source@ios-build-65](https://github.com/hunterrhansen/knightly-source/tree/ios-build-65).
@@ -293,7 +302,7 @@ Checked on the VM on October 23, 2026.
   (`91bff6b`) carried #338; builds 58 and earlier break against this backend.
   **None of the ward path, the walk, the new watch mix, the safety-check labels,
   the endgame drills, the tappable badges, the Steps bar or the lesson intros
-  has been seen on a phone.** Keeping a watch on build 65 is the open gate.
+  has been seen on a phone.** Keeping a watch on build 67 is the open gate.
 - **Production learner data:** #309 reset production's posts-reached record to
   the Gatehouse so every post is walked; the record before the walk is kept as
   the setting `wards_reached_before_walk`.
@@ -409,6 +418,14 @@ and navigation; Reduce Motion, orientation and RTL on settings. Spoken
 accessibility stays manual.
 
 ### Integration and release
+
+- Positional drills ([curriculum](specs/2026-10-20-curriculum-wards-design.md#following-the-steps-method-decided-2026-10-23)):
+  1,732 generated "play the best move" drills make the golden rules, the opening,
+  development, activity, mobility, weak pawns, strong square and open file
+  teachable. Not deployed: after the deploy run `knightly positional` on staging and
+  production (as `knightly endgames` was), or those lessons have no drills to serve
+  while counting as teachable. A strong player's spot-check of five per idea is owed;
+  the 86% precision is the model's own hand check.
 
 - Move grading parity ([spec](specs/2026-10-20-move-grading-parity-design.md#check-before-shipping)):
   deployed and re-graded on staging and production (`sha-00ee89b`). Still open:

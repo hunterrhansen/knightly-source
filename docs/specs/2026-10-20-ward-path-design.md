@@ -114,11 +114,13 @@ towers from the Crossing to the Last Tower (33–43: Steps 5 and 5+); and
 **Part IV, the Citadel**, a castle of one's own (44–47: Step 6). It stays a
 vigil. Each part's first post opens with a rule across the road ("THE KEEP",
 "THE MARCH", "THE CITADEL"). The places and the knight's lines are in
-`src/features/today/ward-copy.ts`; their history notes stay empty until each is
-sourced. Ranks go on a castle every third post: Knight III after post 18, Knight
+`src/features/today/ward-copy.ts`, and their history notes are sourced under
+"From the old books". Ranks go on a castle every third post: Knight III after post 18, Knight
 Banneret I–III, Captain of the Watch I–III, Warden of the March I–III, and
-Castellan when the last post is held (names are placeholders; they wear Knight
-III's emblem until they have art). Positional lessons (mini plans, weak pawns,
+Castellan when the last post is held (names are placeholders). Each new tier
+has its own emblem, the knight's gold-rimmed crowned shield with its own field
+and device: a square banner (Banneret), a watch lantern (Captain), a border
+tower (Warden), and a keep over crossed keys (Castellan, without pips). Positional lessons (mini plans, weak pawns,
 open files…) are introduced and show "Coming soon" until drills exist.
 
 The ward boundaries fall on rank castles: the Portcullis is the gate into the
@@ -152,8 +154,9 @@ nothing has to be read to play. Every line is sourced below.
 
 Each post carries one short note, at most two sentences, shown on its arrival
 card under the knight's line and on its node cards. It is optional reading, never
-a quiz. Every note was checked against the source beside it (2026-10-20); the
-copy is approved and lives in `src/features/today/ward-copy.ts`.
+a quiz. Every note was checked against the source beside it (posts 1–18 on
+2026-10-20, posts 19–47 on 2026-10-23) and lives in `src/features/today/ward-copy.ts`.
+The copy for 1–18 is approved; 19–47 awaits review in its PR.
 
 | # | Note | Source |
 | --- | --- | --- |
@@ -176,6 +179,35 @@ copy is approved and lives in `src/features/today/ward-copy.ts`.
 | 17 | A mew was the cage where a hawk was kept while it moulted. Hawking, like chess, was a knightly skill. | [Etymonline, "mews"](https://www.etymonline.com/word/Mews); Petrus Alfonsi (note 3) |
 | 18 | The queen began as the *fers*, a counsellor who moved one square diagonally. Her modern move first appears in Valencia, around 1475. | [Wikipedia, Ferz](https://en.wikipedia.org/wiki/Ferz); [*Scachs d'amor*](https://en.wikipedia.org/wiki/Scachs_d%27amor) |
 | Keep | The keep, or donjon, was the last and strongest refuge of a castle. | [Britannica, Keep](https://www.britannica.com/print/article/314145) |
+| 19 | At Rochester the stair to the keep's door crossed a drawbridge into a forebuilding, which guarded the entrance. | [Wikipedia, Rochester Castle](https://en.wikipedia.org/wiki/Rochester_Castle); [English Heritage, description](https://english-heritage.org.uk/visit/places/rochester-castle/history/description) |
+| 20 | Norman keeps were usually entered on the first floor, up an outside stair, not at ground level. | [Wikipedia, Rochester Castle](https://en.wikipedia.org/wiki/Rochester_Castle) ("traditionally built with an entrance at first-floor level"); [English Heritage, description](https://english-heritage.org.uk/visit/places/rochester-castle/history/description) |
+| 21 | In Rochester's keep, the grand rooms stood above storerooms in the basement. | [English Heritage, description](https://english-heritage.org.uk/visit/places/rochester-castle/history/description) |
+| 22 | Rochester's well shaft rose inside the keep's cross wall, with a well-head on every floor. | [Wikipedia, Rochester Castle](https://en.wikipedia.org/wiki/Rochester_Castle); [English Heritage, description](https://english-heritage.org.uk/visit/places/rochester-castle/history/description) (the spine wall "contains the shaft of the keep's well") |
+| 23 | Hedingham's keep, built around 1140, has walls about 3.4 metres thick at the base, with small chambers inside them. | [Wikipedia, Hedingham Castle](https://en.wikipedia.org/wiki/Hedingham_Castle); [Historic England, list entry 1122959](https://historicengland.org.uk/listing/the-list/list-entry/1122959) ("gallery and small chambers within the wall thickness") |
+| 24 | Rochester's keep has a gallery running inside the thickness of its outer walls at second-floor level. | [English Heritage, description](https://english-heritage.org.uk/visit/places/rochester-castle/history/description) |
+| 25 | Before castling, the king could leap two squares on his first move. Europe played it as early as the 1200s. | [Wikipedia, Castling](https://en.wikipedia.org/wiki/Castling) (the king's leap) |
+| 26 | The solar was the family's private room, usually upstairs. Its name may come from the Latin for "sun", or for "alone". | [Wikipedia, Solar (room)](https://en.wikipedia.org/wiki/Solar_(room)) (both origins given as possible) |
+| 27 | In medieval Arabic chess you could also win by baring the king: taking every piece he had left. | [Wikipedia, Shatranj](https://en.wikipedia.org/wiki/Shatranj) (a draw in most places if he could take the last piece straight back) |
+| 28 | The ivory "Charlemagne chessmen" lay in the treasury of Saint-Denis by the 1200s. Charlemagne is legend: they were carved centuries after him. | [Wikipedia, Charlemagne chessmen](https://en.wikipedia.org/wiki/Charlemagne_chessmen) (11th century, now in the BnF's Cabinet des Médailles; the link to Charlemagne first appears in 1625) |
+| 29 | A tocsin was an alarm bell. The word comes from Old Occitan for "strike the bell". | [Wikipedia, Tocsin](https://en.wikipedia.org/wiki/Tocsin); [Wiktionary, tocsin](https://en.wiktionary.org/wiki/tocsin) (*tocasenh*: *tocar* + *senh*) |
+| 30 | From about 1600 to 1800, English players counted stalemate as a loss for the player who gave it. | [Wikipedia, Stalemate](https://en.wikipedia.org/wiki/Stalemate) (history; after Murray) |
+| 31 | In 1215 King John's miners brought down a corner turret of Rochester's keep, burning the fat of 40 pigs under its props. | [English Heritage, history of Rochester Castle](https://www.english-heritage.org.uk/visit/places/rochester-castle/history/) (the south-east turret; rebuilt semicircular) |
+| 32 | Lucena's book, printed in Salamanca around 1497, is the oldest printed chess book to survive. It holds 150 positions to solve. | [Wikipedia, Luis Ramírez de Lucena](https://en.wikipedia.org/wiki/Luis_Ram%C3%ADrez_de_Lucena) |
+| 33 | *March* comes from Old French *marche*, "boundary": a march was the land along a border. | [Wiktionary, march](https://en.wiktionary.org/wiki/march) (Etymology 2) |
+| 34 | In October 1597 a border meeting at the west ford of Norham ended in a gunfight across the Tweed at dusk. | [Wikipedia, Norham Castle](https://en.wikipedia.org/wiki/Norham_Castle) |
+| 35 | A Scottish act of 1455 set the border's fires: one bale burning warned the English were coming; two together, that they were coming indeed. | Act of 1455 (12 Jas. II), quoted in the Oxford English Dictionary, "bale" n.2 ([wehd.com](https://wehd.com/7/Bale_sb2.html)): "Ane Baile, is warning of their cumminge … twa bailes togidder at anis, they are cumming in deed"; [DSL, "bale"](https://dsl.ac.uk/entry/dost00052289) |
+| 36 | In 1249 twelve knights, six English and six Scots, met on the border to write down its laws. | [Wikipedia, March law](https://en.wikipedia.org/wiki/March_law_(Anglo-Scottish_border)) |
+| 37 | Pontage was a toll for building or mending a bridge, granted by the king for a set term. | [Wikipedia, Pontage](https://en.wikipedia.org/wiki/Pontage) (by letters patent) |
+| 38 | Old Sarum was an Iron Age hillfort from about 400 BC. The Normans built their castle in the middle of it. | [English Heritage, history of Old Sarum](https://www.english-heritage.org.uk/visit/places/old-sarum/history/) ("a motte was thrown up in the centre of the hillfort") |
+| 39 | The Lucena position isn't in Lucena's book. Its earliest known discussion is Salvio's, in 1634. | [Wikipedia, Lucena position](https://en.wikipedia.org/wiki/Lucena_position) (*Il Puttino*) |
+| 40 | Hadrian's Wall had a milecastle about every Roman mile, each with a gate north and a gate south. | [Wikipedia, Milecastle](https://en.wikipedia.org/wiki/Milecastle) |
+| 41 | Pele towers were small fortified towers built along the Anglo-Scottish border, where families took refuge from raids. | [Wikipedia, Peel tower](https://en.wikipedia.org/wiki/Peel_tower) |
+| 42 | The bishop began as the alfil, an elephant that leapt two squares diagonally. It could reach only an eighth of the board. | [Wikipedia, Alfil](https://en.wikipedia.org/wiki/Alfil_(chess)) |
+| 43 | *Zugzwang* is German for "compulsion to move". Its earliest known use in English is Lasker's, in 1905. | [Wikipedia, Zugzwang](https://en.wikipedia.org/wiki/Zugzwang) (after Edward Winter) |
+| 44 | *Citadel* comes from the Italian *cittadella*, "little city". | [Wiktionary, citadel](https://en.wiktionary.org/wiki/citadel) |
+| 45 | Beaumaris was ringed by defences inside defences: a moat with its own dock, and outer walls with 300 arrow loops. | [Cadw, Beaumaris Castle](https://cadw.gov.wales/visit/places-to-visit/beaumaris-castle) ("four concentric rings of formidable defences") |
+| 46 | The English named the bishop for its mitre-shaped top. The French call it the *fou*, the jester; the Germans, the runner. | [Wikipedia, Bishop (chess)](https://en.wikipedia.org/wiki/Bishop_(chess)) |
+| 47 | A castellan was the governor of a castle. In England the same office was called the constable. | [Wikipedia, Castellan](https://en.wikipedia.org/wiki/Castellan) |
 
 The watch's own lore above is sourced the same way: watch and ward and the
 gates from the Statute of Winchester and Webster's 1913; the *chemin de ronde*

@@ -17,6 +17,7 @@ from . import (
     jobs,
     layers,
     patterns,
+    positional_drills,
     puzzles,
     schedule,
     update,
@@ -206,6 +207,12 @@ def cmd_endgames(conn, args) -> None:
     """Store the generated basic-endgame drills beside the puzzle corpus."""
     added = endgame_drills.load(conn)
     log(f"{added} endgame drills added ({', '.join(endgame_drills.THEMES)}).")
+
+
+def cmd_positional(conn, args) -> None:
+    """Store the generated positional drills beside the puzzle corpus."""
+    added = positional_drills.load(conn)
+    log(f"{added} positional drills added ({', '.join(positional_drills.THEMES)}).")
 
 
 def cmd_wards(conn, args) -> None:
@@ -445,6 +452,11 @@ def main(argv=None) -> None:
 
     s = sub.add_parser("endgames", help="Store the generated basic-endgame drills (opposition, key squares, mates)")
     s.set_defaults(func=cmd_endgames, admin=True)  # the puzzle catalogue is shared by everyone
+
+    s = sub.add_parser(
+        "positional", help="Store the generated positional drills (open file, strong square, development...)"
+    )
+    s.set_defaults(func=cmd_positional, admin=True)  # the puzzle catalogue is shared by everyone
 
     s = sub.add_parser("wards", help="Print the curriculum's wards and the difficulty the corpus supports")
     s.set_defaults(func=cmd_wards, admin=True)  # reads the shared puzzle catalogue

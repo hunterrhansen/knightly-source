@@ -180,8 +180,16 @@ export type SpriteRole =
   | 'character.raider.captain';
 /** Sprites drawn from a number: the moon at a streak day. */
 export type SpriteFamilyRole = 'reward.moon';
-/** A rank's tier; its levels (Squire I–III) are pips on the tier's emblem. */
-export type RankTier = 'page' | 'squire' | 'knight';
+/** A rank's tier; its levels (Squire I–III) are pips on the tier's emblem.
+ * The tiers past Knight are the Keep's, the March's and the Citadel's. */
+export type RankTier =
+  | 'page'
+  | 'squire'
+  | 'knight'
+  | 'banneret'
+  | 'captain'
+  | 'warden'
+  | 'castellan';
 /** A rank's emblem, drawn for a level (0 for a rank without levels). */
 type RankEmblemRole = `reward.rankEmblem.${RankTier}`;
 /** A rank castle beside the map of nights: reached (flag up) or ahead. */

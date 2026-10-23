@@ -346,7 +346,17 @@ function Gallery({ kit }: { kit: Manifest }) {
           </View>
         </Section>
         <Section title="Ranks (reward.rankEmblem.*, map.castle)">
-          {(['page', 'squire', 'knight'] as const).map((tier) =>
+          {(
+            [
+              'page',
+              'squire',
+              'knight',
+              'banneret',
+              'captain',
+              'warden',
+              'castellan',
+            ] as const
+          ).map((tier) =>
             [0, 1, 2, 3].map((level) => (
               <SpriteRow
                 key={`${tier}-${level}`}

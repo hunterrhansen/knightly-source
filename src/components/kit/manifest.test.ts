@@ -43,7 +43,15 @@ const raidRecipes: readonly RaidRecipeRole[] = [
 ];
 /** Every rank tier the server's ranks name (backend watch.py RANKS), and the
  * castle's states on the map of nights. */
-const rankTiers: readonly RankTier[] = ['page', 'squire', 'knight'];
+const rankTiers: readonly RankTier[] = [
+  'page',
+  'squire',
+  'knight',
+  'banneret',
+  'captain',
+  'warden',
+  'castellan',
+];
 const castleStates: readonly CastleState[] = ['reached', 'ahead'];
 /** Every state the Watch page draws the wall in. */
 const wallStates: readonly WallHeroState[] = [
@@ -205,6 +213,12 @@ describe('the nightWatch kit', () => {
     },
   );
 
+  it('draws every rank tier differently, so a new rank never wears an old one’s emblem', () => {
+    const drawing = (tier: RankTier) =>
+      JSON.stringify(kit.emblems[`reward.rankEmblem.${tier}`](3).layers);
+    expect(new Set(rankTiers.map(drawing)).size).toBe(rankTiers.length);
+  });
+
   it('raises a castle on the map for a reached rank and one ahead, flag and base anchored', () => {
     const { states } = kit.characters['map.castle'];
     expect(Object.keys(states).sort()).toEqual([...castleStates].sort());
@@ -223,19 +237,21 @@ describe('the nightWatch kit', () => {
       ['knight-1', 'Knight I', 'knight', 1],
       ['knight-2', 'Knight II', 'knight', 2],
       ['knight-3', 'Knight III', 'knight', 3],
+      ['banneret-1', 'Knight Banneret I', 'banneret', 1],
+      ['banneret-2', 'Knight Banneret II', 'banneret', 2],
+      ['banneret-3', 'Knight Banneret III', 'banneret', 3],
+      ['captain-1', 'Captain of the Watch I', 'captain', 1],
+      ['captain-2', 'Captain of the Watch II', 'captain', 2],
+      ['captain-3', 'Captain of the Watch III', 'captain', 3],
+      ['warden-1', 'Warden of the March I', 'warden', 1],
+      ['warden-2', 'Warden of the March II', 'warden', 2],
+      ['warden-3', 'Warden of the March III', 'warden', 3],
+      ['castellan', 'Castellan', 'castellan', 0],
     ] as const;
     for (const [key, name, tier, level] of ranks) {
       expect(rankEmblemOf({ key, name })).toEqual({ tier, level });
       expect(rankEmblemOf({ name })).toEqual({ tier, level });
     }
-    // The ranks past Knight III wear the full knight's emblem until they have art.
-    expect(
-      rankEmblemOf({ key: 'warden-1', name: 'Warden of the March I' }),
-    ).toEqual({ tier: 'knight', level: 3 });
-    expect(rankEmblemOf({ key: 'castellan', name: 'Castellan' })).toEqual({
-      tier: 'knight',
-      level: 3,
-    });
     expect(rankEmblemOf({ key: 'herald-1', name: 'Herald I' })).toEqual({
       tier: 'page',
       level: 1,

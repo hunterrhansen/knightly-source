@@ -34,6 +34,12 @@ export const nightWatch: Manifest = {
     'reward.rankEmblem.page': (level) => rankEmblemSprite('page', level),
     'reward.rankEmblem.squire': (level) => rankEmblemSprite('squire', level),
     'reward.rankEmblem.knight': (level) => rankEmblemSprite('knight', level),
+    'reward.rankEmblem.banneret': (level) =>
+      rankEmblemSprite('banneret', level),
+    'reward.rankEmblem.captain': (level) => rankEmblemSprite('captain', level),
+    'reward.rankEmblem.warden': (level) => rankEmblemSprite('warden', level),
+    'reward.rankEmblem.castellan': (level) =>
+      rankEmblemSprite('castellan', level),
   },
   characters: {
     'character.knight': lanternKnight,

@@ -94,10 +94,11 @@ takes a slice of each track that is live at its level.
 | `opening` | Ward 2 | opening principles -> opening advantage |
 | `positional` | Ward 12 | weak pawns -> strong square -> open file -> the seventh rank |
 
-`positional` starts late and stays thin, honestly: Lichess publishes no positional themes, so
-there is no corpus for it and `positional.ORDER` has only seven narrow rules. Until that is
-fixed the track carries a handful of ideas and the wards above 1400 are correspondingly
-weaker than the ones below. Say so in the ward rather than pretend otherwise.
+`positional` has no Lichess corpus: Lichess publishes no positional themes. Seven of its ideas
+now have generated drills (below, "Following the Steps Method"); the rest -- mini plans,
+strategy, using pawns, bishop or knight, material and time, the advantage in the ending --
+have no board check that says a move expresses them, so they stay without drills. Say so in
+the ward rather than pretend otherwise.
 
 ### About eighteen wards
 
@@ -147,6 +148,35 @@ answer keys; the method has no controlled outcome study, so this is expert conse
 - **Depth.** Steps deepens calculation by step: one move in Step 1, one and a half in Step 2,
   two and a half by Step 4. A lesson's puzzles ask for at most `wards.DEPTH[step]` of your
   moves when the corpus has them, any length otherwise; generated endgame drills keep theirs.
+- **Positional lessons play the best move** (built 2026-10-23, `positional_drills.py`,
+  `knightly positional`). Steps exercises its positional lessons with "play the best move"
+  pages, so these are positions from the Lichess broadcast database (over-the-board
+  tournament games, CC0) where the move the player chose is Stockfish's one clearly best move:
+  at least `positional_drills.GAP` (80 cp) above the second-best at depth 20 (and at depth
+  14), quiet, threatening no piece, no tactic in its line, not in a decided position (300 cp),
+  and with the second-best move not simply dropping material. A board check confirms the
+  answer carries the lesson's idea. 1,732 drills, about 250 per idea, from three months of
+  broadcasts (2026-07 to 2026-09, 117,616 games):
+
+  | Theme | Check | Lessons |
+  | --- | --- | --- |
+  | `development` | a minor piece off the back rank with another still home, not a knight to the rim | golden rules, the opening, development |
+  | `centre` | a pawn to d4/e4/d5/e5 by move 12 | golden rules, the opening |
+  | `castleEarly` | castling | golden rules, the opening |
+  | `activity` | your least mobile piece (at most two safe squares, not attacked) gains three or more | activity (twice), mobility (twice) |
+  | `weakPawn` | a piece newly attacks an isolated or backward pawn | weak pawns |
+  | `strongSquare` | a knight to their half where no pawn can chase it, held by a pawn | strong square |
+  | `openFile` | a rook to a file with no pawns, or none of ours | open file |
+
+  A hand check of 56 (eight per idea, read with both engine lines) found the answer's point
+  was the idea in 48 (86%): centre 8, open file 7, weak pawns 7, activity 7, castling 7,
+  development 6, strong square 6. The misses were defences (a knight to a6 guarding c7, now
+  excluded), a knight square traded off at once, and a pawn won rather than a square held.
+  The checker was the model that built it, not a strong player; a coach's spot-check is
+  still owed. Ratings are an estimate: the idea's base (750 for castling to 1350 for strong
+  squares) plus 50 for each depth Stockfish needs before it settles on the move. Not built:
+  bishops and bishop or knight, opening advantage and the Steps 5-6 openings, and the draw
+  lessons, which stay "coming soon".
 - **Names.** Lessons use the method's own terms ("X-ray attack" for the skewer, "luring away"
   for deflection), and the post card credits the order to Brunia and van Wijgerden. Their step
   numbers are never shown as Knightly's progress.
@@ -157,11 +187,15 @@ about a year at one watch a night.
 **The whole method (built 2026-10-23).** After the eighteen posts the walk continues through
 the rest of Steps 3 and 3+, then 4 and 4+ (the Keep, posts 19-32), 5 and 5+ (the March, 33-43)
 and 6 (the Citadel, 44-47): 47 posts, 110 lessons, in the method's own order from its lesson
-lists. Positional lessons with no puzzle equivalent (mini plans, weak pawns, open files, strong
-squares, bishops) are introduced and show as coming soon, never blocking their post, until a
-drill exists. Endgame lessons draw the corpus's endgame positions under the `simple` shape,
-except the rook pawn, which has exact generated drills (`rookPawn`); queen against pawn, the
-wrong bishop and rook endings wait on generated drills of their own. Ranks continue every third
+lists. Positional lessons with no drill (mini plans, strategy, bishops, the draws) are
+introduced and show as coming soon, never blocking their post; weak pawns, open files, strong
+squares, activity, mobility and the opening lessons have generated drills (above).
+Endgame-rule lessons draw generated drills checked exactly: the rook pawn from the KPK solver
+(`rookPawn`), and queen against pawn, rook against pawn, the wrong bishop and rook endings
+(winning and drawing) against the Syzygy win/draw/loss tables
+(`backend/scripts/generate_tablebase_drills.py`, 3-4 piece tables plus KRPvKR, 18 MB, from
+tablebase.lichess.ovh, checked against its sha256 list; the tables are needed only to
+regenerate, never to run). Other endgame lessons draw the corpus's `simple` endgames. Ranks continue every third
 post to Warden of the March III, and Castellan when the last post clears. Pace stays set by mastery: extra watches go faster, and placement (#325) is how a
 stronger player skips ahead.
 
@@ -325,8 +359,8 @@ Each step is useful alone, and the first two change nothing a learner sees.
   no study shows it beats an alternative ordering. It is adopted because the alternative is
   percentile ranks over puzzle ratings, which is worse. The defence findings rest on one
   learner's two games.
-- **Positional stays thin** until there is either a positional corpus or a tagger that can
-  name positional ideas. The wards above 1400 are weaker than the ones below and should say so.
+- **Positional stays partial.** Seven ideas have generated drills; the lessons about plans and
+  judgement (mini plans, strategy, bishop or knight) have no checkable idea and no drills.
 
 ## Tests
 

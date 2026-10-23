@@ -114,7 +114,7 @@ WARDS: tuple[Ward, ...] = (
         "loose-pieces",
         "Pieces left loose",
         _l("winning-material", "Winning material", "tactic", "1+", "hangingPiece"),
-        _l("activity", "Activity", "positional", "2"),
+        _l("activity", "Activity", "positional", "2", "activity"),
     ),
     _w(
         "double-attack",
@@ -133,13 +133,13 @@ WARDS: tuple[Ward, ...] = (
         "the-pin",
         "The pin",
         _l("pin", "The pin", "tactic", "2", "pin"),
-        _l("golden-rules", "The three golden rules", "opening", "2"),
+        _l("golden-rules", "The three golden rules", "opening", "2", "development", "centre", "castleEarly"),
     ),
     _w(
         "remove-the-defender",
         "Removing the defender",
         _l("eliminating-defence", "Eliminating the defence", "tactic", "2", "capturingDefender"),
-        _l("opening-principles", "The opening", "opening", "2+"),
+        _l("opening-principles", "The opening", "opening", "2+", "development", "centre", "castleEarly"),
     ),
     _w(
         "discovered-attack",
@@ -213,7 +213,7 @@ WARDS: tuple[Ward, ...] = (
         "trapping",
         "Trapping a piece",
         _l("trapping", "Trapping a piece", "tactic", "4+", "trappedPiece"),
-        _l("mobility", "Mobility", "positional", "3"),
+        _l("mobility", "Mobility", "positional", "3", "activity"),
     ),
     _w(
         "luring",
@@ -226,8 +226,12 @@ WARDS: tuple[Ward, ...] = (
     # --- Part II, the Keep: the rest of Steps 3 and 3+, then Steps 4 and 4+ (2026-10-23) -----
     # In the method's own order. A lesson with no themes is a positional one Steps teaches by
     # explanation and judgement; it is introduced (intros.py) and shows as coming soon, never
-    # blocking its post, until a drill exists. Endgame lessons draw the corpus's endgame
-    # positions (`simple` shape) until generated drills replace them, as rookPawn has.
+    # blocking its post, until a drill exists. Positional lessons whose idea a board check can
+    # confirm (the open file, strong squares, weak pawns, activity, development) draw generated
+    # "find the best move" drills instead (positional_drills.py). Endgame-rule lessons draw
+    # generated drills checked exactly (endgame_drills: rookPawn, and the Syzygy-checked
+    # queenVsPawn, rookVsPawn, wrongBishop, rookEndingWin/Draw); the rest draw the corpus's
+    # `simple` endgames.
     _w(
         "defending-double-attack",
         "Defending against a double attack",
@@ -249,7 +253,7 @@ WARDS: tuple[Ward, ...] = (
     _w(
         "pinning",
         "Pinning",
-        _l("development", "Development", "opening", "3+"),
+        _l("development", "Development", "opening", "3+", "development"),
         _l("pinning", "Pinning", "tactic", "3+", "pin"),
     ),
     _w(
@@ -273,7 +277,7 @@ WARDS: tuple[Ward, ...] = (
     _w(
         "weak-pawns",
         "Weak pawns",
-        _l("weak-pawns", "Weak pawns", "positional", "4"),
+        _l("weak-pawns", "Weak pawns", "positional", "4", "weakPawn"),
         _l("material-advantage", "Material advantage", "endgame", "4"),
     ),
     _w(
@@ -287,7 +291,7 @@ WARDS: tuple[Ward, ...] = (
         "Seventh rank and endgame strategy",
         _l("seventh-rank-4", "Seventh rank", "endgame", "4", "rookEndgame", shape="simple"),
         _l("endgame-strategy", "Endgame strategy", "endgame", "4", "zugzwang", "pawnEndgame"),
-        _l("queen-against-pawn", "Queen against pawn", "endgame", "4", "queenEndgame", shape="simple"),
+        _l("queen-against-pawn", "Queen against pawn", "endgame", "4", "queenVsPawn"),
     ),
     _w(
         "attacking-the-king",
@@ -312,7 +316,7 @@ WARDS: tuple[Ward, ...] = (
     _w(
         "endgame-technique",
         "Endgame technique",
-        _l("endgame-technique", "Endgame technique", "endgame", "4+", "rookEndgame", shape="simple"),
+        _l("endgame-technique", "Endgame technique", "endgame", "4+", "rookEndingWin"),
         _l("chess-problems", "Chess problems", "calculation", "4+", "quietMove"),
     ),
     # --- Part III, the March: Steps 5 and 5+ ---------------------------------------------------
@@ -344,37 +348,37 @@ WARDS: tuple[Ward, ...] = (
         "rook-against-pawn",
         "Rook against pawn",
         _l("opening-5", "The opening", "opening", "5"),
-        _l("rook-against-pawn", "Rook against pawn", "endgame", "5", "rookEndgame", shape="simple"),
+        _l("rook-against-pawn", "Rook against pawn", "endgame", "5", "rookVsPawn"),
     ),
     _w(
         "strong-square",
         "Strong square",
-        _l("strong-square", "Strong square", "positional", "5"),
+        _l("strong-square", "Strong square", "positional", "5", "strongSquare"),
         _l("defending-5", "Defending", "defence", "5", "defensiveMove"),
     ),
     _w(
         "rook-endings",
         "Rook endings",
-        _l("rook-endings", "Rook endings", "endgame", "5", "rookEndgame", shape="simple"),
+        _l("rook-endings", "Rook endings", "endgame", "5", "rookEndingWin", "rookEndingDraw"),
         _l("king-attack-5", "Attack on the king", "mate", "5", "kingsideAttack", "sacrifice"),
     ),
     _w(
         "open-file",
         "Open file",
-        _l("open-file", "Open file", "positional", "5"),
+        _l("open-file", "Open file", "positional", "5", "openFile"),
         _l("draw-5", "Draw", "endgame", "5"),
     ),
     _w(
         "king-in-the-middle",
         "King in the middle",
-        _l("activity-5p", "Activity", "positional", "5+"),
+        _l("activity-5p", "Activity", "positional", "5+", "activity"),
         _l("pawn-endings-5p", "Pawn endings", "endgame", "5+", "pawnEndgame", "zugzwang"),
         _l("king-in-middle-5p", "King in the middle", "mate", "5+", "exposedKing"),
     ),
     _w(
         "wrong-bishop",
         "The wrong bishop",
-        _l("wrong-bishop", "The wrong bishop", "endgame", "5+", "bishopEndgame", shape="simple"),
+        _l("wrong-bishop", "The wrong bishop", "endgame", "5+", "wrongBishop"),
         _l("vulnerability-5p", "Vulnerability", "tactic", "5+", "trappedPiece", "hangingPiece"),
         _l("queen-endings", "Queen endings", "endgame", "5+", "queenEndgame"),
     ),
@@ -397,7 +401,7 @@ WARDS: tuple[Ward, ...] = (
     _w(
         "citadel-walls",
         "Mobility and the opening",
-        _l("mobility-6", "Mobility", "positional", "6"),
+        _l("mobility-6", "Mobility", "positional", "6", "activity"),
         _l("draw-6", "Draw", "endgame", "6"),
         _l("opening-6", "The opening", "opening", "6"),
     ),
@@ -415,7 +419,7 @@ WARDS: tuple[Ward, ...] = (
         _l("advantage-ending", "Advantage in the ending", "positional", "6"),
         _l("bishops", "Bishops", "positional", "6"),
         _l("defending-6", "Defending", "defence", "6", "defensiveMove"),
-        _l("rook-endgame-6", "Rook endgame", "endgame", "6", "rookEndgame", shape="simple"),
+        _l("rook-endgame-6", "Rook endgame", "endgame", "6", "rookEndingDraw", "rookEndingWin"),
     ),
 )
 

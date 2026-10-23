@@ -155,7 +155,7 @@ def test_clearing_a_ward_moves_the_drills_on(db_url):
 def test_unheld_lessons_are_drilled_before_held_ones(db_url):
     conn = db.connect(db_url)
     clear_ward_one(conn)
-    for key, theme in (("m", "mateIn1"), ("h", "hangingPiece"), ("f", "fork")):
+    for key, theme in (("m", "mateIn1"), ("h", "hangingPiece"), ("a", "activity"), ("f", "fork")):
         for i in range(wards.BASIC_VOLUME):
             solved(conn, f"{key}{i}", [theme])  # clear wards 2, 3 and 4
     ward = wards.current(conn)
@@ -170,16 +170,15 @@ def test_unheld_lessons_are_drilled_before_held_ones(db_url):
 
 
 def test_a_lesson_with_no_drills_does_not_park_the_learner_forever(db_url):
-    # Seven wards contain a lesson Lichess has no theme for (activity, the golden rules,
-    # stalemate, thinking ahead...). Gating on those would stop the curriculum dead.
+    # Several wards contain a lesson nothing can drill yet (stalemate, thinking ahead, mini
+    # plans, the draws...). Gating on those would stop the curriculum dead.
     conn = db.connect(db_url)
     for i in range(wards.BASIC_VOLUME):
-        solved(conn, f"m{i}", ["mateIn1"])
-        solved(conn, f"h{i}", ["hangingPiece"])
-    loose = next(w for w in wards.state(conn) if w.ward.key == "loose-pieces")
-    assert not all(lesson.held for lesson in loose.lessons), "activity has no drills, so it is unheld"
-    assert loose.cleared, "but the ward still clears on the lesson that can be taught"
-    assert wards.current(conn).ward.key != "loose-pieces"
+        solved(conn, f"i{i}", ["intermezzo"])
+    between = next(w for w in wards.state(conn) if w.ward.key == "in-between")
+    assert not all(lesson.held for lesson in between.lessons), "thinking ahead has no drills, so it is unheld"
+    assert between.cleared, "but the ward still clears on the lesson that can be taught"
+    assert wards.current(conn).ward.key != "in-between"
 
 
 def test_a_ward_puzzle_respects_the_lessons_shape(db_url, tmp_path):
