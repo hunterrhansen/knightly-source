@@ -168,12 +168,12 @@ const CURRICULUM: readonly (readonly [
 /**
  * The eighteen wards as the server derives them for a learner at post
  * `current`: the Gatehouse blocked (no drills exist), every teachable post
- * before `current` cleared, the rest ahead. `solves` sets the current post's
- * lessons' puzzles solved, in order; three or more hold a lesson.
+ * before `current` cleared, the rest ahead. `answered` sets the current post's
+ * lessons' positions answered (all right), in order; 36 or more hold a lesson.
  */
 export function sampleWards(
   current: number,
-  solves: readonly number[] = [],
+  answered: readonly number[] = [],
 ): JourneyWard[] {
   return CURRICULUM.map(([key, name, lessons], i) => {
     const index = i + 1;
@@ -193,17 +193,19 @@ export function sampleWards(
       lessons: lessons.map(([lkey, lname, track, teachable], j) => {
         const solved =
           state === 'cleared' && teachable
-            ? 3
+            ? 36
             : state === 'current'
-              ? (solves[j] ?? 0)
+              ? (answered[j] ?? 0)
               : 0;
         return {
           key: lkey,
           name: lname,
           track,
           step: '2',
-          held: teachable && solved >= 3,
+          held: teachable && solved >= 36,
           solves: solved,
+          answered: solved,
+          page_right: Math.min(12, solved),
           teachable,
         };
       }),
@@ -217,7 +219,7 @@ export const atTheLists: JourneyMap = {
   ...scheduled,
   // Reached on Oct 12: that night's watch and the 13th's (with an extra) are
   // the Lists' own.
-  wards: sampleWards(4, [3, 1]).map((w) =>
+  wards: sampleWards(4, [36, 1]).map((w) =>
     w.state === 'current' ? { ...w, entered_on: '2026-10-12' } : w,
   ),
 };

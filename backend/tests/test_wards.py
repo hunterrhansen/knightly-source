@@ -71,7 +71,7 @@ def clear_ward_one(conn):
            VALUES (900, 1, 1, 'white', true, 'middlegame', 'Qa1', 'd1a1', 'd1d8', 'miss')"""
     )
     drill._prepare_vision(conn, 10)
-    for _ in range(wards.HOLD_SOLVES):
+    for _ in range(wards.BASIC_VOLUME):
         conn.execute(
             """INSERT INTO threat_reviews (game_id, ply, reviewed_at, answer, correct, rating)
                VALUES (900, 1, iso_now(), 'd1d8', true, 'good')"""
@@ -101,7 +101,7 @@ def test_three_solves_of_a_theme_hold_its_lesson(db_url):
     clear_ward_one(conn)
     start = wards.current(conn)
     assert start.ward.key == "mate-in-one"
-    for i in range(wards.HOLD_SOLVES):
+    for i in range(wards.BASIC_VOLUME):
         solved(conn, f"m{i}", ["mateIn1"])
     assert wards.current(conn).ward.key != "mate-in-one", "the ward should have cleared"
 
@@ -109,7 +109,7 @@ def test_three_solves_of_a_theme_hold_its_lesson(db_url):
 def test_fewer_than_three_solves_is_not_enough(db_url):
     conn = db.connect(db_url)
     clear_ward_one(conn)
-    for i in range(wards.HOLD_SOLVES - 1):
+    for i in range(wards.BASIC_VOLUME - 1):
         solved(conn, f"m{i}", ["mateIn1"])
     assert wards.current(conn).ward.key == "mate-in-one"
 
@@ -146,7 +146,7 @@ def test_clearing_a_ward_moves_the_drills_on(db_url):
     mates = {"mateIn1", "queenMate"}  # the mate-in-one post's two lessons
     before = wards.drill_themes(conn)
     assert before and all(theme in mates for theme, _ in before)
-    for i in range(wards.HOLD_SOLVES):
+    for i in range(wards.BASIC_VOLUME):
         solved(conn, f"m{i}", ["mateIn1"])
     after = wards.drill_themes(conn)
     assert after and all(theme not in mates for theme, _ in after)
@@ -156,11 +156,11 @@ def test_unheld_lessons_are_drilled_before_held_ones(db_url):
     conn = db.connect(db_url)
     clear_ward_one(conn)
     for key, theme in (("m", "mateIn1"), ("h", "hangingPiece"), ("f", "fork")):
-        for i in range(wards.HOLD_SOLVES):
+        for i in range(wards.BASIC_VOLUME):
             solved(conn, f"{key}{i}", [theme])  # clear wards 2, 3 and 4
     ward = wards.current(conn)
     assert ward.ward.key == "mate-in-two"  # mateIn2 and backRankMate, both teachable
-    for i in range(wards.HOLD_SOLVES):
+    for i in range(wards.BASIC_VOLUME):
         solved(conn, f"b{i}", ["backRankMate"])
     # backRankMate is held now, so it must not be drilled first -- but it stays in the list,
     # since a nearly finished ward still has to have something to serve.
@@ -172,7 +172,7 @@ def test_a_lesson_with_no_drills_does_not_park_the_learner_forever(db_url):
     # Seven wards contain a lesson Lichess has no theme for (activity, the golden rules,
     # stalemate, thinking ahead...). Gating on those would stop the curriculum dead.
     conn = db.connect(db_url)
-    for i in range(wards.HOLD_SOLVES):
+    for i in range(wards.BASIC_VOLUME):
         solved(conn, f"m{i}", ["mateIn1"])
         solved(conn, f"h{i}", ["hangingPiece"])
     loose = next(w for w in wards.state(conn) if w.ward.key == "loose-pieces")
@@ -202,7 +202,7 @@ def test_ward_progress_belongs_to_its_user(db_url):
     reach_all(one)
     reach_all(two)
     clear_ward_one(one)
-    for i in range(wards.HOLD_SOLVES):
+    for i in range(wards.BASIC_VOLUME):
         solved(one, f"m{i}", ["mateIn1"])
     assert wards.current(one).ward.key not in ("board-vision", "mate-in-one")
     assert wards.current(two).ward.key == "board-vision", "their answers must not move your ward"
@@ -216,7 +216,7 @@ def test_a_puzzle_solved_on_lichess_counts_as_evidence(db_url):
     # disagreed. Production: 295 Lichess attempts against 26 of ours, 269 solves invisible,
     # and a learner with a 1544 puzzle ability was served mate in one.
     conn = db.connect(db_url)
-    for i in range(wards.HOLD_SOLVES):
+    for i in range(wards.BASIC_VOLUME):
         conn.execute(
             """INSERT INTO puzzle_attempts (source, puzzle_id, attempted_at, success, themes, puzzle_rating)
                VALUES ('lichess', %s, iso_now(), true, %s, 900)""",
@@ -234,7 +234,7 @@ def test_solves_older_than_the_window_do_not_hold_a_lesson(db_url):
     conn = db.connect(db_url)
     clear_ward_one(conn)
     stale = (date.today() - timedelta(days=patterns.RECENT_DAYS + 10)).isoformat() + "T12:00:00Z"
-    for i in range(wards.HOLD_SOLVES + 2):
+    for i in range(wards.BASIC_VOLUME + 2):
         conn.execute(
             """INSERT INTO puzzle_attempts (source, puzzle_id, attempted_at, success, themes, puzzle_rating)
                VALUES ('lichess', %s, %s, true, %s, 900)""",
@@ -266,7 +266,7 @@ def test_correct_vision_answers_hold_ward_one(db_url):
     )
     drill._prepare_vision(conn, 10)
     assert wards.current(conn).ward.key == "board-vision"
-    for _ in range(wards.HOLD_SOLVES):
+    for _ in range(wards.BASIC_VOLUME):
         conn.execute(
             """INSERT INTO threat_reviews (game_id, ply, reviewed_at, answer, correct, rating)
                VALUES (1, 1, iso_now(), 'd1d8', true, 'good')"""
@@ -293,17 +293,24 @@ def vision_chances(conn, taken: int, missed: int):
 
 
 def test_your_games_can_hold_a_lesson_the_drill_teaches(db_url):
-    # 91% of free captures taken at the board is better evidence than three drill answers,
-    # and drilling what someone demonstrably does is a night spent on nothing.
+    # 91% of free captures taken at the board is better evidence than the drill's whole
+    # volume: what the games show needs one page here (Steps' real gate is the games).
     conn = db.connect(db_url)
     vision_chances(conn, taken=11, missed=1)
-    assert wards.current(conn).ward.key == "board-vision", "it still has to be shown once, here"
+    assert wards.current(conn).ward.key == "board-vision", "it still has to be shown here"
     item = conn.execute("SELECT game_id, ply FROM threat_cards WHERE kind = 'vision' LIMIT 1").fetchone()
-    conn.execute(
-        """INSERT INTO threat_reviews (game_id, ply, reviewed_at, answer, correct, rating)
-           VALUES (%s, %s, iso_now(), 'd1d8', true, 'good')""",
-        (item["game_id"], item["ply"]),
-    )
+
+    def answer():
+        conn.execute(
+            """INSERT INTO threat_reviews (game_id, ply, reviewed_at, answer, correct, rating)
+               VALUES (%s, %s, iso_now(), 'd1d8', true, 'good')""",
+            (item["game_id"], item["ply"]),
+        )
+
+    for _ in range(wards.PAGE - 1):
+        answer()
+    assert wards.current(conn).ward.key == "board-vision", "less than a page"
+    answer()
     assert wards.current(conn).ward.key != "board-vision"
 
 
@@ -401,35 +408,34 @@ def lesson_state(conn, key):
     return next(lesson for w in wards.state(conn) for lesson in w.lessons if lesson.lesson.key == key)
 
 
-def test_easy_solves_do_not_hold_a_hard_idea(db_url, tmp_path):
-    # The whole point of an estimate over a count. Three 600-rated deflection puzzles is
-    # three solves, and a count would clear the ward; the idea's own drills are typically
-    # rated far higher, so the evidence does not reach the bar.
+def test_a_lesson_is_held_only_after_its_basic_volume(db_url):
+    # The Steps bar: a lesson's basic workbook (about three pages) answered, not three solves.
     conn = db.connect(db_url)
-    puzzles.import_file(
-        conn,
-        write_csv(tmp_path / "p.csv", [puzzle_row(f"d{i}", 1600, "deflection") for i in range(40)]),
-        log=lambda *a: None,
-    )
-    for i in range(wards.HOLD_SOLVES):
-        solved_at(conn, f"e{i}", ["deflection"], 600)
-    state = lesson_state(conn, "deflection")
-    assert state.solves >= wards.HOLD_SOLVES, "a count-based rule would hold it"
-    assert state.bar > 1000, "its drills are typically hard"
-    assert state.confident_floor < state.bar and not state.held
-
-
-def test_solving_at_the_level_does_hold_it(db_url, tmp_path):
-    conn = db.connect(db_url)
-    puzzles.import_file(
-        conn,
-        write_csv(tmp_path / "p.csv", [puzzle_row(f"m{i}", 900, "mateIn1") for i in range(40)]),
-        log=lambda *a: None,
-    )
-    for i in range(12):
-        solved_at(conn, f"w{i}", ["mateIn1"], 1100)
+    clear_ward_one(conn)
+    for i in range(wards.BASIC_VOLUME - 1):
+        solved_at(conn, f"w{i}", ["mateIn1"], 900)
     state = lesson_state(conn, "mate-in-one")
-    assert state.held and state.confident_floor >= state.bar
+    assert (state.answered, state.page_right, state.held) == (wards.BASIC_VOLUME - 1, wards.PAGE, False)
+    solved_at(conn, "last", ["mateIn1"], 900)
+    assert lesson_state(conn, "mate-in-one").held
+
+
+def test_three_misses_on_the_last_page_keep_a_lesson_unheld(db_url):
+    # 80% of a page is at the level; three misses on a page means another pass.
+    conn = db.connect(db_url)
+    clear_ward_one(conn)
+    for i in range(wards.BASIC_VOLUME - 3):
+        solved_at(conn, f"r{i}", ["mateIn1"], 900)
+    for i in range(3):
+        solved_at(conn, f"x{i}", ["mateIn1"], 900, success=False)
+    state = lesson_state(conn, "mate-in-one")
+    assert state.answered == wards.BASIC_VOLUME and state.page_right == wards.PAGE - 3 and not state.held
+    # The misses stay on the page until enough right answers push the first one off it.
+    for i in range(wards.PAGE - 3):
+        solved_at(conn, f"a{i}", ["mateIn1"], 900)
+    assert not lesson_state(conn, "mate-in-one").held
+    solved_at(conn, "a-last", ["mateIn1"], 900)
+    assert lesson_state(conn, "mate-in-one").held
 
 
 def test_uncertainty_narrows_as_evidence_arrives(db_url):
@@ -466,10 +472,14 @@ def test_the_biggest_gap_is_drilled_first_and_an_unknown_idea_still_gets_a_turn(
     # estimate sits at the learner's overall ability and so never looks like a deficit.
     from knightly import curriculum
 
-    easy = wards.LessonState(curriculum.Lesson("a", "A", "tactic", "2", ("fork",)), False, 9, 1500.0, 60.0, 1000.0)
-    behind = wards.LessonState(curriculum.Lesson("b", "B", "tactic", "2", ("pin",)), False, 9, 900.0, 60.0, 1400.0)
+    easy = wards.LessonState(
+        curriculum.Lesson("a", "A", "tactic", "2", ("fork",)), False, solves=9, theta=1500.0, sigma=60.0, bar=1000.0
+    )
+    behind = wards.LessonState(
+        curriculum.Lesson("b", "B", "tactic", "2", ("pin",)), False, solves=9, theta=900.0, sigma=60.0, bar=1400.0
+    )
     unknown = wards.LessonState(
-        curriculum.Lesson("c", "C", "tactic", "2", ("skewer",)), False, 0, 1200.0, 350.0, 1200.0
+        curriculum.Lesson("c", "C", "tactic", "2", ("skewer",)), False, solves=0, theta=1200.0, sigma=350.0, bar=1200.0
     )
     assert wards.priority(behind) > wards.priority(unknown) > wards.priority(easy)
     ward = wards.WardState(curriculum.Ward("w", "W", ()), 1, "current", (easy, unknown, behind))
@@ -479,8 +489,12 @@ def test_the_biggest_gap_is_drilled_first_and_an_unknown_idea_still_gets_a_turn(
 def test_held_lessons_are_still_served_last_rather_than_dropped(db_url):
     from knightly import curriculum
 
-    done = wards.LessonState(curriculum.Lesson("a", "A", "tactic", "2", ("fork",)), True, 9, 1800.0, 60.0, 1000.0)
-    todo = wards.LessonState(curriculum.Lesson("b", "B", "tactic", "2", ("pin",)), False, 1, 900.0, 200.0, 1400.0)
+    done = wards.LessonState(
+        curriculum.Lesson("a", "A", "tactic", "2", ("fork",)), True, solves=9, theta=1800.0, sigma=60.0, bar=1000.0
+    )
+    todo = wards.LessonState(
+        curriculum.Lesson("b", "B", "tactic", "2", ("pin",)), False, solves=1, theta=900.0, sigma=200.0, bar=1400.0
+    )
     ward = wards.WardState(curriculum.Ward("w", "W", ()), 1, "current", (done, todo))
     assert [t for t, _ in wards._themes_of(ward)] == ["pin", "fork"]
 
@@ -509,7 +523,7 @@ def test_solves_after_a_post_is_reached_clear_it_and_reach_the_next(db_url):
         },
     )
     assert wards.current(conn).ward.key == "mate-in-one"
-    for i in range(wards.HOLD_SOLVES):
+    for i in range(wards.BASIC_VOLUME):
         solved(conn, f"m{i}", ["mateIn1"])
     assert wards.current(conn).ward.key == "loose-pieces"
     # The Armoury is reached now, so the forks and hanging pieces solved before it wait.
@@ -532,10 +546,39 @@ def test_a_post_once_cleared_stays_cleared(db_url):
     assert states["board-vision"] == "cleared" and states["mate-in-one"] == "current"
 
 
-def test_a_lesson_your_games_hold_still_needs_one_solve_here(db_url):
+def test_a_lesson_your_games_hold_still_needs_one_page_here(db_url):
     conn = db.connect(db_url)
     clear_ward_one(conn)
     held_card(conn, 1, 2, "mateIn1")
     assert wards.current(conn).ward.key == "mate-in-one", "a held card alone does not skip the post"
-    solved(conn, "m0", ["mateIn1"])
+    for i in range(wards.PAGE - 1):
+        solved_at(conn, f"m{i}", ["mateIn1"], 900)
+    assert wards.current(conn).ward.key == "mate-in-one", "less than a page"
+    solved_at(conn, "m-last", ["mateIn1"], 900)
     assert wards.current(conn).ward.key != "mate-in-one"
+
+
+def test_a_passed_lessons_reviews_space_out_when_right_and_start_over_when_wrong(db_url, monkeypatch):
+    import dataclasses
+    from datetime import date
+
+    conn = db.connect(db_url)
+    states = wards.state(conn)
+    at = next(w.index for w in states if w.ward.key == "mate-in-one") + 1
+    moved = [
+        dataclasses.replace(w, state="cleared" if w.index < at else "current" if w.index == at else "ahead")
+        for w in states
+    ]
+    monkeypatch.setattr(wards, "state", lambda conn, at=None, today=None: moved)
+    db.set_setting(conn, wards.REACHED_SETTING, {"mate-in-one": {"entered": "2026-09-20", "cleared": "2026-10-01"}})
+    today = date(2026, 10, 20)
+
+    def due(key):
+        return next(d for d, lesson in wards.review_schedule(conn, today) if lesson.lesson.key == key)
+
+    assert due("mate-in-one") == date(2026, 10, 3), "first review two days after the post cleared"
+    solved(conn, "r1", ["mateIn1"], at="2026-10-03T12:00:00Z")
+    solved(conn, "r2", ["mateIn1"], at="2026-10-07T12:00:00Z")
+    assert due("mate-in-one") == date(2026, 10, 15), "two right in a row: eight days on"
+    solved(conn, "r3", ["mateIn1"], success=False, at="2026-10-15T12:00:00Z")
+    assert due("mate-in-one") == date(2026, 10, 17), "a miss starts it over"

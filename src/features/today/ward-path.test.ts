@@ -17,7 +17,7 @@ test('tonight’s beacon stands on the current post’s first teachable lesson n
   expect(model.current).toMatchObject({
     kind: 'tonight',
     title: 'Double attack with the king in it',
-    lesson: { solves: 1, held: false },
+    lesson: { answered: 1, held: false },
   });
   // A lesson with no drills is skipped for the beacon and says so.
   const pin = pathModel(todaySamples.Ready, {

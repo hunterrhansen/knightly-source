@@ -5180,6 +5180,11 @@
             "title": "Ability",
             "type": "integer"
           },
+          "answered": {
+            "default": 0,
+            "title": "Answered",
+            "type": "integer"
+          },
           "bar": {
             "default": 0,
             "title": "Bar",
@@ -5196,6 +5201,11 @@
           "name": {
             "title": "Name",
             "type": "string"
+          },
+          "page_right": {
+            "default": 0,
+            "title": "Page Right",
+            "type": "integer"
           },
           "solves": {
             "title": "Solves",

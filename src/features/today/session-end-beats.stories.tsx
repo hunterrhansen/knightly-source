@@ -204,7 +204,7 @@ export const Narrow: Story = {
 };
 
 const portcullis = postMoment(
-  { ...firstNights, wards: sampleWards(6, [3, 0]) },
+  { ...firstNights, wards: sampleWards(6, [36, 0]) },
   { ...firstNights, wards: sampleWards(7) },
   '2026-10-20',
 );

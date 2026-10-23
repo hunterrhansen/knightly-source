@@ -2439,6 +2439,11 @@ export interface components {
              */
             ability: number;
             /**
+             * Answered
+             * @default 0
+             */
+            answered: number;
+            /**
              * Bar
              * @default 0
              */
@@ -2449,6 +2454,11 @@ export interface components {
             key: string;
             /** Name */
             name: string;
+            /**
+             * Page Right
+             * @default 0
+             */
+            page_right: number;
             /** Solves */
             solves: number;
             /** Step */

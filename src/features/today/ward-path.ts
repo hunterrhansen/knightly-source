@@ -12,9 +12,12 @@ import { POST_RANKS, POSTS_PER_RANK, postCopy, rankOfPost } from './ward-copy';
 // state on every read; this decides only how it is drawn: which lesson the
 // beacon stands on, the rank castles between posts, and which posts show.
 
-/** Puzzles of a lesson's themes solved first try that hold it
- * (backend wards.HOLD_SOLVES). */
-export const HOLD_SOLVES = 3;
+/** The Steps Method's bar (backend wards.BASIC_VOLUME, PAGE, PAGE_RIGHT): a
+ * lesson's basic volume of positions, a workbook page, and how many of a page
+ * must be right. */
+const BASIC_VOLUME = 36;
+const PAGE = 12;
+const PAGE_RIGHT = 10;
 
 /** A lesson as the path draws it. */
 export type PathLesson = {
@@ -23,8 +26,10 @@ export type PathLesson = {
   name: string;
   track: string;
   held: boolean;
-  /** Puzzles solved first try, at most HOLD_SOLVES. */
-  solves: number;
+  /** Positions answered since its post was reached. */
+  answered: number;
+  /** Right first try among the last PAGE answered. */
+  pageRight: number;
   teachable: boolean;
 };
 
@@ -53,7 +58,9 @@ const pathLesson = (ward: string, lesson: JourneyLesson): PathLesson => ({
   name: lesson.name,
   track: lesson.track,
   held: lesson.held,
-  solves: Math.min(HOLD_SOLVES, lesson.solves),
+  // A server before the Steps bar sends only solves.
+  answered: lesson.answered ?? lesson.solves,
+  pageRight: lesson.page_right ?? Math.min(PAGE, lesson.solves),
   teachable: lesson.teachable,
 });
 
@@ -96,7 +103,9 @@ export function heldLine(post: PathPost) {
 export function lessonDetail(lesson: PathLesson) {
   if (!lesson.teachable) return 'Coming soon';
   if (lesson.held) return 'Held';
-  return `${lesson.solves} of ${HOLD_SOLVES} solved`;
+  if (lesson.answered < BASIC_VOLUME)
+    return `${lesson.answered} of ${BASIC_VOLUME} answered`;
+  return `${lesson.pageRight} of ${PAGE} right lately, ${PAGE_RIGHT} needed`;
 }
 
 /**

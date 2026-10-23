@@ -103,8 +103,12 @@ the original frontend on October 20, 2026, which still runs unrouted for rollbac
   take the reviews the nightly watch had no room for, then new slips and family
   puzzles for held moves. At the Gatehouse the idea slots serve the learner's
   own vision drill, then easy loose-piece puzzles (never counted as holding it),
-  and every look-first question is labelled **Safety check** in the app. Not yet
-  seen on a phone. Open: the
+  and every look-first question is labelled **Safety check** in the app. A
+  lesson is held at the Steps Method's bar (36 answered, 10 of the last 12
+  right), passed lessons come back for spaced review, puzzles ask for the depth
+  of their Steps step, and lessons carry Steps' names
+  ([decided 2026-10-23](specs/2026-10-20-curriculum-wards-design.md#following-the-steps-method-decided-2026-10-23)).
+  Not yet seen on a phone. Open: the
   seed crosses rating scales (a Chess.com rapid 917 measured a Lichess puzzle
   ability of 1544, on one account); the Elo corrects it within about 20
   answers, but nobody has measured that on more accounts.
@@ -266,17 +270,17 @@ Checked on the VM on October 23, 2026.
   walk on the web are unchecked. The original
   frontend (`legacy-web`) still runs unrouted for rollback
   ([deployment](deploy.md#rolling-back-the-web-cutover)).
-- **iPhone:** TestFlight `beta` build 62 (standalone, production API, IPA
-  36 MB) is from main `f06db78` (through #341), uploaded October 23. It is the
-  first build with on-device Stockfish (#336) for review's side lines, the
-  Privacy and licences notice (#334) and the GPL licence (#340); its source is
-  published as [knightly-source@ios-build-62](https://github.com/hunterrhansen/knightly-source/tree/ios-build-62)
-  (Actions disabled there). Build 61 (`91bff6b`) carried #338, build 60 #333;
-  builds 58 and earlier break against this backend. **None of the ward path,
-  the walk, the new watch mix, the safety-check labels, the endgame drills,
-  the tappable badges or a side line's on-device eval has been seen on a
-  phone.** Keeping a watch and playing a review side line on build 62 is the
-  open gate.
+- **iPhone:** TestFlight `beta` build 63 (standalone, production API) is from
+  main `2ad269f` (through #344), uploaded October 23: build 62 plus legal-move
+  dots on review positions (#343) and the optional **Live engine in reviews**
+  setting (#344). Its source is published as
+  [knightly-source@ios-build-63](https://github.com/hunterrhansen/knightly-source/tree/ios-build-63).
+  Build 62 (`f06db78`) was the first with on-device Stockfish (#336); on it a
+  review side line played and evaluated on the user's iPhone. Build 61
+  (`91bff6b`) carried #338; builds 58 and earlier break against this backend.
+  **None of the ward path, the walk, the new watch mix, the safety-check labels,
+  the endgame drills, the tappable badges or the live engine setting has been
+  seen on a phone.** Keeping a watch on build 63 is the open gate.
 - **Production learner data:** #309 reset production's posts-reached record to
   the Gatehouse so every post is walked; the record before the walk is kept as
   the setting `wards_reached_before_walk`.

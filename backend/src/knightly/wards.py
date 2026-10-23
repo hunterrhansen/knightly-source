@@ -4,16 +4,18 @@ docs/specs/2026-10-20-curriculum-wards-design.md. `curriculum.WARDS` is the orde
 this is the part that says which ward someone is in, when it is cleared, and which drills it
 asks for. Nothing read WARDS before this module.
 
-### A ward clears on retention, not on exposure
+### A lesson is held at the Steps Method's bar
 
-The rule the whole design rests on: **the curriculum is the map, spaced repetition is how a
-ward is known to be cleared.** Finishing drills proves nothing -- you can solve a fork puzzle
-and forget forks by Thursday. A lesson is held when the evidence says you still have it:
+The Steps Method gives each lesson about three workbook pages of twelve positions, and a
+pupil who gets 80% of a page right is at that level; three or more misses on a page means it
+needs another pass. So a lesson is held when, since its post was reached:
 
-- a card of your own carrying that tactic is held (`deck.holds` -- FSRS stability past the
-  bar *and* a family member solved elsewhere, so it is the idea rather than the diagram), or
-- `HOLD_SOLVES` distinct puzzles of its themes solved first try, the most recent of them not
-  a failure.
+- `BASIC_VOLUME` positions of it have been answered (its basic workbook's worth), and at least
+  `PAGE_RIGHT` of the last `PAGE` were right first try, or
+- a card of your own carrying that tactic is held (`deck.holds`: FSRS stability past the bar
+  *and* a family member solved elsewhere), or your games already show the drill's skill, and
+  one page here is at the bar. Steps' real gate is the games: what they show needs only one
+  page of proof, not the whole volume.
 
 Either route counts, because they are evidence about the same thing from different sources:
 the first is "you kept it from your own game", the second "you kept it in practice". A lesson
@@ -26,8 +28,7 @@ until its drills are built.
 Only evidence from after a learner reaches a post counts toward it (`entered_at` in the
 record), so history never skips one: 325 puzzles solved before the wards existed once cleared
 six posts on the day they launched. A post is reached when the one before it clears, and a
-post once cleared stays cleared (the record moves forward only). A lesson the learner's own
-games already hold needs one fresh solve rather than HOLD_SOLVES: show it once, here.
+post once cleared stays cleared (the record moves forward only).
 
 ### Rating places you; it never advances you
 
@@ -46,13 +47,13 @@ import math
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 
-from . import curriculum, db, deck, drill, endgames, patterns, puzzles
+from . import curriculum, db, deck, drill, endgame_drills, endgames, patterns, puzzles
 
-# Puzzles of a lesson's themes solved first try before practice alone counts as holding it.
-# Three rather than one: a single solve is the diagram, and the whole point of a family is
-# that an idea has to survive being met somewhere else. Still the floor -- below this many
-# observations an estimate is not worth reading, whatever it says.
-HOLD_SOLVES = 3
+# The Steps Method's bar (see the module docstring): a lesson's basic volume, a workbook page,
+# and how many of a page must be right (80%).
+BASIC_VOLUME = 36
+PAGE = 12
+PAGE_RIGHT = 10
 # An idea's own Elo, seeded from the learner's overall puzzle ability. Absent evidence about
 # forks specifically, assume they are as good at forks as they are at everything, which is
 # the same prior `patterns.weakness` shrinks toward.
@@ -62,10 +63,6 @@ IDEA_K = 32
 # stops a long history from ever reading as certainty it has not earned.
 SIGMA_0 = 350.0
 SIGMA_FLOOR = 60.0
-# How many sigmas below the estimate must still clear a ward's difficulty before the idea
-# counts as held. One: being roughly 84% sure beats a bare point estimate, and demanding two
-# would park a learner on ideas they plainly have.
-CONFIDENCE_Z = 1.0
 # An idea we are very unsure about is worth serving to find out, even when its estimate
 # looks fine. This is the explore half of the priority the weakness model asks for.
 PROBE_SIGMA = 250.0
@@ -75,10 +72,8 @@ PROBE_SIGMA = 250.0
 # against is p10 -- "where a theme's easiest examples happen to live", the very signal this
 # curriculum replaced. Placing on it sent a 1400 straight to the last ward.
 #
-# Clearing does the work instead, and does it honestly: a ward goes as soon as its lessons
-# are held, so a strong player clears the early ones in a night or two of HOLD_SOLVES each
-# and a weak one does not. Reinstate placement when the rating mapping is measured, not
-# before.
+# Clearing does the work instead: a ward goes as soon as its lessons are held. Reinstate
+# placement when the rating mapping is measured, not before (issue #325).
 FIRST_WARD = 1
 
 
@@ -86,17 +81,16 @@ FIRST_WARD = 1
 class LessonState:
     lesson: curriculum.Lesson
     held: bool
-    solves: int
+    # Positions of it answered since its post was reached, and how many were right first try.
+    answered: int = 0
+    solves: int = 0
+    # Right first try among the last PAGE answered: the page the bar is judged on.
+    page_right: int = 0
     # The learner's estimated ability on this idea and how unsure we are, both in rating
     # points on the corpus's scale; `bar` is the difficulty the estimate is judged against.
     theta: float = 0.0
     sigma: float = SIGMA_0
     bar: float = 0.0
-
-    @property
-    def confident_floor(self) -> float:
-        """The ability we are reasonably sure the learner is above."""
-        return self.theta - CONFIDENCE_Z * self.sigma
 
     @property
     def probe(self) -> float:
@@ -130,50 +124,57 @@ class WardState:
         return any(lesson.lesson.servable for lesson in self.lessons)
 
 
-def _solves(conn, today: date | None = None) -> list[tuple[str, list[str]]]:
-    """Puzzles solved first try over RECENT_DAYS, oldest first: (when, themes). Counted per
-    lesson from the day its post was reached (`_count_since`).
+def _answers(conn, today: date | None = None) -> list[tuple[str, list[str], bool]]:
+    """Puzzle first tries over RECENT_DAYS, oldest first: (when, themes, right). Counted per
+    lesson from the day its post was reached (`_since`).
 
     **Every source, not just ours.** A puzzle solved on Lichess is the same evidence as one
-    solved here, and `puzzles.ability` has always counted both -- filtering this to our own
-    source made the two disagree. Measured on production: one account had 295 Lichess
-    attempts against 26 of ours, so 269 solves were invisible and the curriculum sat them on
-    mate in one with a puzzle ability of 1544.
-
-    Windowed, because holding an idea is a claim about now. The window is
-    `patterns.RECENT_DAYS`, which is what the rest of the system means by recent, and it is
-    what stops someone returning after a year from skipping half the course on evidence that
-    has decayed.
-    """
+    solved here, and `puzzles.ability` has always counted both. Windowed, because holding an
+    idea is a claim about now: someone returning after a year does not skip half the course
+    on evidence that has decayed."""
     since = db.stamp(
         datetime.combine(today or db.today(conn), datetime.min.time()) - timedelta(days=patterns.RECENT_DAYS)
     )
     rows = conn.execute(
-        """SELECT attempted_at, themes FROM puzzle_attempts
-           WHERE themes IS NOT NULL AND success AND attempted_at >= %s ORDER BY attempted_at""",
+        """SELECT attempted_at, themes, success FROM puzzle_attempts
+           WHERE themes IS NOT NULL AND attempted_at >= %s ORDER BY attempted_at, id""",
         (since,),
     ).fetchall()
     return [
-        (r["attempted_at"], json.loads(r["themes"]) if isinstance(r["themes"], str) else (r["themes"] or []))
+        (
+            r["attempted_at"],
+            json.loads(r["themes"]) if isinstance(r["themes"], str) else (r["themes"] or []),
+            bool(r["success"]),
+        )
         for r in rows
     ]
 
 
-def _drill_solves(conn, today: date | None = None) -> list[tuple[str, str]]:
-    """Correct first answers over RECENT_DAYS, oldest first: (when, drill kind). How a lesson
-    with no Lichess theme is held. Graded answers only (`rating IS NOT NULL`), as the deck
-    counts them."""
+def _drill_answers(conn, today: date | None = None) -> list[tuple[str, str, bool]]:
+    """Drill first answers over RECENT_DAYS, oldest first: (when, drill kind, right). How a
+    lesson with no Lichess theme is held. Graded answers only (`rating IS NOT NULL`), as the
+    deck counts them."""
     since = db.stamp(
         datetime.combine(today or db.today(conn), datetime.min.time()) - timedelta(days=patterns.RECENT_DAYS)
     )
     rows = conn.execute(
-        """SELECT r.reviewed_at, t.kind FROM threat_reviews r
+        """SELECT r.reviewed_at, t.kind, r.correct FROM threat_reviews r
            JOIN threat_cards t ON t.game_id = r.game_id AND t.ply = r.ply
-           WHERE r.correct AND r.rating IS NOT NULL AND r.reviewed_at >= %s
-           ORDER BY r.reviewed_at""",
+           WHERE r.rating IS NOT NULL AND r.reviewed_at >= %s
+           ORDER BY r.reviewed_at, r.id""",
         (since,),
     ).fetchall()
-    return [(r["reviewed_at"], r["kind"]) for r in rows]
+    return [(r["reviewed_at"], r["kind"], bool(r["correct"])) for r in rows]
+
+
+def page(results: list[bool]) -> tuple[int, int, int]:
+    """(answered, right, right on the last PAGE) for one lesson's answers, oldest first."""
+    return len(results), sum(results), sum(results[-PAGE:])
+
+
+def held_at_bar(answered: int, page_right: int, volume: int = BASIC_VOLUME) -> bool:
+    """The Steps bar: `volume` answered and PAGE_RIGHT of the last PAGE right."""
+    return answered >= volume and page_right >= PAGE_RIGHT
 
 
 def _since(entry: dict | None) -> str | None:
@@ -263,39 +264,41 @@ def entry(conn, at: int | None = None) -> int:
 
 def state(conn, at: int | None = None, today: date | None = None) -> list[WardState]:
     """Every ward with its lessons' evidence: cleared behind, one current, the rest ahead."""
-    solved, held_tactics, drills = _solves(conn), _held_tactics(conn), _drill_solves(conn)
+    answers, held_tactics, drills = _answers(conn), _held_tactics(conn), _drill_answers(conn)
     attempts, overall, band = _attempts(conn), float(puzzles.ability(conn)), bands(conn)
     reached = db.get_setting(conn, REACHED_SETTING) or {}
     start = entry(conn, at)
     out: list[WardState] = []
     current_found = False
     for index, ward in enumerate(curriculum.WARDS, start=1):
-        # Only what was solved since this post was reached counts toward it; a post not yet
-        # reached has nothing.
+        # Only what was answered since this post was reached counts toward it; a post not
+        # yet reached has nothing.
         since = _since(reached.get(ward.key))
         lessons = []
         for lesson in ward.lessons:
             # A lesson is evidenced by its puzzle themes, or by the drill that teaches it
             # where no theme exists (ward 1), or by a card of your own carrying the tactic.
             themes = set(lesson.themes)
-            solves = 0 if since is None else sum(1 for at_, ts in solved if at_ >= since and themes & set(ts))
+            results = (
+                [] if since is None else [right for at_, ts, right in answers if at_ >= since and themes & set(ts)]
+            )
             if lesson.drill and since is not None:
-                solves = max(solves, sum(1 for at_, kind in drills if at_ >= since and kind == lesson.drill))
-            # The estimate, not a count: held when we are reasonably sure the learner's
-            # ability on this idea clears the difficulty of its own drills. HOLD_SOLVES
-            # stays as the floor on evidence -- an estimate over one answer is a guess
-            # however confident the arithmetic looks.
-            theta, sigma, seen = estimate(attempts, lesson.themes, overall)
+                drilled = [right for at_, kind, right in drills if at_ >= since and kind == lesson.drill]
+                results = max(results, drilled, key=len)
+            answered, solves, page_right = page(results)
+            # The estimate no longer decides holding (the Steps bar does); it still orders
+            # what is worth serving (`priority`).
+            theta, sigma, _ = estimate(attempts, lesson.themes, overall)
             bar = band.get(ward.key, 0.0)
-            by_practice = lesson.servable and solves >= HOLD_SOLVES and (theta - CONFIDENCE_Z * sigma >= bar or not bar)
+            by_practice = lesson.servable and held_at_bar(answered, page_right)
             # Held by the games themselves: a card carrying the tactic for a themed lesson,
             # or -- for a lesson taught by a drill -- the learner already doing it at the
-            # board. Drilling what someone demonstrably does is a night spent on nothing.
+            # board. Those still show one page here, at the bar.
             by_game = any(theme in held_tactics for theme in lesson.themes)
             if not by_game and lesson.drill:
                 by_game = drill.held_in_games(conn, lesson.drill)
-            # What your games already hold still has to be shown once, here.
-            lessons.append(LessonState(lesson, by_practice or (by_game and solves >= 1), solves, theta, sigma, bar))
+            held = by_practice or (by_game and held_at_bar(answered, page_right, PAGE))
+            lessons.append(LessonState(lesson, held, answered, solves, page_right, theta, sigma, bar))
         teachable = [lesson for lesson in lessons if lesson.lesson.servable]
         done = bool(teachable) and all(lesson.held for lesson in teachable)
         servable = bool(teachable)
@@ -379,35 +382,83 @@ def current_drills(conn, at: int | None = None) -> list[str]:
     return list(dict.fromkeys(lesson.lesson.drill for lesson in ordered if lesson.lesson.drill))
 
 
+# How many moves of yours a lesson's puzzles ask for, by the Steps Method step it comes from:
+# the method deepens calculation on purpose, half a move in Step 1 (one move wins), one and a
+# half in Step 2, two and a half by Step 4. Our generated endgame drills are technique lines
+# and keep their length.
+DEPTH = {"1": 1, "1+": 1, "2": 2, "2+": 2, "2ta": 2, "3": 2, "3+": 3, "4": 3}
+
+
+def depth(lesson: curriculum.Lesson, theme: str) -> int | None:
+    """The most moves of yours a puzzle for this lesson's `theme` should ask for, or None."""
+    return None if theme in endgame_drills.THEMES else DEPTH.get(lesson.step)
+
+
 def ward_puzzle(conn, today: date | None = None, at: int | None = None) -> dict | None:
     """A puzzle for the current ward: its unheld lessons first, respecting each lesson's
     shape. None when the ward has nothing the corpus can serve -- the caller falls back to
     the weakness order rather than serving nothing."""
     today = today or db.today(conn)
     ward = current(conn, at)  # one pass over the evidence, not one per theme
+    deepest: dict[str, int | None] = {}
+    for lesson in ward.lessons:
+        for theme in (*lesson.lesson.themes, *lesson.lesson.practice):
+            deepest.setdefault(theme, depth(lesson.lesson, theme))
     for theme, shape in _themes_of(ward):
-        puzzle = puzzles.themed_puzzle(conn, theme, today)
+        puzzle = puzzles.themed_puzzle(conn, theme, today, deepest.get(theme))
         if puzzle and (shape is None or endgames.matches(puzzle["fen_prev"], shape)):
             return {**puzzle, "ward": ward.ward.key, "theme": theme}
     return None
 
 
-def review_puzzle(conn, today: date | None = None, at: int | None = None) -> dict | None:
-    """A puzzle for an idea from a post before the current one, for the watch's mixed review:
-    served unannounced, so the learner has to recognise which idea it is. Takes turns across
-    the earlier posts' themes (by tonight's puzzles tried), the most recent post first. None
-    before the learner has passed a post with puzzles."""
+# Days until a lesson from a passed post comes back for review, by how many of its reviews in
+# a row were right: a miss starts it over. Expanding intervals, as any spaced-repetition
+# schedule; each review is a fresh position of the idea, never one seen before.
+REVIEW_DAYS = (2, 4, 8, 16, 32, 64, 128)
+
+
+def review_schedule(conn, today: date | None = None, at: int | None = None) -> list[tuple[date, LessonState]]:
+    """Every lesson with puzzle themes in a post the learner has passed, with the day it is due
+    for review, soonest first. Its clock starts the day its post was cleared; answers on its
+    themes since then move it along REVIEW_DAYS, a wrong one back to the start."""
     today = today or db.today(conn)
     states = state(conn, at)
     current_index = next(w.index for w in states if w.state == "current")
-    pairs = [pair for w in reversed(states) if w.index < current_index for pair in _themes_of(w)]
-    if not pairs:
-        return None
-    turn = puzzles.done_today(conn, today) % len(pairs)
-    for theme, shape in pairs[turn:] + pairs[:turn]:
-        puzzle = puzzles.themed_puzzle(conn, theme, today)
-        if puzzle and (shape is None or endgames.matches(puzzle["fen_prev"], shape)):
-            return puzzle
+    reached = db.get_setting(conn, REACHED_SETTING) or {}
+    answers = _answers(conn, today)
+    out = []
+    for ward in states:
+        if ward.index >= current_index:
+            continue
+        cleared = (reached.get(ward.ward.key) or {}).get("cleared") or today.isoformat()
+        for lesson in ward.lessons:
+            themes = set(lesson.lesson.themes) | set(lesson.lesson.practice)
+            if not themes:
+                continue
+            last, streak = date.fromisoformat(cleared), 0
+            for at_, ts, right in answers:
+                if at_[:10] < cleared or not themes & set(ts):
+                    continue
+                last = max(last, date.fromisoformat(at_[:10]))
+                streak = streak + 1 if right else 0
+            due = last + timedelta(days=REVIEW_DAYS[min(streak, len(REVIEW_DAYS) - 1)])
+            out.append((due, lesson))
+    return sorted(out, key=lambda pair: (pair[0], pair[1].lesson.key))
+
+
+def review_puzzle(conn, today: date | None = None, at: int | None = None) -> dict | None:
+    """A fresh puzzle for the lesson from a passed post that is most overdue for review, for the
+    watch's mixed review: served unannounced, so the learner has to recognise which idea it
+    is (the Steps Method's Mix, used during the next step). None before the learner has
+    passed a post with puzzles."""
+    today = today or db.today(conn)
+    for _, lesson in review_schedule(conn, today, at):
+        themes = list(lesson.lesson.themes) + [t for t in lesson.lesson.practice if t not in lesson.lesson.themes]
+        for theme in themes:
+            puzzle = puzzles.themed_puzzle(conn, theme, today, depth(lesson.lesson, theme))
+            shape = lesson.lesson.shape if theme in lesson.lesson.themes else None
+            if puzzle and (shape is None or endgames.matches(puzzle["fen_prev"], shape)):
+                return puzzle
     return None
 
 
@@ -475,6 +526,8 @@ def as_json(ward: WardState, reached: dict | None = None) -> dict:
                 "step": lesson.lesson.step,
                 "held": lesson.held,
                 "solves": lesson.solves,
+                "answered": lesson.answered,
+                "page_right": lesson.page_right,
                 "ability": round(lesson.theta),
                 "uncertainty": round(lesson.sigma),
                 "bar": round(lesson.bar),

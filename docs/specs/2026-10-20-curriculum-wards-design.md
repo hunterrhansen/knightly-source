@@ -123,6 +123,33 @@ their last 40 rated games. The Elo of a ward is an output of measurement, not an
 This also means the ward boundaries move as the corpus is re-imported, which is correct and
 should be visible in the derivation rather than frozen into constants.
 
+## Following the Steps Method (decided 2026-10-23)
+
+Knightly builds on a proven curriculum rather than its own. Beyond the order, it now matches
+the Steps Method in four ways (research from the official sites, trainer-manual previews and
+answer keys; the method has no controlled outcome study, so this is expert consensus):
+
+- **Volume and mastery.** A Steps lesson is about three workbook pages of twelve positions,
+  and 80% of a page right means the pupil is at the level. A lesson is held at
+  `wards.BASIC_VOLUME` (36) answered since its post was reached with `PAGE_RIGHT` (10) of the
+  last `PAGE` (12) right. Steps' real gate is the games: a lesson your games already show
+  needs one page here. This replaces three first-try solves plus an Elo check.
+- **Spaced review of lessons.** Steps uses its Mix books during the next step. A lesson from a
+  passed post comes back in the watch's mixed-review slots on `wards.REVIEW_DAYS` (2, 4, 8 …
+  128 days), each right review pushing it out and a miss starting it over, always as a fresh
+  position (`wards.review_schedule`).
+- **Depth.** Steps deepens calculation by step: one move in Step 1, one and a half in Step 2,
+  two and a half by Step 4. A lesson's puzzles ask for at most `wards.DEPTH[step]` of your
+  moves when the corpus has them, any length otherwise; generated endgame drills keep theirs.
+- **Names.** Lessons use the method's own terms ("X-ray attack" for the skewer, "luring away"
+  for deflection), and the post card credits the order to Brunia and van Wijgerden. Their step
+  numbers are never shown as Knightly's progress.
+
+With four idea slots a night a lesson takes about two weeks; the eighteen posts' basic volume
+about a year at one watch a night, before the Plus lessons and Steps 4-6 that would follow the
+Keep. Pace stays set by mastery: extra watches go faster, and placement (#325) is how a
+stronger player skips ahead.
+
 ## The five practice modes
 
 The Steps Method's workbook variants are not reading levels -- they are five different things

@@ -26,10 +26,13 @@ const TRACK_NAMES: Record<string, string> = {
 };
 const trackName = (track: string) => TRACK_NAMES[track] ?? track;
 
-// Every watch keeps three puzzles for the post (the server's POST_SHARE), and
-// only puzzles solved since the post was reached count toward it.
+// Four of every watch's ten items are the post's (backend mix.SLOTS), and only
+// answers since the post was reached count toward it: the Steps Method's bar.
 const CLEARS =
-  'Every watch brings three of this post’s puzzles. A lesson is held once you solve three of them first try here, or one if a move from your own games already shows it.';
+  'Every watch brings four of this post’s positions. A lesson is held once you’ve answered 36 of them and got 10 of your last 12 right. If your own games already show it, one page of 12 is enough.';
+// The order is theirs; every position and word here is Knightly's own.
+const CREDIT =
+  'Lessons follow the order of the Steps Method by Rob Brunia and Cor van Wijgerden.';
 
 /** The post's knight line and its note from the old books. */
 function PostStory({ post }: { post: PathPost }) {
@@ -107,6 +110,7 @@ export function PostCard({ post }: { post: PathPost }) {
         {post.state === 'current' && (
           <Text style={styles.clears}>{CLEARS}</Text>
         )}
+        <Text style={styles.clears}>{CREDIT}</Text>
       </View>
     </Card>
   );

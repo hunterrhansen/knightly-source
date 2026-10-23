@@ -456,12 +456,16 @@ class WardLessonOut(BaseModel):
     # Which Steps Method lesson this follows ("2", "3+"). Provenance, not shown to a learner.
     step: str
     held: bool
-    # Puzzles of its themes solved first try. 0 for a lesson with no drills yet.
+    # Positions of it right first try since its post was reached. 0 for a lesson with no
+    # drills yet.
     solves: int
+    # Positions of it answered since its post was reached, and right among the last
+    # wards.PAGE: held at wards.BASIC_VOLUME answered with wards.PAGE_RIGHT of a page right.
+    answered: int = 0
+    page_right: int = 0
     # The learner's estimated ability on this idea, how unsure that estimate is, and the
-    # difficulty it is judged against -- all rating points on the corpus's scale. A lesson
-    # is held when ability minus uncertainty clears the bar, not when solves reaches a
-    # count: three easy puzzles are three solves and no evidence about a hard idea.
+    # difficulty of its drills, in rating points on the corpus's scale: what orders the
+    # lessons worth serving, not what holds them.
     ability: int = 0
     uncertainty: int = 0
     bar: int = 0

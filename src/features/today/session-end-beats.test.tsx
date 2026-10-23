@@ -280,7 +280,7 @@ test('a watch with no move held goes straight to its Results', async () => {
 });
 
 test('posts held on the ward path come after Results, then the memory beat', async () => {
-  const before = { ...firstNights, wards: sampleWards(6, [3, 0]) };
+  const before = { ...firstNights, wards: sampleWards(6, [36, 0]) };
   const after = { ...firstNights, wards: sampleWards(7) };
   const posts = postMoment(before, after, '2026-10-20');
   const finish = jest.fn();

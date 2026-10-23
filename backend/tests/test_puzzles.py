@@ -504,3 +504,24 @@ def test_a_busy_night_still_gives_four_of_ten_items_to_the_posts_idea(db_url, tm
     done = client.get("/api/deck?mode=lesson").json()
     assert done["lesson"] == {"done": daily.GOAL, "total": daily.GOAL}
     assert done["card"] is None and done["puzzle"] is None
+
+
+def test_an_early_posts_puzzles_ask_for_one_move_and_fall_back_to_longer(db_url, tmp_path, monkeypatch):
+    # The Steps Method deepens calculation step by step: Step 1's lessons are one move.
+    from knightly import wards
+
+    long_line = (
+        "r3k3/8/8/1N6/8/8/8/4K3 b - - 0 1,e8d8 b5c7 d8c8 c7a8,900,75,95,1000,mateIn1 long,https://lichess.org/x,\n"
+    )
+    conn = db.connect(db_url)
+    puzzles.import_file(
+        conn,
+        write_csv(tmp_path / "p.csv", ["aaaaa," + long_line, themed_row("short", "mateIn1 short")]),
+        log=lambda *a: None,
+    )
+    ward = next(w for w in wards.state(conn) if w.ward.key == "mate-in-one")
+    monkeypatch.setattr(wards, "current", lambda conn, at=None: ward)
+    assert wards.ward_puzzle(conn)["id"] == "short"
+    puzzles.answer(conn, "short", ["b5c7"])
+    # With no one-mover left, the longer line still serves rather than nothing.
+    assert wards.ward_puzzle(conn)["id"] == "aaaaa"

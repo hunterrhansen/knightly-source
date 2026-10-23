@@ -79,8 +79,13 @@ export const wardSchema = z.object({
         /** The Steps Method's numbering: provenance only, never shown. */
         step: z.string().max(10),
         held: z.boolean(),
-        /** Puzzles of its themes solved first try; three hold it. */
+        /** Positions of it right first try since its post was reached. */
         solves: count,
+        /** Positions answered since its post was reached, and right among the
+         * last page of 12: held at 36 answered with 10 of a page right (the
+         * Steps Method's bar). Absent from servers before it. */
+        answered: count.optional(),
+        page_right: count.optional(),
         /** False while no drills exist for it: never held, never blocking. */
         teachable: z.boolean(),
       }),

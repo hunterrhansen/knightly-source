@@ -92,7 +92,9 @@ def _l(
 # Steps 1-plus through 4, which is roughly where Knightly's learners are. Step 1's basic
 # lessons are the rules of chess and are dropped: everyone here already plays online. Steps 5
 # and 6 (rook endings, strong squares, open files, the seventh rank) are deliberately absent
-# until someone is reliably clearing ward 18.
+# until someone is reliably clearing ward 18. Lesson names are the Steps Method's own terms
+# (decided 2026-10-23), which differ from common usage in places: "X-ray attack" is a skewer,
+# "luring away" is deflection. Their step numbers are never shown as Knightly's progress.
 WARDS: tuple[Ward, ...] = (
     _w(
         "board-vision",
@@ -106,7 +108,7 @@ WARDS: tuple[Ward, ...] = (
         "Mate in one",
         _l("mate-in-one", "Mate in one", "mate", "1", "mateIn1"),
         # Mating with the queen first (generated, endgame_drills.py), then the corpus's.
-        _l("creating-mate", "Creating mate", "mate", "1+", "queenMate", "mateIn1"),
+        _l("creating-mate", "Mating with the queen", "mate", "1+", "queenMate", "mateIn1"),
     ),
     _w(
         "loose-pieces",
@@ -118,7 +120,7 @@ WARDS: tuple[Ward, ...] = (
         "double-attack",
         "The double attack",
         _l("double-attack", "Double attack", "tactic", "2", "fork"),
-        _l("double-attack-king", "Double attack with the king in it", "tactic", "2", "fork", "doubleCheck"),
+        _l("double-attack-king", "Double attack with other pieces", "tactic", "2", "fork", "doubleCheck"),
     ),
     _w(
         "mate-in-two",
@@ -177,8 +179,8 @@ WARDS: tuple[Ward, ...] = (
     _w(
         "x-ray",
         "X-ray and skewer",
-        _l("x-ray", "The X-ray effect", "tactic", "3", "xRayAttack"),
-        _l("skewer", "Skewer", "tactic", "3", "skewer"),
+        _l("x-ray", "X-ray protection", "tactic", "3", "xRayAttack"),
+        _l("skewer", "X-ray attack", "tactic", "3", "skewer"),
     ),
     _w(
         "square-of-the-pawn",
@@ -205,20 +207,20 @@ WARDS: tuple[Ward, ...] = (
             "smotheredMate",
             "vukovicMate",
         ),
-        _l("threats", "Threats", "defence", "3"),
+        _l("threats", "Defending against a threat", "defence", "3"),
     ),
     _w(
         "trapping",
         "Trapping a piece",
-        _l("trapping", "Trapping", "tactic", "4+", "trappedPiece"),
+        _l("trapping", "Trapping a piece", "tactic", "4+", "trappedPiece"),
         _l("mobility", "Mobility", "positional", "3"),
     ),
     _w(
         "luring",
         "Luring and interference",
         _l("luring", "Luring", "tactic", "4", "attraction"),
-        _l("interfering", "Interfering", "tactic", "4", "interference"),
-        _l("deflection", "Deflection", "tactic", "4", "deflection"),
+        _l("interfering", "Interference", "tactic", "4", "interference"),
+        _l("deflection", "Luring away", "tactic", "4", "deflection"),
         _l("clearing", "Clearing", "tactic", "4", "clearance"),
     ),
 )

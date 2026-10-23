@@ -106,19 +106,19 @@ export const WardsFirstPost = story('Ready', {
 /** Deep in: the Portcullis, with a lesson that has no drills yet. */
 export const WardsPortcullis = story('Ready', {
   ...firstNights,
-  wards: sampleWards(6, [2, 0]),
+  wards: sampleWards(6, [24, 0]),
 });
 /** Into the Middle Ward: the Postern current, the ward's gate drawn below
  * the Guardroom, over the Outer Ward's posts. */
 export const WardsMiddleWard = story('Ready', {
   ...firstNights,
-  wards: sampleWards(8, [1]),
+  wards: sampleWards(8, [12]),
 });
 /** The whole walk: at the Great Hall, post 18, with every post behind it
  * down to the Gatehouse, the three wards' gates and the rank castles. */
 export const WardsWholeWalk = story('Ready', {
   ...scheduled,
-  wards: sampleWards(18, [1]).map((w) =>
+  wards: sampleWards(18, [12]).map((w) =>
     w.state === 'current' ? { ...w, entered_on: '2026-10-12' } : w,
   ),
 });

@@ -30,7 +30,7 @@ import type { MapCastle } from './journey-map';
 import type { PathModel, PathNode } from './path-model';
 import { ArrivePop, KeptPop, RoadFill, STEP, WalkingKnight } from './path-step';
 import { TrackGlyph } from './track-glyph';
-import { HOLD_SOLVES } from './ward-path';
+import { lessonDetail } from './ward-path';
 
 // The home path drawn (docs/specs/2026-10-19-path-home-design.md, "Home: the
 // path"): a winding column of nodes over the night sky, newest at the top,
@@ -117,7 +117,7 @@ function nodeLabel(node: PathNode) {
     parts.push(`${node.lesson.name}, ${node.lesson.track}`);
     if (node.kind === 'tonight' && node.detail) parts.push(node.detail);
     if (node.lesson.teachable && !node.lesson.held)
-      parts.push(`${node.lesson.solves} of ${HOLD_SOLVES} solved`);
+      parts.push(lessonDetail(node.lesson));
     for (const c of node.castles) parts.push(`${c.name}: ${castleText(c)}`);
     return parts.join('. ');
   }

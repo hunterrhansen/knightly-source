@@ -368,13 +368,20 @@ def _playable(row) -> bool:
     return len(moves) >= 2 and len(moves) % 2 == 0 and practice_lines._legal(row["fen"], moves)
 
 
-def _pick(conn, theme: str, seed: str, target: int, phase: str | None = None) -> dict | None:
+def _pick(
+    conn, theme: str, seed: str, target: int, phase: str | None = None, max_moves: int | None = None
+) -> dict | None:
     """A playable puzzle in `theme` you haven't tried here, near `target` (widening if none
     is), picked by `seed` so a reload serves the same one. "mate" leaves out back-rank
-    mates, as patterns.strength counts them. `phase` narrows to Lichess's own phase tag."""
+    mates, as patterns.strength counts them. `phase` narrows to Lichess's own phase tag;
+    `max_moves` to lines where you play at most that many moves."""
     back_rank = " AND (' ' || p.themes || ' ') NOT ILIKE '%% backRankMate %%'" if theme == "mate" else ""
     in_phase = " AND (' ' || p.themes || ' ') ILIKE %s" if phase else ""
     extra = (f"% {phase} %",) if phase else ()
+    if max_moves:
+        # The line is the setting-up move, then yours and theirs in turn: 2n moves for n of yours.
+        in_phase += " AND array_length(string_to_array(p.moves, ' '), 1) <= %s"
+        extra = (*extra, 2 * max_moves)
     for spread in (NEAR, NEAR * 3, 10_000):
         rows = conn.execute(
             f"""SELECT * FROM lichess_puzzles p
@@ -414,9 +421,13 @@ def idea_puzzle(conn, today: date | None = None) -> dict | None:
     return None
 
 
-def themed_puzzle(conn, theme: str, today: date) -> dict | None:
-    """The next puzzle in `theme`, stable within a day."""
-    return _pick(conn, theme, f"{today.isoformat()}:{theme}", target_rating(conn))
+def themed_puzzle(conn, theme: str, today: date, max_moves: int | None = None) -> dict | None:
+    """The next puzzle in `theme`, stable within a day; at most `max_moves` of yours when it
+    has one that short, any length otherwise."""
+    seed, target = f"{today.isoformat()}:{theme}", target_rating(conn)
+    if max_moves and (short := _pick(conn, theme, seed, target, max_moves=max_moves)):
+        return short
+    return _pick(conn, theme, seed, target)
 
 
 def _line(conn, puzzle_id: str):
