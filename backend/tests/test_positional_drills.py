@@ -47,6 +47,39 @@ def test_each_idea_check_recognises_its_idea(fen, uci, idea, expected):
     assert (idea in carries(fen, uci)) is expected
 
 
+@pytest.mark.parametrize(
+    ("fen", "uci", "idea", "expected"),
+    [
+        # A rook up, Rd1 offers the rook trade (Ra1 guards d1); level, the same move is no lesson.
+        ("2kr4/5ppp/8/8/8/8/5PPP/R3R1K1 w - - 0 30", "e1d1", "trade", True),
+        ("1rkr4/5ppp/8/8/8/8/5PPP/R3R1K1 w - - 0 30", "e1d1", "trade", False),
+        # A rook up in an ending: Kg2 walks toward the centre; Kh2 gets no nearer.
+        ("7k/p7/8/8/8/8/P7/3R3K w - - 0 40", "h1g2", "kingActivity", True),
+        ("7k/p7/8/8/8/8/P7/3R3K w - - 0 40", "h1h2", "kingActivity", False),
+        # c5 strikes at d6 (a lever); b5 leaves a5 behind and is passed; c4 does neither.
+        ("4k3/8/3p4/8/2P5/8/8/4K3 w - - 0 20", "c4c5", "pawnPlay", True),
+        ("4k3/8/8/p7/1P6/8/8/4K3 w - - 0 20", "b4b5", "pawnPlay", True),
+        ("4k3/8/3p4/8/8/2P5/8/4K3 w - - 0 20", "c3c4", "pawnPlay", False),
+        # Bishop or knight can take on d5; with no bishop, there is no choice.
+        ("4k3/8/8/3p4/4B3/2N5/8/4K3 w - - 0 20", "c3d5", "minorChoice", True),
+        ("4k3/8/8/3p4/8/2N5/8/4K3 w - - 0 20", "c3d5", "minorChoice", False),
+        # The Queen's Gambit offers c4 to the d5 pawn; e3 offers nothing.
+        ("rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2", "c2c4", "gambit", True),
+        ("rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2", "e2e3", "gambit", False),
+        # Three pieces out against none, d4 strikes at e5; d3 opens nothing.
+        ("rnbqkbnr/pppp1ppp/8/4p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 5", "d2d4", "openLines", True),
+        ("rnbqkbnr/pppp1ppp/8/4p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 5", "d2d3", "openLines", False),
+        # The c1 bishop behind its own dark-square pawns gets out to d2; behind light-square
+        # pawns it is a good bishop, and the same move frees nothing bad.
+        ("6k1/5ppp/8/8/3P4/4P3/1P3P2/2B3K1 w - - 0 25", "c1d2", "badBishop", True),
+        ("6k1/5ppp/8/8/2P5/1P1P4/P3P3/2B3K1 w - - 0 25", "c1d2", "badBishop", False),
+    ],
+)
+def test_each_plan_idea_check_recognises_its_idea(fen, uci, idea, expected):
+    carried = positional_drills.plan_carries(chess.Board(fen), chess.Move.from_uci(uci))
+    assert (idea in carried) is expected
+
+
 def test_a_move_that_threatens_a_piece_carries_no_idea():
     # Rd1 takes the open file, but it also attacks the loose knight: the drill would be the threat.
     assert carries("6k1/5ppp/8/3n4/8/8/5PPP/R5K1 w - - 0 1", "a1d1") == []
@@ -58,8 +91,11 @@ def test_an_attacked_piece_moving_away_is_not_activity():
 
 
 def drills():
-    with open(positional_drills.DATA, newline="") as f:
-        return list(csv.DictReader(f))
+    rows = []
+    for path in (positional_drills.DATA, positional_drills.PLANS_DATA):
+        with open(path, newline="") as f:
+            rows += list(csv.DictReader(f))
+    return rows
 
 
 def answer_position(row) -> tuple[chess.Board, chess.Move]:
@@ -77,8 +113,11 @@ def test_every_drill_is_legal_and_its_answer_carries_its_idea():
         board, answer = answer_position(row)
         assert answer in board.legal_moves, row["PuzzleId"]
         idea = row["Themes"].split()[0]
-        assert idea in positional_drills.THEMES
-        assert idea in positional_drills.carries(board, answer), row["PuzzleId"]
+        if idea in positional_drills.PLAN_THEMES:
+            assert idea in positional_drills.plan_carries(board, answer), row["PuzzleId"]
+        else:
+            assert idea in positional_drills.THEMES
+            assert idea in positional_drills.carries(board, answer), row["PuzzleId"]
 
 
 def test_every_drill_records_a_clear_engine_margin():
@@ -93,7 +132,7 @@ def test_every_lesson_given_a_positional_theme_has_enough_drills():
         for theme in row["Themes"].split():
             by_theme[theme] = by_theme.get(theme, 0) + 1
     for lesson in curriculum.LESSONS.values():
-        ours = [t for t in lesson.themes if t in positional_drills.THEMES]
+        ours = [t for t in lesson.themes if t in positional_drills.THEMES + positional_drills.PLAN_THEMES]
         if ours:
             assert sum(by_theme.get(t, 0) for t in ours) >= MIN_PER_LESSON, lesson.key
 

@@ -150,13 +150,13 @@ WARDS: tuple[Ward, ...] = (
         "defending-mate",
         "Seeing mate coming",
         _l("defending-mate", "Defending against mate", "defence", "2", "defensiveMove"),
-        _l("stalemate", "Stalemate", "endgame", "2+"),
+        _l("stalemate", "Stalemate", "endgame", "2+", "stalemate"),
     ),
     _w(
         "in-between",
         "The in-between move",
         _l("intermezzo", "The intermediate move", "tactic", "2", "intermezzo"),
-        _l("thinking-ahead", "Thinking ahead", "calculation", "2ta"),
+        _l("thinking-ahead", "Thinking ahead", "calculation", "2ta", "short"),
     ),
     _w(
         "pawn-endings",
@@ -207,7 +207,7 @@ WARDS: tuple[Ward, ...] = (
             "smotheredMate",
             "vukovicMate",
         ),
-        _l("threats", "Defending against a threat", "defence", "3"),
+        _l("threats", "Defending against a threat", "defence", "3", "defensiveMove"),
     ),
     _w(
         "trapping",
@@ -224,24 +224,25 @@ WARDS: tuple[Ward, ...] = (
         _l("clearing", "Clearing", "tactic", "4", "clearance"),
     ),
     # --- Part II, the Keep: the rest of Steps 3 and 3+, then Steps 4 and 4+ (2026-10-23) -----
-    # In the method's own order. A lesson with no themes is a positional one Steps teaches by
-    # explanation and judgement; it is introduced (intros.py) and shows as coming soon, never
-    # blocking its post, until a drill exists. Positional lessons whose idea a board check can
-    # confirm (the open file, strong squares, weak pawns, activity, development) draw generated
-    # "find the best move" drills instead (positional_drills.py). Endgame-rule lessons draw
+    # In the method's own order. Positional lessons draw generated "find the best move" drills
+    # whose answer a board check ties to the idea (positional_drills.py): the open file, strong
+    # squares, weak pawns, activity, development, and for the plan lessons (PLAN_IDEAS) a lever,
+    # a passed pawn made, a trade when ahead, a pawn given for time, a bad bishop freed, which
+    # minor piece takes, the king in a better ending. Mini-plans and strategy draw several;
+    # the later openings draw the opening rules again, deeper. Endgame-rule lessons draw
     # generated drills checked exactly (endgame_drills: rookPawn, and the Syzygy-checked
-    # queenVsPawn, rookVsPawn, wrongBishop, rookEndingWin/Draw); the rest draw the corpus's
-    # `simple` endgames.
+    # queenVsPawn, rookVsPawn, wrongBishop, rookEndingWin/Draw, and the draws: stalemate,
+    # drawBasics, drawPieces); the rest draw the corpus's `simple` endgames.
     _w(
         "defending-double-attack",
         "Defending against a double attack",
         _l("defending-double-attack", "Defending against a double attack", "defence", "3", "defensiveMove"),
-        _l("draw-3", "Draw", "endgame", "3"),
+        _l("draw-3", "Draw", "endgame", "3", "drawBasics", "stalemate"),
     ),
     _w(
         "mini-plan",
         "The mini plan",
-        _l("mini-plan", "Mini plan", "positional", "3"),
+        _l("mini-plan", "Mini plan", "positional", "3", "activity", "weakPawn"),
         _l("rook-pawn", "The rook pawn", "endgame", "3+", "rookPawn"),
     ),
     _w(
@@ -259,7 +260,7 @@ WARDS: tuple[Ward, ...] = (
     _w(
         "blocking",
         "Blocking",
-        _l("opening-advantage", "Opening advantage", "opening", "4"),
+        _l("opening-advantage", "Opening advantage", "opening", "4", "openLines"),
         _l("blocking", "Blocking", "mate", "4", "smotheredMate", "attraction"),
     ),
     _w(
@@ -278,7 +279,7 @@ WARDS: tuple[Ward, ...] = (
         "weak-pawns",
         "Weak pawns",
         _l("weak-pawns", "Weak pawns", "positional", "4", "weakPawn"),
-        _l("material-advantage", "Material advantage", "endgame", "4"),
+        _l("material-advantage", "Material advantage", "endgame", "4", "trade"),
     ),
     _w(
         "attack-on-the-king",
@@ -304,12 +305,12 @@ WARDS: tuple[Ward, ...] = (
         "Interference and blocking",
         _l("interference-4p", "Interference", "tactic", "4+", "interference"),
         _l("blocking-4p", "Blocking", "mate", "4+", "smotheredMate"),
-        _l("draws-4p", "Draws", "endgame", "4+"),
+        _l("draws-4p", "Draws", "endgame", "4+", "drawBasics"),
     ),
     _w(
         "mini-plans",
         "Mini-plans and batteries",
-        _l("mini-plans-4p", "Mini-plans", "positional", "4+"),
+        _l("mini-plans-4p", "Mini-plans", "positional", "4+", "activity", "weakPawn", "openFile", "strongSquare"),
         _l("pawn-endings-4p", "Pawn endings", "endgame", "4+", "pawnEndgame", "zugzwang"),
         _l("batteries", "Discovered attack", "tactic", "4+", "discoveredAttack", "discoveredCheck"),
     ),
@@ -323,14 +324,14 @@ WARDS: tuple[Ward, ...] = (
     _w(
         "material-and-time",
         "Material and time",
-        _l("material-and-time", "Material and time", "positional", "5"),
+        _l("material-and-time", "Material and time", "positional", "5", "gambit"),
         _l("mate-5", "Mate", "mate", "5", "mateIn3"),
     ),
     _w(
         "breakthrough",
         "Breakthrough",
         _l("breakthrough", "Breakthrough", "endgame", "5", "advancedPawn", "pawnEndgame"),
-        _l("using-pawns", "Using pawns", "positional", "5"),
+        _l("using-pawns", "Using pawns", "positional", "5", "pawnPlay"),
     ),
     _w(
         "pawn-race",
@@ -347,7 +348,7 @@ WARDS: tuple[Ward, ...] = (
     _w(
         "rook-against-pawn",
         "Rook against pawn",
-        _l("opening-5", "The opening", "opening", "5"),
+        _l("opening-5", "The opening", "opening", "5", "development", "centre", "castleEarly"),
         _l("rook-against-pawn", "Rook against pawn", "endgame", "5", "rookVsPawn"),
     ),
     _w(
@@ -366,7 +367,7 @@ WARDS: tuple[Ward, ...] = (
         "open-file",
         "Open file",
         _l("open-file", "Open file", "positional", "5", "openFile"),
-        _l("draw-5", "Draw", "endgame", "5"),
+        _l("draw-5", "Draw", "endgame", "5", "drawPieces"),
     ),
     _w(
         "king-in-the-middle",
@@ -396,28 +397,28 @@ WARDS: tuple[Ward, ...] = (
         "The king in the middle",
         _l("king-in-middle-6", "The king in the middle", "mate", "6", "exposedKing", "sacrifice"),
         _l("passed-pawn-6", "The passed pawn", "endgame", "6", "advancedPawn", "promotion"),
-        _l("strategy", "Strategy", "positional", "6"),
+        _l("strategy", "Strategy", "positional", "6", "pawnPlay", "strongSquare", "weakPawn", "badBishop"),
     ),
     _w(
         "citadel-walls",
         "Mobility and the opening",
         _l("mobility-6", "Mobility", "positional", "6", "activity"),
-        _l("draw-6", "Draw", "endgame", "6"),
-        _l("opening-6", "The opening", "opening", "6"),
+        _l("draw-6", "Draw", "endgame", "6", "drawPieces", "rookEndingDraw"),
+        _l("opening-6", "The opening", "opening", "6", "development", "centre", "castleEarly"),
     ),
     _w(
         "citadel-hall",
         "Tactics",
         _l("tactics-6", "Tactics", "tactic", "6", "sacrifice", "deflection", "attraction"),
         _l("pawn-ending-6", "Pawn ending", "endgame", "6", "pawnEndgame"),
-        _l("bishop-or-knight", "Bishop or knight?", "positional", "6"),
+        _l("bishop-or-knight", "Bishop or knight?", "positional", "6", "minorChoice"),
     ),
     _w(
         "castellans-tower",
         "King's attack and the ending",
         _l("kings-attack-6", "King's attack", "mate", "6", "kingsideAttack", "mateIn3"),
-        _l("advantage-ending", "Advantage in the ending", "positional", "6"),
-        _l("bishops", "Bishops", "positional", "6"),
+        _l("advantage-ending", "Advantage in the ending", "positional", "6", "kingActivity"),
+        _l("bishops", "Bishops", "positional", "6", "badBishop"),
         _l("defending-6", "Defending", "defence", "6", "defensiveMove"),
         _l("rook-endgame-6", "Rook endgame", "endgame", "6", "rookEndingDraw", "rookEndingWin"),
     ),

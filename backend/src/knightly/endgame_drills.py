@@ -11,11 +11,16 @@ the method". So these are generated, and every one is checked rather than guesse
 - **Queen and rook mates** (KQK, KRK) are proved by Stockfish's mate search in the generator
   (`backend/scripts/generate_endgames.py`): a reported mate is a real one, and a position is
   kept only when its first move is the only mate that fast.
+- **Four- and five-piece endings and the draws** are checked against the Syzygy tables
+  (`backend/scripts/generate_tablebase_drills.py`, TABLEBASE_DATA).
 
 The generator writes DATA in the Lichess puzzle file's layout, and `load` stores it beside the
 corpus (`knightly endgames`), themed so the curriculum's endgame lessons draw on it. These
 themes are ours, not Lichess's: keySquares, opposition, squareOfPawn, rookPawn (the rook
-pawn's own wins and draws, Steps 3+), queenMate, rookMate.
+pawn's own wins and draws, Steps 3+), queenMate, rookMate, and from the tables queenVsPawn,
+rookVsPawn, wrongBishop, rookEndingWin, rookEndingDraw, stalemate (mate rather than stalemate,
+or the stalemate that saves you), drawBasics (king, pawn and minor-piece draws) and drawPieces
+(holding against a rook or queen).
 """
 
 import csv
@@ -41,6 +46,9 @@ THEMES = (
     "wrongBishop",
     "rookEndingWin",
     "rookEndingDraw",
+    "stalemate",
+    "drawBasics",
+    "drawPieces",
 )
 
 WIN, DRAW = 1, 0

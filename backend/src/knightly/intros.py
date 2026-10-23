@@ -7,9 +7,9 @@ guided move is judged in the app and never recorded, so it never counts toward h
 lesson; the intro is only marked seen (SETTING).
 
 Positions are the easiest ones the curriculum has for the lesson: its own themes, its practice
-themes (the Gatehouse's loose pieces), or INTRO_THEMES for a lesson with no drills of its own.
-The few lessons nothing can supply (the opening rules, activity, stalemate) have positions
-chosen by hand in DATA, each checked by the tests.
+themes (the Gatehouse's loose pieces). A few lessons have positions chosen by hand in DATA
+(the opening rules, activity, stalemate), each checked by the tests; a lesson with neither
+has no example.
 """
 
 import json
@@ -22,12 +22,6 @@ from . import curriculum, db, practice_lines, puzzles
 
 SETTING = "lesson_intros"  # {lesson key: "YYYY-MM-DD"}: introduced on that day
 DATA = Path(__file__).with_name("data") / "lesson_intros.json"
-# Lessons with no drills of their own, shown with the corpus theme closest to their Steps aim.
-INTRO_THEMES = {
-    "thinking-ahead": ("mateIn2",),
-    "threats": ("defensiveMove",),
-    "mobility": ("trappedPiece",),
-}
 SCAN = 40  # easiest candidates looked at per theme
 
 
@@ -99,7 +93,7 @@ def payload(conn, lesson: curriculum.Lesson) -> dict:
         example = _exercise(hand["example"]["fen"], hand["example"]["moves"])
         guided = _exercise(hand["guided"]["fen"], hand["guided"]["moves"]) if hand.get("guided") else None
     else:
-        themes = lesson.themes or lesson.practice or INTRO_THEMES.get(lesson.key, ())
+        themes = lesson.themes or lesson.practice
         found = _easiest(conn, themes, wards.DEPTH.get(lesson.step))
         example = found[0] if found else None
         guided = found[1] if len(found) > 1 else None

@@ -1,7 +1,11 @@
 """Generate the positional drills (knightly.positional_drills.DATA).
 
     uv run python scripts/generate_positional.py GAMES.pgn.zst [...] [--per-theme 300]
-        [--engine PATH] [--workers 8] [--report report.json]
+        [--engine PATH] [--workers 8] [--report report.json] [--plans]
+
+With --plans it makes the plan lessons' drills (positional_drills.PLAN_IDEAS) into
+PLANS_DATA instead: the same checks, except that the converting ideas (trade, kingActivity)
+start from a better position, between CONVERT_FROM and CONVERT_TO.
 
 GAMES are Lichess broadcast database months (database.lichess.org, CC0): over-the-board
 tournament games. A position becomes a drill when the move the player chose there carries one
@@ -71,6 +75,19 @@ BASE = {
     "strongSquare": 1350,
 }
 FIND_STEP = 50
+# The plan lessons, rarest-looking first, and where Steps places them: opening advantage and
+# material advantage in Step 4, material and time and using pawns in 5, the rest in 6.
+PLAN_PRIORITY = ("minorChoice", "badBishop", "gambit", "openLines", "kingActivity", "trade", "pawnPlay")
+PLAN_BASE = {
+    "openLines": 1400,
+    "trade": 1350,
+    "gambit": 1500,
+    "pawnPlay": 1450,
+    "badBishop": 1600,
+    "minorChoice": 1600,
+    "kingActivity": 1500,
+}
+CONVERT_FROM, CONVERT_TO = 100, 900  # centipawns: better, not yet a matter of technique alone
 VALUES = pd.VALUES
 
 
@@ -95,7 +112,15 @@ def games(path: Path):
             proc.wait()
 
 
-def candidates(paths: list[Path], log, max_games: int | None = None) -> list[dict]:
+def in_window(theme: str, cp: int) -> bool:
+    """Whether a position's evaluation suits the idea: level-ish for most, better for the
+    converting ones."""
+    if theme in pd.CONVERTING:
+        return CONVERT_FROM <= cp < CONVERT_TO
+    return abs(cp) < DECISIVE
+
+
+def candidates(paths: list[Path], log, max_games: int | None = None, plans: bool = False) -> list[dict]:
     """Positions where the move played carries an idea, one per game and theme, deduplicated
     (a broadcast often carries the same game twice)."""
     out, seen, read = [], set(), 0
@@ -117,14 +142,16 @@ def candidates(paths: list[Path], log, max_games: int | None = None) -> list[dic
                 if ply > LAST_PLY:
                     break
                 if ply >= FIRST_PLY and prev is not None and not board.is_check():
-                    carried = pd.carries(board, move)
-                    ideas = [t for t in PRIORITY if t in carried]
-                    fresh = [t for t in ideas if t not in done]
-                    key = board.epd() if fresh else None
+                    carried = pd.plan_carries(board, move) if plans else pd.carries(board, move)
+                    ideas = [t for t in (PLAN_PRIORITY if plans else PRIORITY) if t in carried]
                     # The broadcaster's own evaluation, when it has one, skips decided positions.
                     ev = child.parent.eval() if child.parent is not game else None
-                    cp = ev.pov(board.turn).score(mate_score=100_000) if ev else 0
-                    if fresh and key not in seen and abs(cp) < DECISIVE:
+                    cp = ev.pov(board.turn).score(mate_score=100_000) if ev else None
+                    if cp is not None:
+                        ideas = [t for t in ideas if in_window(t, cp)]
+                    fresh = [t for t in ideas if t not in done]
+                    key = board.epd() if fresh else None
+                    if fresh and key not in seen:
                         seen.add(key)
                         out.append(
                             {
@@ -224,17 +251,18 @@ def judge(engine, c: dict, verify_depth: int) -> tuple[dict | None, str]:
     if len(first) < 2:
         return None, "one legal move"
     (best, cp, pv), (_, cp2, _) = first[0], first[1]
+    theme = c["ideas"][0]
     if best != played:
         return None, "played not best"
-    if abs(cp) >= DECISIVE:
-        return None, "decided"
+    if not in_window(theme, cp):
+        return None, "decided" if abs(cp) >= DECISIVE else "not better"
     if cp - cp2 < pd.GAP:
         return None, "gap too small"
     if tactical(board, pv):
         return None, "tactic in line"
     deep = lines(engine, board, verify_depth)
     (best, cp, pv), (_, cp2, pv2) = deep[0], deep[1]
-    if best != played or cp - cp2 < pd.GAP or abs(cp) >= DECISIVE:
+    if best != played or cp - cp2 < pd.GAP or not in_window(theme, cp):
         return None, "unstable"
     if tactical(board, pv):
         return None, "tactic in line"
@@ -250,6 +278,36 @@ def judge(engine, c: dict, verify_depth: int) -> tuple[dict | None, str]:
     }, "kept"
 
 
+def drill_rows(kept: dict[str, list[dict]], priority, base: dict[str, int], plans: bool) -> list[dict]:
+    """The kept drills in the Lichess puzzle file's layout."""
+    rows = []
+    for theme in priority:
+        for d in kept[theme]:
+            board = chess.Board(d["fen"])
+            before = d["before"]  # the position before the opponent's last move
+            moves = [d["prev"], d["played"]]
+            phase = "opening" if board.fullmove_number <= pd.OPENING_MOVES else "middlegame"
+            if plans and pd.endgame(board):
+                phase = "endgame"
+            rows.append(
+                {
+                    "PuzzleId": "kp" + hashlib.sha1(f"{before} {' '.join(moves)}".encode()).hexdigest()[:10],
+                    "FEN": before,
+                    "Moves": " ".join(moves),
+                    "Rating": base[theme] + FIND_STEP * (d["find"] - 1),
+                    "RatingDeviation": 75,
+                    "Popularity": 100,
+                    "NbPlays": 1000,
+                    "Themes": " ".join([*d["ideas"], "positional", phase]),
+                    "GameUrl": d["url"],
+                    "Gap": d["gap"],
+                    "Depth": d["depth"],
+                    "Eval": d["eval"],
+                }
+            )
+    return rows
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("games", nargs="+", type=Path)
@@ -262,12 +320,16 @@ def main() -> None:
     parser.add_argument("--out", default=str(pd.DATA))
     parser.add_argument("--report", default=None, help="write counts and every kept drill's lines here")
     parser.add_argument("--keep-parries", action="store_true", help="keep drills whose second-best move drops material")
+    parser.add_argument("--plans", action="store_true", help="the plan lessons' ideas, into PLANS_DATA")
     args = parser.parse_args()
+    priority, base = (PLAN_PRIORITY, PLAN_BASE) if args.plans else (PRIORITY, BASE)
+    if args.plans and args.out == str(pd.DATA):
+        args.out = str(pd.PLANS_DATA)
 
     def log(msg):
         print(msg, file=sys.stderr, flush=True)
 
-    found = candidates(args.games, log, args.max_games)
+    found = candidates(args.games, log, args.max_games, args.plans)
     random.Random(args.seed).shuffle(found)
     # Rare ideas first, so the common ones cannot use up the engine time.
     by_theme = Counter(c["ideas"][0] for c in found)
@@ -306,41 +368,25 @@ def main() -> None:
                     log(f"  {n:,} judged; kept {dict((t, len(v)) for t, v in kept.items())}")
                 submit()
 
-    rows = []
-    for theme in PRIORITY:
-        for d in kept[theme]:
-            board = chess.Board(d["fen"])
-            before = d["before"]  # the position before the opponent's last move
-            moves = [d["prev"], d["played"]]
-            phase = "opening" if board.fullmove_number <= pd.OPENING_MOVES else "middlegame"
-            rows.append(
-                {
-                    "PuzzleId": "kp" + hashlib.sha1(f"{before} {' '.join(moves)}".encode()).hexdigest()[:10],
-                    "FEN": before,
-                    "Moves": " ".join(moves),
-                    "Rating": BASE[theme] + FIND_STEP * (d["find"] - 1),
-                    "RatingDeviation": 75,
-                    "Popularity": 100,
-                    "NbPlays": 1000,
-                    "Themes": " ".join([*d["ideas"], "positional", phase]),
-                    "GameUrl": d["url"],
-                    "Gap": d["gap"],
-                    "Depth": d["depth"],
-                    "Eval": d["eval"],
-                }
-            )
+    rows = drill_rows(kept, priority, base, args.plans)
+    if args.plans:
+        # A plan drill can be a position and answer the positional drills already have (a
+        # lever that is also a centre move): stored once, under the first file's themes.
+        with open(pd.DATA, newline="") as f:
+            taken = {row["PuzzleId"] for row in csv.DictReader(f)}
+        rows = [r for r in rows if r["PuzzleId"] not in taken]
     with open(args.out, "w", newline="") as f:
         writer = csv.DictWriter(f, FIELDS)
         writer.writeheader()
         writer.writerows(rows)
-    log(f"wrote {len(rows)} drills to {args.out}: {dict((t, len(kept[t])) for t in PRIORITY)}")
+    log(f"wrote {len(rows)} drills to {args.out}: {dict((t, len(kept[t])) for t in priority)}")
     if args.report:
         Path(args.report).write_text(
             json.dumps(
                 {
                     "candidates": dict(by_theme),
                     "reasons": {t: dict(r) for t, r in reasons.items()},
-                    "kept": {t: kept[t] for t in PRIORITY},
+                    "kept": {t: kept[t] for t in priority},
                 },
                 indent=1,
             )

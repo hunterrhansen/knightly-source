@@ -212,7 +212,7 @@ def cmd_endgames(conn, args) -> None:
 def cmd_positional(conn, args) -> None:
     """Store the generated positional drills beside the puzzle corpus."""
     added = positional_drills.load(conn)
-    log(f"{added} positional drills added ({', '.join(positional_drills.THEMES)}).")
+    log(f"{added} positional drills added ({', '.join(positional_drills.THEMES + positional_drills.PLAN_THEMES)}).")
 
 
 def cmd_wards(conn, args) -> None:

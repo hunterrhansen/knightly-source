@@ -124,7 +124,16 @@ def test_every_tablebase_drill_is_legal_ends_on_your_move_and_has_an_id_from_its
             assert move in board.legal_moves, (row["PuzzleId"], uci)
             board.push(move)
         assert row["PuzzleId"] == "kn" + hashlib.sha1(f"{row['FEN']} {row['Moves']}".encode()).hexdigest()[:10]
-    assert set(counts) == {"queenVsPawn", "rookVsPawn", "wrongBishop", "rookEndingWin", "rookEndingDraw"}
+    assert set(counts) == {
+        "queenVsPawn",
+        "rookVsPawn",
+        "wrongBishop",
+        "rookEndingWin",
+        "rookEndingDraw",
+        "stalemate",
+        "drawBasics",
+        "drawPieces",
+    }
     assert all(n >= 100 for n in counts.values()), counts
 
 
@@ -136,6 +145,16 @@ SYZYGY = __import__("os").environ.get(
 @pytest.mark.skipif(
     not __import__("os").path.exists(f"{SYZYGY}/KRPvKR.rtbw"), reason="Syzygy tables not on this machine"
 )
+def only_mate(board):
+    mates = []
+    for m in board.legal_moves:
+        b = board.copy(stack=False)
+        b.push(m)
+        if b.is_checkmate():
+            mates.append(m)
+    return mates[0] if len(mates) == 1 else None
+
+
 def test_every_tablebase_drill_move_is_the_only_one_that_keeps_your_result():
     import chess.syzygy
 
@@ -153,7 +172,9 @@ def test_every_tablebase_drill_move_is_the_only_one_that_keeps_your_result():
             moves = [chess.Move.from_uci(u) for u in row["Moves"].split()]
             board.push(moves[0])
             for i, move in enumerate(moves[1:]):
-                if i % 2 == 0:
+                if i % 2 == 0 and row["Themes"].startswith("stalemate") and only_mate(board) == move:
+                    pass  # mate, not stalemate: the one mating move, beside winning ones that are slower
+                elif i % 2 == 0:
                     want = value(tb, board)
                     keep = []
                     for m in board.legal_moves:

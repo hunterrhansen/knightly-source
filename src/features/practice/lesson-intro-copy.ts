@@ -75,7 +75,7 @@ const COPY: Record<string, IntroCopy> = {
   },
   stalemate: {
     line: 'No legal move and no check is a draw. When you’re winning, leave the king a square. When you’re losing, look for it.',
-    look: 'Mate them, and leave no stalemate.',
+    look: 'Mate without stalemate, or find the stalemate that saves you.',
   },
   intermezzo: {
     line: 'Before you take back, look for something stronger in between: a check or a bigger threat they must answer first.',
@@ -348,7 +348,7 @@ const COPY: Record<string, IntroCopy> = {
   },
   'draw-5': {
     line: 'Stalemate, too little material, the wrong bishop: know the draws so you can find them, or avoid them.',
-    look: 'Is this a draw?',
+    look: 'Which move holds the draw?',
   },
   'activity-5p': {
     line: 'Make your pieces active and open the position for them.',
@@ -408,7 +408,7 @@ const COPY: Record<string, IntroCopy> = {
   },
   'draw-6': {
     line: 'Fortresses, perpetuals and stalemates: the best defence can still end level.',
-    look: 'Can you build a fortress?',
+    look: 'Which move holds the draw?',
   },
   'opening-6': {
     line: 'Play the opening by its principles, not by memory: develop, the centre, king safety.',

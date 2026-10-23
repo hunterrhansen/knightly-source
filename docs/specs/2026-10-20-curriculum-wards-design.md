@@ -174,9 +174,31 @@ answer keys; the method has no controlled outcome study, so this is expert conse
   excluded), a knight square traded off at once, and a pawn won rather than a square held.
   The checker was the model that built it, not a strong player; a coach's spot-check is
   still owed. Ratings are an estimate: the idea's base (750 for castling to 1350 for strong
-  squares) plus 50 for each depth Stockfish needs before it settles on the move. Not built:
-  bishops and bishop or knight, opening advantage and the Steps 5-6 openings, and the draw
-  lessons, which stay "coming soon".
+  squares) plus 50 for each depth Stockfish needs before it settles on the move.
+- **The plan lessons (built 2026-10-23).** The same pipeline (`generate_positional.py
+  --plans`, `positional_plans.csv`, 1,366 drills) with checks that name the move's part in a
+  plan, since no board test names a plan: a pawn lever while ahead in development (opening
+  advantage, `openLines`), a piece trade offered when two pawns or more ahead (material
+  advantage, `trade`), a pawn left to be taken in the opening (material and time, `gambit`),
+  a lever or a passed pawn made (using pawns, `pawnPlay`), a bad bishop freed or traded
+  (bishops, `badBishop`), which of bishop and knight takes (bishop or knight, `minorChoice`),
+  and the king toward the centre or their pawns in a better ending (advantage in the ending,
+  `kingActivity`). Trade and king activity start from a better position (+1 to +9); the
+  answer may be a capture for `minorChoice` and `openLines`. Mini-plans draw activity, weak
+  pawns, open files and strong squares; strategy draws the structure ideas (pawn play,
+  strong squares, weak pawns, bad bishops); the Steps 5 and 6 openings draw the opening
+  rules again. A Stockfish re-search of twelve per idea at depth 18 agreed on 83 of 84. Every
+  lesson now has drills.
+- **Draws and defence (built 2026-10-23).** Stalemate and the four draw lessons draw
+  Syzygy-checked drills (557): `stalemate` is half mate-not-stalemate (the one mating move
+  where another stalemates, king and queen or rook against king) and half the stalemate that
+  saves a lost ending, or the one win beside a stalemate; `drawBasics` (Steps 3, 4+) is the
+  one move that holds king and pawn, pawn against pawn, or bishop or knight against pawn;
+  `drawPieces` (5, 6) holds rook against bishop or knight and pawn against rook or queen.
+  Every move of yours is the only one keeping the result, never a capture or promotion.
+  Perpetual check and fortresses need more than five pieces and are not drilled.
+  Defending against a threat draws `defensiveMove`, as the other defending lessons do, and
+  Thinking ahead draws Lichess's two-move puzzles (`short`).
 - **Names.** Lessons use the method's own terms ("X-ray attack" for the skewer, "luring away"
   for deflection), and the post card credits the order to Brunia and van Wijgerden. Their step
   numbers are never shown as Knightly's progress.
@@ -187,12 +209,11 @@ about a year at one watch a night.
 **The whole method (built 2026-10-23).** After the eighteen posts the walk continues through
 the rest of Steps 3 and 3+, then 4 and 4+ (the Keep, posts 19-32), 5 and 5+ (the March, 33-43)
 and 6 (the Citadel, 44-47): 47 posts, 110 lessons, in the method's own order from its lesson
-lists. Positional lessons with no drill (mini plans, strategy, bishops, the draws) are
-introduced and show as coming soon, never blocking their post; weak pawns, open files, strong
-squares, activity, mobility and the opening lessons have generated drills (above).
+lists. Every lesson has drills (above); a lesson that ever lacks them shows as coming soon and
+never blocks its post.
 Endgame-rule lessons draw generated drills checked exactly: the rook pawn from the KPK solver
-(`rookPawn`), and queen against pawn, rook against pawn, the wrong bishop and rook endings
-(winning and drawing) against the Syzygy win/draw/loss tables
+(`rookPawn`), and queen against pawn, rook against pawn, the wrong bishop, rook endings
+(winning and drawing) and the draws against the Syzygy win/draw/loss tables
 (`backend/scripts/generate_tablebase_drills.py`, 3-4 piece tables plus KRPvKR, 18 MB, from
 tablebase.lichess.ovh, checked against its sha256 list; the tables are needed only to
 regenerate, never to run). Other endgame lessons draw the corpus's `simple` endgames. Ranks continue every third

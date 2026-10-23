@@ -169,16 +169,23 @@ def test_unheld_lessons_are_drilled_before_held_ones(db_url):
     assert themes[0] != "backRankMate" and "backRankMate" in themes
 
 
-def test_a_lesson_with_no_drills_does_not_park_the_learner_forever(db_url):
-    # Several wards contain a lesson nothing can drill yet (stalemate, thinking ahead, mini
-    # plans, the draws...). Gating on those would stop the curriculum dead.
+def test_a_lesson_with_no_drills_does_not_park_the_learner_forever(db_url, monkeypatch):
+    # Every lesson has drills today, but a new one may land before its drills do; gating on it
+    # would stop the curriculum dead. The mini plan stands in for it here.
+    import dataclasses
+
+    def bare(ward):
+        if ward.key != "mini-plan":
+            return ward
+        return dataclasses.replace(ward, lessons=(dataclasses.replace(ward.lessons[0], themes=()), *ward.lessons[1:]))
+
+    monkeypatch.setattr(curriculum, "WARDS", tuple(bare(w) for w in curriculum.WARDS))
     conn = db.connect(db_url)
     for i in range(wards.BASIC_VOLUME):
-        solved(conn, f"i{i}", ["intermezzo"])
-    between = next(w for w in wards.state(conn) if w.ward.key == "in-between")
-    assert not all(lesson.held for lesson in between.lessons), "thinking ahead has no drills, so it is unheld"
-    assert between.cleared, "but the ward still clears on the lesson that can be taught"
-    assert wards.current(conn).ward.key != "in-between"
+        solved(conn, f"i{i}", ["rookPawn"])
+    plan = next(w for w in wards.state(conn) if w.ward.key == "mini-plan")
+    assert not all(lesson.held for lesson in plan.lessons), "the mini plan has no drills, so it is unheld"
+    assert plan.cleared, "but the ward still clears on the lesson that can be taught"
 
 
 def test_a_ward_puzzle_respects_the_lessons_shape(db_url, tmp_path):
