@@ -70,11 +70,6 @@ export type OpenCard =
   | { kind: 'node'; node: PathNode }
   | { kind: 'castle'; castle: MapCastle };
 
-/** The node screen's address for a node or a castle on the path. */
-export const nodeHref = (key: string) => `/node?key=${encodeURIComponent(key)}`;
-export const castleHref = (key: string) =>
-  `/node?castle=${encodeURIComponent(key)}`;
-
 /** Which card a node screen address names, found on the path as it is now
  * (null when the path no longer has it). */
 export function findCard(

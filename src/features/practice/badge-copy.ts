@@ -31,18 +31,18 @@ export function badgeAbout(badge: Badge): BadgeAbout {
       };
     case 'taught':
       return {
-        title: `At ${badge.place.replace(/^The /, 'the ')}`,
-        body: `Tonight’s lesson: ${badge.lesson}. Holding it moves you on.`,
+        title: badge.lesson,
+        body: `Practice this idea: ${badge.lesson}.`,
       };
     case 'test':
       return {
-        title: 'The post’s test',
-        body: 'Twelve positions from this post at its own level. Ten right and the post is yours; your games still have the last word.',
+        title: 'Practice check',
+        body: 'Twelve positions on this topic. Aim for ten correct answers, then apply the idea in your games.',
       };
     case 'review':
       return {
         title: 'Mixed review',
-        body: 'An idea from a post you’ve passed, not named. Spot which one it is.',
+        body: 'A previously practiced idea, not named. Recognize it in a new position.',
       };
     case 'rated':
       return {

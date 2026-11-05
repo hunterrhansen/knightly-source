@@ -31,16 +31,16 @@ Start with [README](../README.md) and [agent instructions](../AGENTS.md).
 | [Instant practice](specs/2026-10-15-instant-practice-design.md) | Solutions served with positions; instant moves and hints, background saves |
 | [Session-end beats](specs/2026-10-14-session-end-beats-design.md) | Results, streak-extended and memory beats at the end of practice, review and daily steps |
 | [Games library](specs/2026-10-12-games-design.md) | Native library, next review, search/filters and paginated game summaries |
-| [Navigation design](specs/2026-10-12-knightly-navigation-design.md) | Approved: one screen with no tab bar, the path's header, Games/Progress/Account modals and the web without a sidebar |
+| [Navigation design](specs/2026-10-12-knightly-navigation-design.md) | Restored Today/Games/Progress tabs, responsive web shell and Account modal |
 | [Today daily review](specs/2026-10-13-today-daily-review-design.md) | Released daily review: daily lesson, streaks, freezes, reminders and backend summary |
 | [Your watch](specs/2026-10-18-watch-time-anchor-design.md) | Learner-chosen watch time and "After I …" anchor, onboarding/settings, once-a-day reminders with back-off |
-| [The watch story](specs/2026-10-18-watch-story-design.md) | Proposed: Watch, Games and Progress rebuilt around the nightly watch; slip states, map of nights with star-driven ranks, the watch seen from the wall |
-| [The path home](specs/2026-10-19-path-home-design.md) | Accepted; step 1 built (the path home from today's data, Progress without the map); server extra watches and the schedule ahead open. Home is one path of watches ordered by the review schedule, sections are ranks |
-| [The ward path](specs/2026-10-20-ward-path-design.md) | Proposed: home's sections become the curriculum's eighteen posts through a real castle's Outer, Middle and Inner Wards to the keep (place name leads, plain topic beneath), lessons as nodes, ranks every third post, watch and chess lore, arrival/cleared/placement moments |
+| [The watch story](specs/2026-10-18-watch-story-design.md) | Plain lesson layout, character-free explanations and chess wording |
+| [The path home](specs/2026-10-19-path-home-design.md) | Direct practice/review home, recovery states and navigation |
+| [The ward path](specs/2026-10-20-ward-path-design.md) | Teaching sequence compatibility without journey, posts or ranks |
 | [The watch kit](specs/2026-10-18-watch-kit-design.md) | Proposed: every sprite, scene, effect and sound addressed by role in one manifest so art is swappable; contract tests and the staged build plan for the watch |
 | [Move grading parity](specs/2026-10-20-move-grading-parity-design.md) | Implemented in the backend, not deployed: rating-matched severity (fitted curve), a narrower Miss and Great in any position, so grades read as Chess.com's; reference set and production drift review open |
 | [Progress specification](specs/2026-10-11-progress-design.md) | Approved redesign: rating line, last-4-weeks habit card, five-axis skill shape with one action; now one sheet with All stats folded in |
-| [Knightly direction](knightly-direction.md) | Accepted premise (every night, a short watch), the main-thing filter, story, references, tone and open decisions |
+| [Knightly direction](knightly-direction.md) | Accepted chess learning focus; retained rewards and removed story UI |
 | [Art and motion direction](art-direction.md) | Proposed illustration, motion, reward juice and UI sound brief; deliverables for commissioned art |
 | [Art style lock](art-style-lock.md) | Prompt pack and decision process for locking one AI-assisted illustration style, starting with the reward kit |
 | [Current status](status.md) | Implemented scope, product gaps and remaining release checks |

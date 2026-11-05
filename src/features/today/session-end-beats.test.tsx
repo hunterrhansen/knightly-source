@@ -1,10 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { AccessibilityInfo } from 'react-native';
 import type { SessionResults } from '../../ui';
-import { firstNights } from './journey-samples';
 import { SessionBeats } from './session-end-beats';
-import { postMoment } from './ward-path';
-import { sampleWards } from './ward-samples';
 
 jest.mock('expo-router', () => ({ Stack: { Screen: () => null } }));
 // The watch ask's reminder switch reaches the native notifications bridge.
@@ -96,9 +93,7 @@ test('a streak extension plays after the results, and only then finishes', async
   await settle();
   expect(screen.queryByRole('button', { name: 'Done' })).toBeNull();
   fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
-  expect(
-    screen.getByRole('header', { name: '13 nights in a row' }),
-  ).toBeTruthy();
+  expect(screen.getByRole('header', { name: '13 days in a row' })).toBeTruthy();
   await settle();
   fireEvent.press(screen.getByRole('button', { name: 'Done' }));
   expect(finish).toHaveBeenCalledTimes(1);
@@ -193,35 +188,21 @@ const rankUp = {
   ],
 };
 
-test('a rank-up follows the streak in place of Long-term memory, names the rank and the next one, then finishes', async () => {
+test('legacy rank and castle data do not add steps between results and the streak', async () => {
   const finish = jest.fn();
   render(
     <SessionBeats
       results={results}
       streak={streak}
-      mastered={2}
       rankUp={rankUp}
+      held={3}
       finish={{ label: 'Done', onPress: finish }}
     />,
   );
+  expect(screen.getByText('Practice complete')).toBeTruthy();
   await settle();
   fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
-  expect(
-    screen.getByRole('header', { name: '13 nights in a row' }),
-  ).toBeTruthy();
-  await settle();
-  fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
-  expect(screen.getByRole('header', { name: 'Squire I' })).toBeTruthy();
-  expect(screen.getByText('New rank')).toBeTruthy();
-  expect(
-    screen.getByText(
-      'Every post before this castle is held. 10 moves from your own games have stopped slipping along the way.',
-    ),
-  ).toBeTruthy();
-  expect(screen.getByText('★ Loose piece · Nf5')).toBeTruthy();
-  expect(screen.getByText('tonight')).toBeTruthy();
-  expect(screen.getByText('Next: Squire II after post 6')).toBeTruthy();
-  expect(screen.queryByText(/moved to long-term memory/)).toBeNull();
+  expect(screen.queryByText('New rank')).toBeNull();
   await settle();
   fireEvent.press(screen.getByRole('button', { name: 'Done' }));
   expect(finish).toHaveBeenCalledTimes(1);
@@ -244,65 +225,4 @@ test('without a rank-up, positions moved to long-term memory keep their own beat
     }),
   ).toBeTruthy();
   expect(screen.queryByText('New rank')).toBeNull();
-});
-
-test('the watch ends over the wall with the raids turned back, then its Results', async () => {
-  const finish = jest.fn();
-  render(
-    <SessionBeats
-      held={3}
-      results={results}
-      finish={{ label: 'Done', onPress: finish }}
-    />,
-  );
-  expect(
-    screen.getByRole('header', { name: '3 raids turned back' }),
-  ).toBeTruthy();
-  expect(screen.queryByText('Practice complete')).toBeNull();
-  await settle();
-  fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
-  expect(screen.getByText('Practice complete')).toBeTruthy();
-  await settle();
-  fireEvent.press(screen.getByRole('button', { name: 'Done' }));
-  expect(finish).toHaveBeenCalledTimes(1);
-});
-
-test('a watch with no move held goes straight to its Results', async () => {
-  render(
-    <SessionBeats
-      held={0}
-      results={results}
-      finish={{ label: 'Done', onPress: jest.fn() }}
-    />,
-  );
-  expect(screen.queryByRole('header', { name: /turned back/ })).toBeNull();
-  expect(screen.getByText('Practice complete')).toBeTruthy();
-});
-
-test('posts held on the ward path come after Results, then the memory beat', async () => {
-  const before = { ...firstNights, wards: sampleWards(6, [36, 0]) };
-  const after = { ...firstNights, wards: sampleWards(7) };
-  const posts = postMoment(before, after, '2026-10-20');
-  const finish = jest.fn();
-  render(
-    <SessionBeats
-      results={results}
-      posts={posts}
-      mastered={2}
-      finish={{ label: 'Done', onPress: finish }}
-    />,
-  );
-  await settle();
-  fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
-  await settle();
-  expect(
-    screen.getByRole('header', { name: 'The Portcullis is held' }),
-  ).toBeTruthy();
-  expect(
-    screen.getByText('Through the Portcullis: the Middle Ward.'),
-  ).toBeTruthy();
-  expect(screen.getByText('The Guardroom')).toBeTruthy();
-  fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
-  await settle();
-  expect(screen.getByText(/moved to long-term memory/)).toBeTruthy();
 });

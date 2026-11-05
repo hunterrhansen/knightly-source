@@ -9,6 +9,9 @@ The inspected Expo default SDK 57 scaffold carries the Expo MIT notice, preserve
 Brand mark and navigation glyph geometry are adapted from Hunter Hansen’s original
 Knightly `web/src/components/logo.tsx` and `kn-icon.tsx`, under the preserved
 [MIT notice](knightly-MIT.txt). Expo rendering uses react-native-svg.
+The restored native tab PNGs (`today`, `games`, `progress`, at @1x/@2x/@3x)
+come unchanged from the version before `4269cd6`, generated from Knightly's own
+glyph geometry. Their existing MIT provenance applies.
 The navigation glyphs' SVG masters in `assets/navigation/` are written by
 `npm run brand:generate` from the same glyph shapes in Knightly's glossy cel
 (`src/components/ui/glyph-art.ts`, original Knightly art; the Progress tile's

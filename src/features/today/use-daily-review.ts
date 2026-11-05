@@ -28,30 +28,6 @@ export function useLearnMore(onAdded: () => void) {
   });
 }
 
-/** The daily lesson's deck (`/api/deck?mode=lesson`): its next card names
- * tonight's first move, and its results say how tonight went. Shares the
- * deck's cache key prefix, so a saved answer refreshes it. */
-export function useLessonDeck(enabled: boolean) {
-  const { scope } = useSessionScope();
-  return useQuery({
-    queryKey: [...scope.meKey, 'deck', 'lesson'],
-    queryFn: ({ signal }) => scope.api.deck(signal, 'lesson'),
-    enabled,
-  });
-}
-
-/** A kept night's watch (`/api/journey/night`), for its node card: what it
- * held and where each of its moves stands now. Under the journey's key, so
- * whatever refreshes the path refreshes it. */
-export function useKeptNight(date: string | undefined) {
-  const { scope } = useSessionScope();
-  return useQuery({
-    queryKey: [...scope.meKey, 'journey', 'night', date],
-    queryFn: ({ signal }) => scope.api.keptNight(date ?? '', signal),
-    enabled: !!date,
-  });
-}
-
 /** The path's nights: stars, ranks and nights kept (`/api/journey`). Progress
  * shares it for the rank chip. */
 export function useJourney() {

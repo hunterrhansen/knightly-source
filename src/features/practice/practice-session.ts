@@ -439,7 +439,7 @@ export class PracticeSession extends LessonStore<
                 : 'Nothing to answer right now'
               : this.mode === 'challenge'
                 ? deck.challenge?.passed
-                  ? 'Post cleared'
+                  ? 'Practice complete'
                   : deck.challenge?.passed === false
                     ? 'Not this time'
                     : 'Nothing to answer right now'

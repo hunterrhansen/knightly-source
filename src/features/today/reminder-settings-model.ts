@@ -7,7 +7,7 @@ import { useDailyReview } from './use-daily-review';
 type ReminderChoice = 'off' | 'on';
 
 export const REMINDER_FOOTER =
-  'One notification at your watch time, only on days you haven’t kept your watch. It asks for notification permission when you turn it on.';
+  'One notification at your practice time, only on days you haven’t completed practice. It asks for notification permission when you turn it on.';
 export const BLOCKED_MESSAGE =
   'Notifications are off for Knightly. Turn them on in system settings to get reminders.';
 
@@ -29,7 +29,7 @@ const choicesAt = (time: string) => [
   { value: 'on' as const, label: `At ${time}` },
 ];
 
-/** Settings → Your watch: the watch (edited on its own screen) and whether this
+/** Settings → Practice reminders: the watch (edited on its own screen) and whether this
  * device reminds at its time. */
 export function useReminderSettings(): ReminderSettingsView {
   const reminder = useReminderPreference();

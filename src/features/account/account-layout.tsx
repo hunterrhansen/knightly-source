@@ -59,7 +59,7 @@ export function AccountLayout({
             ['connections', 'Linked accounts', 'Chess.com and Lichess'],
             // Reminders are local notifications (iOS and Android); the watch
             // itself is chosen everywhere.
-            ['reminders', 'Your watch', 'Time, habit and reminder'],
+            ['reminders', 'Practice reminders', 'Time, habit and reminder'],
             ['updates', 'Daily update', 'Sync and analysis status'],
             ['analysis', 'Analysis', 'Depth and practice scheduling'],
             ['data', 'Your data', 'Usage, export and account deletion'],

@@ -3,7 +3,6 @@ import { nightWatch } from './manifest';
 import { rankEmblemOf } from './rank';
 import { isNight, landingCurve } from './recipe';
 import type {
-  CastleState,
   CharacterRole,
   Manifest,
   RaiderKind,
@@ -65,11 +64,6 @@ export function useRankEmblem(rank: { key?: string; name: string }) {
   return useContext(Kit).emblems[`reward.rankEmblem.${tier}`](level);
 }
 
-/** A rank castle on the map of nights. */
-export function useCastle(state: CastleState) {
-  return useContext(Kit).characters['map.castle'].states[state];
-}
-
 /** The opponent's `kind` of piece as a raider at the treeline. */
 export function useRaider(kind: RaiderKind) {
   return useContext(Kit).characters[`character.raider.${kind}`];
@@ -114,12 +108,6 @@ export function useWallView(role: WallViewRole) {
 }
 
 const InWatch = createContext(false);
-
-/** Marks its children as drawn on the wall: the lesson's chrome below takes
- * its watch surfaces (parchment bubble, stone buttons). */
-export function WatchSurfaces({ children }: { children: ReactNode }) {
-  return <InWatch.Provider value>{children}</InWatch.Provider>;
-}
 
 /** The surface `role` draws on inside the watch frame; none outside it. */
 export function useWatchSurface(role: SurfaceRole) {

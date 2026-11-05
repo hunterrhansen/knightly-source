@@ -5,13 +5,10 @@ import { createStyles, useTheme } from '../../theme/theme';
 import { tokens } from '../../theme/tokens';
 import { useSystemReducedMotion } from '../../theme/use-reduced-motion';
 import { useTextBlock } from '../../theme/use-text-block';
-import { useWatchSurface } from '../kit/registry';
-import { KnightMascot, type KnightMood } from './knight-mascot';
+import type { KnightMood } from './knight-mascot';
 
-/** The coach's speech bubble above a lesson board: a title with the move's
- * grade and evaluation, and a line of explanation. Its tail points at the
- * knight, so the words read as his. On the watch's wall it is parchment and
- * the knight is the scene's, so it draws none of its own. */
+/** A character-free instruction panel: move grade, evaluation and explanation.
+ * Fixed line slots preserve board geometry across prompts and feedback. */
 export function CoachBubble({
   title,
   grade,
@@ -20,7 +17,6 @@ export function CoachBubble({
   tag,
   tone = 'plain',
   lines,
-  mood,
 }: {
   title: string;
   /** The knight's mood, when not the one the tone implies (thinking while
@@ -41,34 +37,13 @@ export function CoachBubble({
   const fixed = lines !== undefined;
   const titleSize = 18;
   const bodySize = 15;
-  const parchment = useWatchSurface('ui.parchment');
-  const { ring, tail } = useToneBorder(tone, parchment?.edge);
+  const { ring } = useToneBorder(tone);
   return (
     <View style={styles.row}>
-      {/* The knight reacts to the coach's verdict, replaying on each new one. */}
-      {!parchment && (
-        <KnightMascot
-          size={44}
-          mood={
-            mood ??
-            (tone === 'right'
-              ? 'cheer'
-              : tone === 'wrong'
-                ? 'encourage'
-                : 'idle')
-          }
-          play={title}
-        />
-      )}
       <View
         accessibilityLiveRegion="polite"
         style={[
           styles.bubble,
-          parchment && {
-            backgroundColor: parchment.fill,
-            // The parchment's drop shadow, as the wall's plaques have.
-            boxShadow: `0 4px 0 ${parchment.ledge}`,
-          },
           fixed && {
             height:
               text.height(titleSize, 1) + text.height(bodySize, lines) + 20,
@@ -76,16 +51,6 @@ export function CoachBubble({
         ]}
       >
         <Animated.View pointerEvents="none" style={[motion.border, ring]} />
-        {/* Drawn over the ring, so it opens the bubble's edge into the tail. */}
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            motion.tail,
-            styles.tail,
-            parchment && { backgroundColor: parchment.fill },
-            tail,
-          ]}
-        />
         {/* New words fade in, so a verdict replaces the prompt softly. */}
         <Animated.View
           key={`${title}\n${tag ?? ''}\n${body ?? ''}`}
@@ -97,7 +62,6 @@ export function CoachBubble({
             <Text
               style={[
                 styles.title,
-                parchment && { color: parchment.ink },
                 fixed && { lineHeight: text.lineHeight(titleSize) },
               ]}
               numberOfLines={fixed ? 1 : 2}
@@ -110,7 +74,6 @@ export function CoachBubble({
             <Text
               style={[
                 styles.body,
-                parchment && { color: parchment.inkMuted },
                 fixed && { lineHeight: text.lineHeight(bodySize) },
               ]}
               numberOfLines={lines}
@@ -131,7 +94,6 @@ export function CoachBubble({
 }
 
 const wordsIn = FadeIn.duration(tokens.motion.move);
-const TAIL = 14;
 // Theme-independent styles for the animated overlay.
 const motion = NativeStyleSheet.create({
   // Over the bubble's own transparent border, matching its radius.
@@ -144,19 +106,6 @@ const motion = NativeStyleSheet.create({
     borderWidth: 2,
   },
   words: { gap: 2 },
-  // A square turned to a point, outlined on its two outer sides only; its
-  // centre sits on the bubble's left edge, level with the knight's face.
-  tail: {
-    position: 'absolute',
-    left: -2 - TAIL / 2,
-    top: 22 - 2 - TAIL / 2,
-    width: TAIL,
-    height: TAIL,
-    borderLeftWidth: 2,
-    borderBottomWidth: 2,
-    borderBottomLeftRadius: 3,
-    transform: [{ rotate: '45deg' }],
-  },
 });
 
 /** The bubble's border eases between plain, right and wrong: a state flip,
@@ -176,15 +125,13 @@ function useToneBorder(tone: 'plain' | 'right' | 'wrong', plain?: string) {
   } as const;
   return {
     ring: { borderRadius: theme.radius.control, borderColor, ...transition },
-    tail: { borderColor, ...transition },
   };
 }
 
 const useStyles = createStyles((theme) => ({
   row: {
     flexDirection: 'row',
-    // Room for the tail between the knight and the bubble.
-    gap: theme.spacing.sm + 6,
+    gap: theme.spacing.sm,
     alignItems: 'flex-start',
   },
   bubble: {
@@ -198,7 +145,6 @@ const useStyles = createStyles((theme) => ({
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
   },
-  tail: { backgroundColor: theme.colors.surface },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

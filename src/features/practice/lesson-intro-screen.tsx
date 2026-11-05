@@ -10,7 +10,6 @@ import {
   LessonFrame,
   LessonHeader,
   Screen,
-  useWallView,
 } from '../../ui';
 import { useLessonIntro } from './lesson-intro';
 
@@ -19,7 +18,6 @@ import { useLessonIntro } from './lesson-intro';
 export function LessonIntroScreen() {
   const { key = '' } = useLocalSearchParams<{ key?: string }>();
   const { scope } = useSessionScope();
-  const wallView = useWallView('scene.wallView');
   const reduced = useSystemReducedMotion();
   const intro = useQuery({
     queryKey: [...scope.meKey, 'lesson-intro', key],
@@ -40,9 +38,8 @@ export function LessonIntroScreen() {
   const view = useLessonIntro(intro.data, onFinish, reduced);
   const failed = intro.isError || (intro.isSuccess && !view);
   return (
-    <Screen preset="fixed" style={{ backgroundColor: wallView.far.sky[0] }}>
+    <Screen preset="fixed">
       <LessonFrame
-        watch
         bars={
           <LessonHeader
             title={intro.data?.name ?? 'Lesson'}
@@ -56,7 +53,7 @@ export function LessonIntroScreen() {
             body={
               view?.body ??
               (failed
-                ? 'This lesson has nothing to show yet. Its positions come in the watch.'
+                ? 'This lesson has nothing to show yet. Its positions come in practice.'
                 : '')
             }
             tone={view?.tone ?? 'plain'}

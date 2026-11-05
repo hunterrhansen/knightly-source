@@ -14,8 +14,8 @@ npm run test:board              # five board tests only
 
 The runner builds fresh Storybook/production outputs, chooses loopback ports and
 starts an owned Expo development server for app navigation. One Playwright config
-covers board input/promotion, offline protected navigation/reload and production
-startup/lab redirects. Existing listeners are never adopted or terminated.
+covers board input/promotion, offline protected navigation/reload, restored main navigation
+(including keyboard activation) and production startup/lab redirects. Existing listeners are never adopted or terminated.
 Explicit preview ports are available with `--port 6010 --production-port 6011`.
 
 These fixture/offline tests do not establish live Clerk/backend integration,

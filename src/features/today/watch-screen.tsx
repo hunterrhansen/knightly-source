@@ -35,13 +35,13 @@ function leave() {
 }
 
 /**
- * Your watch: when the learner keeps it and the habit it follows ("After I finish
- * dinner, I will keep my watch"). Saved to the account; only after the save is
+ * Practice reminders: when the learner keeps it and the habit it follows ("After I finish
+ * dinner, I will keep my practice"). Saved to the account; only after the save is
  * acknowledged does Remind me ask this device for notification permission.
  */
 export function WatchScreen() {
   return (
-    <Page safeArea avoidKeyboard title="Your watch" onBack={leave}>
+    <Page safeArea avoidKeyboard title="Practice reminders" onBack={leave}>
       <Body>
         A few minutes a day with your own mistakes. Tie it to something you
         already do and it sticks.
@@ -52,7 +52,7 @@ export function WatchScreen() {
 }
 
 /**
- * The watch's time, habit and reminder, and Keep my watch. `preselect` (the
+ * The watch's time, habit and reminder, and Save practice reminder. `preselect` (the
  * time a watch was just kept) leads the times as its own choice; a saved
  * watch is shown as saved. `onDone` runs once it is saved (and, natively,
  * the reminder applied or refused and acknowledged).
@@ -126,15 +126,15 @@ export function WatchForm({
     <>
       {refused ? (
         <Notice
-          title="Your watch is saved"
+          title="Practice reminders is saved"
           message="Notifications are off for Knightly, so there will be no reminder. Turn them on in system settings to get one."
           action="Done"
           onAction={onDone}
         />
       ) : null}
-      <Card eyebrow="When" title="When will you keep your watch?">
+      <Card eyebrow="When" title="When will you complete your practice?">
         <ToggleGroup
-          label="Watch time"
+          label="Practice time"
           variant="pills"
           value={time}
           options={times.map((value) => ({
@@ -148,7 +148,7 @@ export function WatchForm({
       <Card eyebrow="After what" title="After I …">
         <TextField
           label="After I"
-          accessibilityLabel="The habit your watch follows"
+          accessibilityLabel="The habit your practice follows"
           value={anchor}
           maxLength={ANCHOR_MAX + 10}
           onChangeText={(value) => {
@@ -156,7 +156,7 @@ export function WatchForm({
             setTouched(true);
           }}
           placeholder={anchorSuggestions(time)[0]}
-          helpText=", I will keep my watch."
+          helpText=", I will practice."
           error={touched && anchor && problem ? problem : undefined}
           editable={!busy}
         />
@@ -181,8 +181,8 @@ export function WatchForm({
           <View style={styles.remindText}>
             <Text style={styles.remindTitle}>Remind me</Text>
             <Text style={styles.quiet}>
-              One reminder at this time, only on days you haven’t kept your
-              watch.
+              One reminder at this time, only on days you haven’t completed
+              practice.
             </Text>
           </View>
           <Switch
@@ -196,7 +196,7 @@ export function WatchForm({
       )}
       {save.error && (
         <Notice
-          title="Couldn’t save your watch"
+          title="Couldn’t save your practice"
           message={save.error.message}
           action="Retry"
           onAction={() => save.mutate({ time, anchor: cleaned })}
@@ -206,7 +206,7 @@ export function WatchForm({
         disabled={busy || !!problem}
         onPress={() => save.mutate({ time, anchor: cleaned })}
       >
-        Keep my watch
+        Save practice reminder
       </Button>
     </>
   );

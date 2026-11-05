@@ -116,7 +116,7 @@ test('a week of silence is reminded daily, then Mondays only, then not at all af
   for (const reminder of backedOff) {
     expect(reminder.at.getDay()).toBe(1);
     expect(reminder.body).toBe(
-      'A new week, a new moon. Your watch is ready whenever you are.',
+      'A new week, a fresh start. Your practice is ready whenever you are.',
     );
   }
   const quiet = review({ streak: streak({ last_kept: '2026-09-12' }) });

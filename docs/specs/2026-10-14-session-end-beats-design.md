@@ -1,5 +1,13 @@
 # Session-end beats
 
+## Current presentation
+
+Results lead directly, followed by the streak acknowledgement and optional
+practice reminder/learning follow-up. No wall scene, raids, post completion or
+rank-up beat appears in the app. Keep points, their star icon, score breakdown
+and short reward feedback. This replaces the story-specific beats below.
+
+
 Approved for implementation ([#86](https://github.com/hunterrhansen/knightly/issues/86)).
 The end of a practice session, the end of a game review and the daily review's
 between-steps screen become short full-screen beats, one idea per screen, in
@@ -15,17 +23,10 @@ A session ends on a sequence of a few beats. Each beat fills the screen
 text makes it taller than the screen, and pins one full-width primary button at
 the bottom. Beats advance only on that button; nothing advances on a timer.
 
-0. **The watch's end** (the daily lesson only, when a move held tonight): over
-   the wall, before Results.
-1. **Results** (always, when the session has results).
-2. **Streak extended** (only when this session extended the streak).
-   Proposed: when no watch is set and the ask is due, **Your watch** follows it
-   ([Asking for the watch](2026-10-18-watch-time-anchor-design.md#asking-for-the-watch)).
-3. **Rank up** (only when this session's stars reached a new rank; see
-   [Stars and ranks](2026-10-18-watch-story-design.md#stars-and-ranks)). It
-   replaces Long-term memory, which it already tells.
-4. **Long-term memory** (only when this session moved positions into long-term
-   memory and no rank was reached).
+1. **Results** whenever the session has results.
+2. **Streak extended** when this session extended the streak.
+3. **Practice reminders** when no reminder is configured and the ask is due.
+4. **Long-term memory** when saved positions entered long-term memory.
 
 The last beat's button is the session's exit: **Done**.
 
@@ -102,43 +103,12 @@ When `today.memory.mastered_today` grew between the same two reads, a sky beat:
 a star badge drops in and sparkles with the `reward` cue, "N positions moved
 to long-term memory" and "You won't see them for a while." No beat when the field is missing.
 
-### Rank up
-
-When `/api/home`'s `journey.rank` changed between the same two reads and
-`journey.stars` grew (a rank reached without a new star, such as thresholds
-lowered on the server, shows nothing): the rank's emblem
-(`reward.rankEmblem.*`) drops onto a night-sky disc with gold sparkles and the
-`reward` cue, "New rank", the rank name, "N moves from your own games have
-stopped slipping since your first watch", the last three stars from
-`/api/journey` (label, move and the day earned, read only when a rank was
-reached) and "Next: {rank} at N stars". No confetti. Practice and game review
-both show it.
-
-### The watch's end
-
-The daily lesson is the watch, so it ends over the wall
-([kit stage 7](2026-10-18-watch-kit-design.md#build-plan-for-the-core-of-the-watch)):
-the wall's `end` scene (`scene.wallHero`: raiders gone, gate shut, the knight on
-lookout). His lantern brightens one step per move held tonight
-(`fx.lanternBrighten`; from a low light to full at five held moves, so fewer
-leave it partly lit), then "N raids turned back" lands over the gate
-(`fx.turnedBack`, the `gateCaption` slot centred on the gate at any width) with
-gold sparkles and the `reward` cue, and "Your lantern burns brighter for every
-move you held." under the scene (`copy.watchEnd`). N is tonight's held moves
-(`results` with `correct`, the count the Watch page's kept results show;
-puzzles are not raids). Many held moves step faster so the beat stays near
-three seconds. After 21:00 both recipes cross-fade without swelling or
-bouncing; reduced motion shows the lit lantern and the caption at once. The
-scene is labelled as a header with the caption and announced once. No beat
-when nothing held. It plays on the session-end screen, after the lesson's
-last answer, so it cannot move the board.
-
 ## Where beats appear
 
-- **Practice** (`PracticeLayout`, the nightly and extra watches): replaces the
+- **Practice** (`PracticeLayout`, daily and additional practice): replaces the
   complete state's Summary.
 - **Game review** (`ReviewLayout` complete): replaces the Review complete page.
-- Today's Done keeps its medal and confetti.
+- Home confirms saved results without a story celebration.
 
 ## Motion and accessibility
 
@@ -156,14 +126,12 @@ last answer, so it cannot move the board.
 - Shared UI (`src/components/ui/`): `BeatFrame` (full-screen frame, gated button,
   one-time announcement), `ResultsBeat` with its `StatCard`s, the session-time
   and results helpers, the motion primitives (`PopIn`, `FadeIn`, `Ignite`,
-  `RollingNumber`, `Beacon`), the reward effects kit
+  `RollingNumber`), the reward effects kit
   (`reward-effects`), plus `StreakCalendar` (this week only, not navigable, for
   the beat) and `Moon`. Shared UI imports no feature.
 - Today owns the before/after streak comparison (`sessionEnd`, pure),
   `useSessionEnd` and the `SessionBeats` sequence with its `StreakBeat` and
-  `MemoryBeat`, `RankUpBeat` and `WatchEndBeat` (`session-end-beats.tsx`),
-  exported through `today-api.ts`; the wall scene, its recipes and copy are
-  the kit's (`WatchEndScene` in `src/components/kit/watch-end.tsx`);
+  `MemoryBeat` (`session-end-beats.tsx`), exported through `today-api.ts`;
   practice and review screens pass its result into their layouts. Previews and
   Storybook pass sample values.
 - Practice and review own their stats and timing; grading and progress stay

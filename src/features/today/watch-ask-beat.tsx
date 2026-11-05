@@ -7,8 +7,8 @@ import { WatchForm } from './watch-screen';
 
 /**
  * Same time tomorrow? The session-end beat after Streak extended while no
- * watch is set: the Your watch form, starting from the time this watch was
- * kept. Keep my watch saves and continues; Not now records a skip and
+ * watch is set: the Practice reminders form, starting from the time this watch was
+ * kept. Save practice reminder saves and continues; Not now records a skip and
  * continues. One idea only, and no ✕. Fades in, at once under reduced motion.
  */
 export function WatchAskBeat({
@@ -38,7 +38,7 @@ export function WatchAskBeat({
               Same time tomorrow?
             </Text>
             <Text style={styles.coach}>
-              {`You kept ${tonight} watch at ${at}. Tie tomorrow’s to something you already do and it sticks.`}
+              {`You completed ${tonight} practice at ${at}. Tie tomorrow’s to something you already do and it sticks.`}
             </Text>
           </View>
           <WatchForm preselect={keptWatchTime(keptAt)} onDone={next} />

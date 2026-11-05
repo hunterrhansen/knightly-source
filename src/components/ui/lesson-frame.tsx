@@ -7,7 +7,6 @@ import { tokens } from '../../theme/tokens';
 import { ActionTiles } from './action-bar';
 import { FittedBoard } from './fitted-board';
 import type { LessonFrameProps } from './lesson-frame-types';
-import { WallLessonFrame } from './lesson-wall-frame';
 import { PointsFlight, PointsFlightProvider } from './points-flight';
 import { SheetRise } from './screen-motion';
 
@@ -15,11 +14,9 @@ import { SheetRise } from './screen-motion';
  * coach over a board fitted to the room left (never scrolling), the bottom
  * action bar and a verdict sheet sliding over it. The caller's container
  * holds the safe-area top; the bar keeps the bottom inset, so a sheet can run
- * to the edge. `watch` draws the same lesson from the castle wall. */
+ * to the edge. Every lesson uses the plain board layout. */
 export function LessonFrame(props: LessonFrameProps) {
-  return props.watch ? (
-    <WallLessonFrame {...props} />
-  ) : props.side ? (
+  return props.side ? (
     <WideFrame {...props} side={props.side} />
   ) : (
     <PlainFrame {...props} />

@@ -2,7 +2,7 @@
 export const settingsSectionTitles: Record<string, string> = {
   appearance: 'Appearance',
   connections: 'Linked accounts',
-  reminders: 'Your watch',
+  reminders: 'Practice reminders',
   updates: 'Daily update',
   analysis: 'Analysis',
   data: 'Your data',

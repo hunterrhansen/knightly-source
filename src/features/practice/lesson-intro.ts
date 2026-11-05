@@ -331,12 +331,12 @@ export function useLessonIntro(
         ? 'That’s the move'
         : step === 'wrong'
           ? 'Not this time'
-          : 'Your turn on watch',
+          : 'Your turn',
     body:
       step === 'right'
-        ? 'Tonight’s positions follow.'
+        ? 'Your practice positions follow.'
         : step === 'wrong'
-          ? 'The arrow shows the move. Tonight’s positions follow.'
+          ? 'The arrow shows the move. Your practice positions follow.'
           : words.look,
     tone: step === 'right' ? 'right' : step === 'wrong' ? 'wrong' : 'plain',
     actions:

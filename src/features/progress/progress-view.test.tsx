@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { Overview } from '../../lib/api/progress-contract';
-import { climbing, firstNights, scheduled } from '../today/today-api';
+import { climbing, firstNights } from '../today/today-api';
 import { ProgressView, type ProgressViewProps } from './progress-view';
 
 jest.mock('expo-router', () => ({
@@ -110,7 +110,7 @@ const stats = (data: Overview, over: Partial<ProgressViewProps> = {}) =>
 
 beforeEach(() => onOpen.mockReset());
 
-test('Progress is one sheet: rank, is it working, nights, your game and your memory, in that order', () => {
+test('Progress keeps improvement, consistency and learning summaries without ranks', () => {
   render(
     <ProgressView
       {...props({
@@ -150,108 +150,37 @@ test('Progress is one sheet: rank, is it working, nights, your game and your mem
     .map((node) => node.props.children)
     .filter((text) =>
       [
-        'Your rank',
         'Is it working?',
-        'Nights',
+        'Practice consistency',
         'Your game',
         'Your memory',
       ].includes(text),
     );
   expect(headings).toEqual([
-    'Your rank',
     'Is it working?',
-    'Nights',
+    'Practice consistency',
     'Your game',
     'Your memory',
   ]);
-  // Your rank: the emblem's chip and the stars to the next rank.
-  expect(screen.getByText('Squire II · ★ 23')).toBeTruthy();
-  expect(screen.getByText('Clear post 9 for Squire III')).toBeTruthy();
+  expect(screen.queryByText('Your rank')).toBeNull();
   // Nights: all time, in a row, the best run and freezes.
-  expect(screen.getByLabelText('13 nights kept')).toBeTruthy();
+  expect(screen.getByLabelText('13 practice days')).toBeTruthy();
   expect(screen.getByLabelText('5 in a row')).toBeTruthy();
   expect(screen.getByLabelText('12 best run')).toBeTruthy();
   expect(screen.getByLabelText('1 freeze')).toBeTruthy();
   // Your memory: your moves by where they are on the watch, and coming up.
   expect(
-    screen.getByLabelText('5 on watch, 9 held, 23 stopped slipping'),
+    screen.getByLabelText('5 due for practice, 9 held, 23 stopped slipping'),
   ).toBeTruthy();
   expect(screen.getByText('Coming up')).toBeTruthy();
   // All stats is folded in: no separate page to open.
   expect(screen.queryByText(/Opens All stats/)).toBeNull();
 });
 
-test('with no star yet Progress reads as early, not empty: Page and the first star card, and no map', () => {
-  render(<ProgressView {...props()} />);
-  expect(screen.getByLabelText(/^Rank Page, 0 stars\./)).toBeTruthy();
-  expect(screen.getByText('Your first star')).toBeTruthy();
-  expect(screen.getByText('14 moves are on their way now.')).toBeTruthy();
-  // The map of nights moved to the home path.
-  expect(screen.queryByLabelText(/^Night \d+/)).toBeNull();
-});
-
-test('before the first star, the card shows the held move closest to 11 days as progress toward it', () => {
-  render(
-    <ProgressView {...props({ journey: { ...resource, data: scheduled } })} />,
-  );
-  expect(screen.getByText('Closest: Missed threat · Qd4')).toBeTruthy();
-  // 7.4 days reads as 7: never as the bar before it is reached.
-  expect(
-    screen.getByLabelText('Missed threat Qd4 holds 7 of 11 days').props
-      .accessibilityValue,
-  ).toEqual({ min: 0, max: 11, now: 7.4 });
-  expect(
-    screen.getByText('Holds 7 of 11 days. Each Good answer stretches it.'),
-  ).toBeTruthy();
-  screen.unmount();
-  // Past the bar on its schedule, a tactic still needs a puzzle of its own.
-  const owed = {
-    ...scheduled,
-    first_star: {
-      ...(scheduled.first_star as NonNullable<typeof scheduled.first_star>),
-      days: 11,
-      needs_family: true,
-    },
-  };
-  render(<ProgressView {...props({ journey: { ...resource, data: owed } })} />);
-  expect(
-    screen.getByText(
-      'Holds 11 of 11 days. Solve one puzzle of its tactic to earn the star.',
-    ),
-  ).toBeTruthy();
-  screen.unmount();
-  // From an older server, or with nothing held yet, the card explains stars only.
-  render(<ProgressView {...props()} />);
-  expect(screen.queryByText(/^Closest:/)).toBeNull();
-});
-
-test('a lapsed star is counted as dimmed and back on the watch while the rank chip keeps every star', () => {
-  render(
-    <ProgressView {...props({ journey: { ...resource, data: climbing } })} />,
-  );
-  expect(screen.getByText('Squire II · ★ 23')).toBeTruthy();
-  expect(screen.getByText('1 dimmed · back on your watch')).toBeTruthy();
-  expect(screen.queryByText('Your first star')).toBeNull();
-});
-
 test('the proof row compares blunders per game with the 30 days before', () => {
   render(<ProgressView {...props()} />);
   expect(screen.getByText('2.1 → 1.4')).toBeTruthy();
   expect(screen.getByLabelText('Blunders per game, 2.1 to 1.4')).toBeTruthy();
-});
-
-test('a rank that fails to load offers a retry and keeps the proof row', () => {
-  const refetch = jest.fn();
-  render(
-    <ProgressView
-      {...props({
-        journey: { ...resource, error: new Error('Not found'), refetch },
-      })}
-    />,
-  );
-  fireEvent.press(screen.getByRole('button', { name: 'Retry your rank' }));
-  expect(refetch).toHaveBeenCalledTimes(1);
-  expect(screen.getByText('2.1 → 1.4')).toBeTruthy();
 });
 
 test('loaded ratings stay visible during a background refresh; a failed refresh offers a retry without losing them', () => {

@@ -113,7 +113,7 @@ test('saves the chosen time and habit, then asks for notification permission', a
   fireEvent.press(screen.getByRole('radio', { name: /9:00 PM/ }));
   fireEvent.press(screen.getByText('finish dinner'));
   expect(mockPermission).not.toHaveBeenCalled();
-  fireEvent.press(screen.getByText('Keep my watch'));
+  fireEvent.press(screen.getByText('Save practice reminder'));
   await waitFor(() => expect(mockRouter.back).toHaveBeenCalled());
   expect(saves).toEqual([
     ['/api/settings/watch', { time: '21:00', anchor: 'finish dinner' }],
@@ -125,10 +125,10 @@ test('a habit typed with its own “After I” is saved without it', async () =>
   const saves = serve(acknowledge);
   mount();
   fireEvent.changeText(
-    await screen.findByLabelText('The habit your watch follows'),
+    await screen.findByLabelText('The habit your practice follows'),
     '  After I  walk the dog. ',
   );
-  fireEvent.press(screen.getByText('Keep my watch'));
+  fireEvent.press(screen.getByText('Save practice reminder'));
   await waitFor(() => expect(mockRouter.back).toHaveBeenCalled());
   expect(saves).toEqual([
     ['/api/settings/watch', { time: '20:00', anchor: 'walk the dog' }],
@@ -139,8 +139,8 @@ test('a failed save stays on the screen and asks for nothing', async () => {
   const saves = serve(() => new Response('{}', { status: 500 }));
   mount();
   fireEvent.press(await screen.findByText('get into bed'));
-  fireEvent.press(screen.getByText('Keep my watch'));
-  await screen.findByText('Couldn’t save your watch');
+  fireEvent.press(screen.getByText('Save practice reminder'));
+  await screen.findByText('Couldn’t save your practice');
   expect(saves).toHaveLength(1);
   expect(mockPermission).not.toHaveBeenCalled();
   expect(mockRouter.back).not.toHaveBeenCalled();
@@ -165,7 +165,7 @@ test('after the first watch, the ask starts from when it was kept and continues 
     ).toMatchObject({ checked: true }),
   );
   fireEvent.press(screen.getByText('finish dinner'));
-  fireEvent.press(screen.getByText('Keep my watch'));
+  fireEvent.press(screen.getByText('Save practice reminder'));
   await waitFor(() => expect(next).toHaveBeenCalledTimes(1));
   expect(saves).toEqual([
     ['/api/settings/watch', { time: '20:45', anchor: 'finish dinner' }],

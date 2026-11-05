@@ -1,15 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
-import { accountKey } from '../../lib/account-queries';
-import type { JourneyMap } from '../../lib/api/journey-contract';
 import type { DailyReview } from '../../lib/api/today-contract';
-import { useSessionScope } from '../../lib/auth/session-boundary';
 import { usePreferences } from '../../theme/preferences';
 import { addDays } from '../../ui';
 import type { RankUp, StreakExtension } from './session-end-beats';
 import { useStreakHistory } from './today-streak-calendar';
 import { useDailyReview } from './use-daily-review';
-import { type PostMoment, postMoment } from './ward-path';
+import type { PostMoment } from './ward-path';
 import { useWatchAsk, watchAskDue } from './watch-ask';
 
 export type SessionEnd = {
@@ -110,36 +106,6 @@ export function useSessionEnd(finished: boolean): SessionEnd & {
     };
   }, [finished, refetch]);
   const end = sessionEnd(baseline.current, after ?? undefined);
-  // The journey before and after: the post beat compares the ward path, and
-  // the rank-up beat names the moves that stopped slipping last.
-  const { scope } = useSessionScope();
-  const map = useQuery({
-    queryKey: accountKey(scope, 'journey'),
-    queryFn: ({ signal }) => scope.api.journey(signal),
-    refetchOnMount: 'always',
-  });
-  const journeyBefore = useRef<JourneyMap | undefined>(undefined);
-  if (!journeyBefore.current && map.isFetchedAfterMount && map.isSuccess)
-    journeyBefore.current = map.data;
-  const [journeyAfter, setJourneyAfter] = useState<JourneyMap | null>();
-  const refetchMap = map.refetch;
-  useEffect(() => {
-    if (!finished) {
-      setJourneyAfter(undefined);
-      return;
-    }
-    let alive = true;
-    void refetchMap().then((result) => {
-      if (alive) setJourneyAfter(result.isSuccess ? result.data : null);
-    });
-    return () => {
-      alive = false;
-    };
-  }, [finished, refetchMap]);
-  const posts =
-    after && journeyAfter
-      ? postMoment(journeyBefore.current, journeyAfter, after.day)
-      : null;
   // A Sunday-first week starts the day before the summary's Monday-first one.
   const { weekStart } = usePreferences().preferences;
   const monday = end.streak?.week[0]?.date;
@@ -149,12 +115,6 @@ export function useSessionEnd(finished: boolean): SessionEnd & {
   );
   return {
     ...end,
-    posts,
-    rankUp: end.rankUp && {
-      ...end.rankUp,
-      key: map.data?.ranks.find((rank) => rank.name === end.rankUp?.rank)?.key,
-      latest: map.data?.star_list.slice(-3).reverse(),
-    },
     streak: end.streak && {
       ...end.streak,
       earlier: earlier?.days,
@@ -172,7 +132,7 @@ export function useSessionEnd(finished: boolean): SessionEnd & {
           ? { keptAt }
           : undefined,
     },
-    // A failed journey read shows no post beat rather than holding Results.
-    pending: finished && (after === undefined || journeyAfter === undefined),
+    // Results wait only for the fresh daily summary, not a removed journey.
+    pending: finished && after === undefined,
   };
 }

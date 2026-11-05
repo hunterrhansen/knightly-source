@@ -12,7 +12,8 @@ CI and deployment state is in the [runtime guide](docs/runtime-verification.md#c
 - Released to production and TestFlight: Clerk sign-in, Chess.com import and the
   Games library, Today daily review with streaks, daily practice, game review,
   Progress and settings. The backend owns
-  grading and saved progress. [Current status](docs/status.md) lists what is
+  grading and saved progress. The local UI restores Today/Games/Progress navigation
+  while keeping the simplified practice presentation. [Current status](docs/status.md) lists what is
   deployed, unreleased and still unchecked.
 - The shared board supports tap/drag/keyboard input, promotion, correlated
   feedback, motion and accessibility adapters. Board Lab contains simulated
@@ -136,6 +137,12 @@ provisioning profile. Open the finished build's EAS install link on that phone.
 Preview builds do not publish to the App Store or configure OTA updates.
 Production Clerk's Native applications settings must allow the iOS callback
 `app.knightlychess://callback`; the older preview uses a different callback.
+
+The development-only `/navigation-preview` route shows the restored Today,
+Games and Progress navigation without sign-in or backend data. Use **Explore
+navigation** on sign-in. Web shows a sidebar at desktop widths and bottom links
+on phones; native builds show the platform tab bar. Practice/review remain
+full-screen and Account retains its modal. Production excludes this preview.
 
 ## Shared component gallery
 

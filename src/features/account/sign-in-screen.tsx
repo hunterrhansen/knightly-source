@@ -84,6 +84,9 @@ function DevLinks({ style }: { style: StyleProp<TextStyle> }) {
       <Link href="/board-lab" asChild>
         <Text style={style}>Explore board workshop</Text>
       </Link>
+      <Link href="/navigation-preview" asChild>
+        <Text style={style}>Explore navigation</Text>
+      </Link>
     </>
   );
 }

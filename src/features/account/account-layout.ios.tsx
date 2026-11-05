@@ -65,7 +65,7 @@ export function AccountLayout({
                 `${preferences.board.charAt(0).toUpperCase()}${preferences.board.slice(1)} board`,
               ],
               ['connections', 'Linked accounts', 'Chess.com and Lichess'],
-              ['reminders', 'Your watch', 'Time, habit and reminder'],
+              ['reminders', 'Practice reminders', 'Time, habit and reminder'],
               ['updates', 'Daily update', 'Sync and analysis status'],
               ['analysis', 'Analysis', 'Depth and practice scheduling'],
               ['data', 'Your data', 'Usage, export and account deletion'],

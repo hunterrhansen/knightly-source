@@ -1,5 +1,14 @@
 # Progress page
 
+## Current presentation
+
+Show chess improvement, practice consistency (streak, total practice days,
+best run, freezes), game skills and saved memory summaries. Remove the rank
+header, next-rank targets, first-star progression card and post/castle references.
+The reward star and points in lesson results remain separate from this removed
+progression UI. Existing backend responses and saved history remain valid.
+
+
 Since 2026-10-19 Progress is one scrolling modal with All stats folded in
 (no `/progress/stats`); its order is in
 [the path home](2026-10-19-path-home-design.md#progress). The sections below

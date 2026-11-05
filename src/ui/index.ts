@@ -8,7 +8,6 @@ export {
   BoardEffects,
 } from '../components/kit/beats';
 export {
-  useCastle,
   useCharacter,
   useLandingCurve,
   useLandmark,
@@ -17,16 +16,10 @@ export {
   useSkyline,
   useSprite,
   useSpriteFamily,
-  useWallView,
 } from '../components/kit/registry';
 export { actorBox, SceneView } from '../components/kit/scene';
 export { SpriteView } from '../components/kit/sprite';
-export type { Raid, RaidMood, Sprite } from '../components/kit/types';
-export {
-  useWatchEndReady,
-  useWatchEndWords,
-  WatchEndScene,
-} from '../components/kit/watch-end';
+
 export { ActionBar, ActionButton } from '../components/ui/action-bar';
 export { ActionIcon, type ActionIconName } from '../components/ui/action-icon';
 export { Avatar } from '../components/ui/avatar';
@@ -35,7 +28,6 @@ export { Button } from '../components/ui/button';
 export { Callout } from '../components/ui/callout';
 export { Card, CardTone } from '../components/ui/card';
 export {
-  Beacon,
   FadeIn,
   Ignite,
   PopIn,

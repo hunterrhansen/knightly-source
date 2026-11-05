@@ -38,12 +38,6 @@ export function RootNavigator() {
       animation: reducedMotion ? ('fade' as const) : ('default' as const),
     }),
   };
-  // Games holds the board: on iOS it opens full screen, not as the sheet, so
-  // the board keeps its full size and no swipe-down competes with a drag.
-  const fullScreen = {
-    ...modal,
-    ...(Platform.OS === 'ios' && { presentation: 'fullScreenModal' as const }),
-  };
   const captured = useRef(false);
   const restored = useRef(false);
   if (!captured.current) {
@@ -99,12 +93,8 @@ export function RootNavigator() {
         </Stack.Protected>
         <Stack.Protected guard={state.phase === 'signed-in'}>
           <Stack.Screen name="(main)" />
-          {/* Account and Progress open over the path as iOS's full-height
-              sheet; Games, with its board, full screen. Elsewhere each is a
-              pushed page. */}
           <Stack.Screen name="(account)" options={modal} />
-          <Stack.Screen name="games" options={fullScreen} />
-          <Stack.Screen name="progress" options={modal} />
+          <Stack.Screen name="games/[gameId]" />
           <Stack.Screen name="practice" />
           <Stack.Screen name="review/[gameId]" />
           <Stack.Screen name="connect-games" />
@@ -115,6 +105,7 @@ export function RootNavigator() {
         <Stack.Protected guard={__DEV__}>
           <Stack.Screen name="board-lab" />
           <Stack.Screen name="shell-lab" />
+          <Stack.Screen name="navigation-preview" />
           <Stack.Screen name="(account-preview)" options={modal} />
         </Stack.Protected>
       </Stack>

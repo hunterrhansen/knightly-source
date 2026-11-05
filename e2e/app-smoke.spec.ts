@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('app protects Account while offline and keeps workshop navigation usable across reload', async ({
+test('app protects Account offline, preserves workshop input and switches the restored navigation across reload', async ({
   page,
 }) => {
   await page.route('**/api/config', (route) =>
@@ -22,4 +22,27 @@ test('app protects Account while offline and keeps workshop navigation usable ac
     page.getByRole('heading', { name: 'Board workshop', exact: true }),
   ).toBeVisible();
   await expect(page.getByRole('gridcell')).toHaveCount(64);
+  await page.goto('/navigation-preview');
+  const navigation = page.getByRole('navigation');
+  await navigation.getByRole('link', { name: 'Games', exact: true }).click();
+  await expect(page).toHaveURL(/\/navigation-preview\/games$/);
+  await expect(
+    page.getByRole('heading', { name: 'Games', exact: true }),
+  ).toBeVisible();
+  const progress = navigation.getByRole('link', {
+    name: 'Progress',
+    exact: true,
+  });
+  await progress.focus();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/navigation-preview\/progress$/);
+  await page.reload();
+  await expect(
+    page.getByRole('heading', { name: 'Progress', exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole('navigation')
+    .getByRole('link', { name: 'Today', exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/navigation-preview$/);
 });

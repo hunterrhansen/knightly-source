@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { DailyReview, Watch } from '../../lib/api/today-contract';
 
-/** Watch times offered on Your watch (local device time); evening is the default. */
+/** Watch times offered on Practice reminders (local device time); evening is the default. */
 export const WATCH_TIMES = [
   '07:00',
   '08:00',
@@ -17,7 +17,7 @@ export const WATCH_TIMES = [
 ] as const;
 export const DEFAULT_WATCH_TIME = '20:00';
 
-/** Whether this device reminds, and (from before Your watch) the time it chose. The
+/** Whether this device reminds, and (from before Practice reminders) the time it chose. The
  * saved watch's time wins once there is one. */
 export type ReminderPreference = { enabled: boolean; time: string };
 export const DEFAULT_REMINDER: ReminderPreference = {
@@ -57,16 +57,16 @@ const DAILY_FOR = 7;
 const STOP_AFTER = 30;
 
 const FRESH_START =
-  'A new week, a new moon. Your watch is ready whenever you are.';
+  'A new week, a fresh start. Your practice is ready whenever you are.';
 
 /** Encouraging lines, one per day in turn so consecutive days differ. Never guilt. */
 function rotatingLine(dayNumber: number, part: string) {
   const lines = [
-    'Your watch is ready. A few minutes is enough.',
+    'Your practice is ready. A few minutes is enough.',
     `Your past mistakes are ready for another look ${part}.`,
-    `A short watch ${part}. You can stop whenever you like.`,
-    'The knight is keeping watch. Join in for a few minutes.',
-    `One small watch ${part} keeps the habit growing.`,
+    `A short practice session ${part}. You can stop whenever you like.`,
+    'Your practice is ready. Take a few minutes to review.',
+    `One short practice session ${part} keeps the habit growing.`,
   ];
   return lines[dayNumber % lines.length] ?? FRESH_START;
 }

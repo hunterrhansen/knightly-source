@@ -173,7 +173,6 @@ export const journeyMapSchema = journeySummarySchema.extend({
 });
 export type JourneyMap = z.infer<typeof journeyMapSchema>;
 export type AheadDay = NonNullable<JourneyMap['ahead']>[number];
-export type FirstStar = NonNullable<JourneyMap['first_star']>;
 export type WatchMoves = NonNullable<JourneyMap['moves']>;
 export type JourneyWard = NonNullable<JourneyMap['wards']>[number];
 export type JourneyLesson = JourneyWard['lessons'][number];

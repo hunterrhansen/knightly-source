@@ -1,4 +1,3 @@
-import type { FirstStar } from '../../lib/api/journey-contract';
 import type {
   GameTrend,
   Overview,
@@ -265,24 +264,6 @@ export function focusFor(
       };
     }
   }
-}
-
-/** The closest move's memory in whole days, rounded down so it never reads
- * as the bar before it is reached. */
-export const firstStarDays = (closest: FirstStar) =>
-  Math.min(closest.target, Math.floor(closest.days));
-
-/** Progress toward the first star, from the held move closest to the
- * 11-day bar (`/api/journey`'s `first_star`). */
-export function firstStarLine(closest: FirstStar) {
-  const days = firstStarDays(closest);
-  const held = `Holds ${days} of ${closest.target} days`;
-  // A held move short of a star is either under the bar or, past it, still
-  // owed a puzzle of its tactic (a move with no tactic stops at the bar).
-  if (!closest.needs_family) return `${held}. Each Good answer stretches it.`;
-  return closest.days >= closest.target
-    ? `${held}. Solve one puzzle of its tactic to earn the star.`
-    : `${held}, then one puzzle of its tactic solved.`;
 }
 
 /** The proof row: blunders per game this period against the one before. */

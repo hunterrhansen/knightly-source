@@ -7,7 +7,7 @@ const STROKE = 10;
 
 /** Moves as a ring: each segment's share of `total` in its colour, the
  * rest the bare track, with one count in the middle (Progress's "Your
- * moves": stopped slipping gold, held green, on watch sky). */
+ * moves": stopped slipping gold, held green, due for practice sky). */
 export function DeckRing({
   segments,
   total: count,

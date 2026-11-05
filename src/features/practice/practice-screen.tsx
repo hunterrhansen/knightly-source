@@ -35,14 +35,12 @@ import {
   LessonHeader,
   LessonTopBar,
   praiseFor,
-  type Raid,
   Screen,
   SkeletonLine,
   useLoadingCoach,
   useMissCount,
   usePressSquish,
   useSessionTime,
-  useWallView,
   VerdictSheet,
 } from '../../ui';
 import {
@@ -59,12 +57,7 @@ import { useLessonIntro } from './lesson-intro';
 import { LineSteps } from './line-steps';
 import { heldBoard, practiceBoard } from './practice-board';
 import { practiceProgress } from './practice-progress';
-import { raidOf } from './practice-raid';
-import {
-  challengeEnd,
-  practiceResults,
-  raidsTurnedBack,
-} from './practice-results';
+import { challengeEnd, practiceResults } from './practice-results';
 import {
   cardPrompt,
   NO_THREAT,
@@ -141,7 +134,6 @@ export function PracticeScreen({
       end={end}
       canHide
       // Tonight's watch, and an extra watch another: seen from the castle wall.
-      watch
     />
   );
 }
@@ -158,7 +150,6 @@ export function PracticeLayout({
   challenge = false,
   end,
   canHide = false,
-  watch = false,
 }: {
   session: PracticeSession;
   state: PracticeState;
@@ -177,7 +168,6 @@ export function PracticeLayout({
   watch?: boolean;
 }) {
   const styles = useStyles();
-  const wallView = useWallView('scene.wallView');
   const { theme } = useTheme();
   const text = useTextBlock();
   // Room under the board for the meta line and the solution's ‹ › steps.
@@ -231,16 +221,6 @@ export function PracticeLayout({
   const held = !e && shownBoard ? lastExercise.current : undefined;
   const shown = e ?? held;
   const shownItem = shown?.item;
-  // From the wall, the position's opponent pieces wait at the treeline; the
-  // last raid stays while the next position loads.
-  const lastRaid = useRef<Raid | undefined>(undefined);
-  const raid =
-    watch && e
-      ? raidOf(e, phase, shownBoard?.orientation ?? 'w')
-      : watch && held
-        ? lastRaid.current
-        : undefined;
-  lastRaid.current = raid;
   const shownCard = shownItem?.kind === 'card' ? shownItem : undefined;
   // This visit's session time, from the first exercise shown to completion.
   const elapsed = useSessionTime(!!e, phase === 'complete');
@@ -532,11 +512,11 @@ export function PracticeLayout({
         safety
           ? `Safety check: ${safety.toLowerCase()}`
           : test
-            ? 'The post’s test'
+            ? 'Practice check'
             : sameIdea
               ? 'Same idea as the position you just solved'
               : taught
-                ? `Lesson at ${taught.place}: ${taught.lesson}`
+                ? `Lesson: ${taught.lesson}`
                 : review
                   ? 'Mixed review'
                   : `Puzzle rated ${shownItem?.kind === 'puzzle' ? shownItem.rating : ''}`
@@ -560,11 +540,11 @@ export function PracticeLayout({
           {safety
             ? `Safety check · ${safety}`
             : test
-              ? 'The post’s test'
+              ? 'Practice check'
               : sameIdea
                 ? 'Same idea'
                 : taught
-                  ? `At ${taught.place.replace(/^The /, 'the ')}`
+                  ? taught.lesson
                   : review
                     ? 'Mixed review'
                     : `Rated ${shownItem?.kind === 'puzzle' ? shownItem.rating : ''}`}
@@ -595,14 +575,8 @@ export function PracticeLayout({
       }
     />
   );
-  // From the wall, the label is the treeline's plaque and the coach speaks
-  // from the battlements below the board.
-  const coach = watch ? (
-    bubble
-  ) : (
+  const coach = (
     <>
-      {/* The label's row is always reserved, so a puzzle's or safety label
-          never pushes the board down (the board never moves). */}
       <View style={[styles.labelSlot, { height: labelHeight }]}>{label}</View>
       {bubble}
     </>
@@ -621,8 +595,6 @@ export function PracticeLayout({
           }}
           // The test never keeps the night; a castle reached still rises.
           streak={null}
-          rankUp={end?.rankUp}
-          posts={end?.posts}
           pending={end?.pending}
           finish={finish}
         />
@@ -639,7 +611,6 @@ export function PracticeLayout({
       <Animated.View key="end" entering={summaryIn} style={motion.fill}>
         <SessionBeats
           // The watch ends over the wall before its Results.
-          held={watch ? raidsTurnedBack(ended) : 0}
           results={{
             ...practiceResults(ended, elapsed, session.pointsSummary()),
             ...(end?.tomorrowDue
@@ -648,7 +619,7 @@ export function PracticeLayout({
                 }
               : {}),
             title: extra
-              ? 'Extra watch complete'
+              ? 'Extra practice complete'
               : lesson
                 ? 'Lesson complete'
                 : ended.results.length
@@ -658,8 +629,6 @@ export function PracticeLayout({
           // Only the night's first watch keeps the streak: never an extra one.
           streak={extra ? null : end?.streak}
           mastered={end?.mastered}
-          rankUp={end?.rankUp}
-          posts={end?.posts}
           pending={end?.pending}
           finish={finish}
         />
@@ -673,24 +642,17 @@ export function PracticeLayout({
       // as on Duolingo), so the screen keeps the top inset itself.
       // From the wall the frame keeps it, so the sky reaches the top edge.
       safeAreaEdges={
-        !watch && (Platform.OS === 'web' || progress || firstLoad)
-          ? ['top']
-          : []
+        Platform.OS === 'web' || progress || firstLoad ? ['top'] : []
       }
-      // From the wall, the night sky runs up behind the status bar.
-      style={watch ? { backgroundColor: wallView.far.sky[0] } : undefined}
     >
       <LessonFrame
-        watch={watch}
-        plaque={watch ? label : undefined}
-        raid={intro ? undefined : raid}
         bars={
           <>
             <LessonHeader
               hidden={!!progress || firstLoad}
               title={
                 extra
-                  ? 'Extra watch'
+                  ? 'Extra practice'
                   : lesson
                     ? 'Daily lesson'
                     : puzzle

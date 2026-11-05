@@ -32,9 +32,9 @@ on screen. It never resizes the board.
   so it only sounds.
 - Praise rotates by attempt, not at random, so a render never changes it:
   Great find!, That's it!, Well played!, Excellent!, Nicely done!, Spot on!
-- The coach bubble above the board keeps the explanation (the server's
+- The instruction panel above the board keeps the explanation (the server's
   message, best move and saved state); the sheet carries only the verdict and
-  the two actions, as on Duolingo, where the bubble explains and the sheet judges.
+  the two actions, with the explanation kept separate from the verdict.
 - Practice still steps through a finished line with ‹ ›: the steps move into
   the green sheet, above its buttons.
 - When the sheet fills the space under the board on a phone, its buttons sit
@@ -169,3 +169,10 @@ meta line under the board.
 progression state; screens only read it. `VerdictSheet`, `LessonTopBar` and
 `praiseFor` stay in shared UI with no feature imports. Session tests own the
 counting rules; the components are reviewed in Storybook and on devices.
+
+## Reward presentation
+
+Points keep the small star icon, flight to the counter and a brief counter pop.
+Bonuses retain their score and sound, with no board dimming, oversized shooting
+star, impact animation or blocking reward overlay. The segmented progress bar,
+combo count, move feedback and reduced-motion behavior remain.

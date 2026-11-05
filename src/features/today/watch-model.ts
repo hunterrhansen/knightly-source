@@ -20,12 +20,13 @@ export function cleanAnchor(input: string) {
 export const ANCHOR_MAX = 60;
 /** Why the anchor can't be saved yet, or undefined. */
 export function anchorProblem(anchor: string) {
-  if (anchor.length < 2) return 'Pick or write the habit your watch follows.';
+  if (anchor.length < 2)
+    return 'Pick or write the habit your practice follows.';
   if (anchor.length > ANCHOR_MAX)
     return `Keep it under ${ANCHOR_MAX} characters.`;
   return undefined;
 }
 
-/** "After I finish dinner, I will keep my watch." */
+/** "After I finish dinner, I will practice." */
 export const anchorSentence = (anchor: string) =>
-  `After I ${anchor}, I will keep my watch.`;
+  `After I ${anchor}, I will practice.`;

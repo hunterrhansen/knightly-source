@@ -4,6 +4,31 @@ What is implemented, what still needs checking and what is planned for removal.
 Local checks and bundling do not establish a release. Specs hold behavior; this
 page holds only state and open gates.
 
+## Local presentation update (not released)
+
+The current checkout replaces the journey with direct practice/review actions on
+Home. Practice and review use a plain background and character-free instructions.
+Ranks, first-star progression, castle/post completion and raid scenes are removed
+from product screens. Points, star icon, small reward flight, segmented progress,
+streak/calendar, grading and saved learning remain. Bonuses no longer dim the
+board or launch an oversized shooting star. Old journey links return home. Native Today/Games/Progress tabs and the responsive
+web sidebar/bottom navigation are restored locally. Practice and game review
+remain full-screen above the tabs; Account keeps its native modal.
+
+Release gates: inspect the updated Home, practice, review and Progress on a real
+iPhone, including large text, VoiceOver, orientation and reduced motion. Native runtime remains unverified: Xcode lists iPhone simulators but cannot boot
+them because the iOS 27 runtime is missing. Android runtime remains deferred.
+Full local verification and all seven browser smoke tests pass. Browser visual
+review covers Home, practice and Progress, narrow layouts and reduced-motion
+point rewards. The restored web navigation also passes link selection, keyboard
+activation and reload checks at wide and narrow widths. Native tab switching,
+icon rendering and return from full-screen lessons still need a device check.
+These previews use sample data and do not establish real
+authenticated behavior. Tests tied only to the removed path/raider presentation
+were removed or replaced by direct-entry and retained-result checks; scoring,
+save recovery and account-isolation coverage remains.
+The deployed behavior below predates this local UI change.
+
 ## Implemented and deployed
 
 The backend runs in staging and production (same `ghcr.io/hunterrhansen/knightly-backend`
@@ -253,7 +278,9 @@ the original frontend on October 20, 2026, which still runs unrouted for rollbac
 
 Checked on the VM on October 23, 2026.
 
-- **Backend:** staging and production both run `sha-d496a17` (main after
+- **Backend:** staging and production both run `sha-b262a7c` (main after
+  #361, October 23): drills for the last 12 lessons; the 1,366 plan drills are
+  loaded in both (`knightly positional`). Before it, `sha-d496a17` (main after
   #359, October 23): stalemate, draw and defence drills; the 557 new
   Syzygy-checked drills are loaded in both (`knightly endgames`). Before it,
   `sha-0e736a9` (main after
@@ -285,7 +312,11 @@ Checked on the VM on October 23, 2026.
   walk on the web are unchecked. The original
   frontend (`legacy-web`) still runs unrouted for rollback
   ([deployment](deploy.md#rolling-back-the-web-cutover)).
-- **iPhone:** TestFlight `beta` build 68 (standalone, production API) is from
+- **iPhone:** TestFlight `beta` build 69 (standalone, production API) is from
+  main `b262a7c` (through #361, with #359's reworded intro prompts), uploaded
+  October 23; source published as
+  [knightly-source@ios-build-69](https://github.com/hunterrhansen/knightly-source/tree/ios-build-69).
+  Build 68 is from
   main `0e736a9` (through #357: the history notes, rank emblems and positional
   drills), uploaded October 23; source published as
   [knightly-source@ios-build-68](https://github.com/hunterrhansen/knightly-source/tree/ios-build-68).
@@ -311,7 +342,7 @@ Checked on the VM on October 23, 2026.
   (`91bff6b`) carried #338; builds 58 and earlier break against this backend.
   **None of the ward path, the walk, the new watch mix, the safety-check labels,
   the endgame drills, the tappable badges, the Steps bar or the lesson intros
-  has been seen on a phone.** Keeping a watch on build 68 is the open gate.
+  has been seen on a phone.** Keeping a watch on build 69 is the open gate.
 - **Production learner data:** #309 reset production's posts-reached record to
   the Gatehouse so every post is walked; the record before the walk is kept as
   the setting `wards_reached_before_walk`.
@@ -434,13 +465,12 @@ accessibility stays manual.
 
 - Draw and defence drills ([curriculum](specs/2026-10-20-curriculum-wards-design.md#following-the-steps-method-decided-2026-10-23)):
   557 Syzygy-checked stalemate and draw drills, and the threat and thinking-ahead
-  lessons on Lichess themes. Deployed and loaded in both environments; build 68
-  predates the reworded intro prompts (stalemate, the Steps 5 and 6 draws).
+  lessons on Lichess themes. Deployed and loaded in both environments.
 
 - Plan-lesson drills ([curriculum](specs/2026-10-20-curriculum-wards-design.md#following-the-steps-method-decided-2026-10-23)):
   1,366 generated drills give the last 12 lessons drills; every lesson now has them.
-  On deploy run `knightly positional` in both environments, or those posts stall. A
-  strong player's spot-check is owed, as for the positional drills.
+  Deployed and loaded in both environments. A strong player's spot-check is owed, as
+  for the positional drills.
 
 - Move grading parity ([spec](specs/2026-10-20-move-grading-parity-design.md#check-before-shipping)):
   deployed and re-graded on staging and production (`sha-00ee89b`). Still open:

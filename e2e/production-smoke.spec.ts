@@ -17,6 +17,9 @@ test('production sign-in renders and development labs redirect without controls'
   for (const route of [
     '/board-lab',
     '/shell-lab',
+    '/navigation-preview',
+    '/navigation-preview/games',
+    '/navigation-preview/progress',
     '/account-preview',
     '/account-settings-preview',
     '/account-privacy-preview',

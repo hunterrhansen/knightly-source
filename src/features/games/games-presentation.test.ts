@@ -32,7 +32,7 @@ test('a row names its slips by the earliest state, Clean when none slipped, and 
   const row = (slips: GameSummary['slips'], analysed = true) =>
     slipStatus({ analysed, slips });
   expect(row({ on_watch: 3, held: 2, stopped: 1 })).toEqual({
-    label: '3 on watch',
+    label: '3 due for practice',
     tone: 'watch',
   });
   expect(row({ on_watch: 0, held: 2, stopped: 1 })).toEqual({
@@ -79,7 +79,7 @@ test('the summary card is hidden until a game in the last seven days is analysed
     eyebrow: 'Last 7 days · 3 games',
     title: '4 moves slipped past you',
     chips: [
-      { tone: 'watch', label: '2 on your watch' },
+      { tone: 'watch', label: '2 due for practice' },
       { tone: 'held', label: '1 held' },
       { tone: 'stopped', label: '1 stopped slipping' },
     ],

@@ -1,94 +1,43 @@
 # Knightly navigation design
 
-Status: approved 2026-10-12; revised 2026-10-19 for the one screen (no tab
-bar). Knightly has one screen, the path, with everything else over it; see
-[the path home](2026-10-19-path-home-design.md#one-screen-no-tab-bar) for what
-opens where. This spec holds how navigation looks: tokens, glyphs, the native
-header, the modals and the web. Account isolation and the 768-pixel
-breakpoint from the [foundation specification](2026-10-10-app-foundation-design.md)
-stay the same.
+Accepted: restore the navigation used immediately before commit `4269cd6`.
+Keep the simplified [daily practice home](2026-10-19-path-home-design.md) and
+[Knightly direction](../knightly-direction.md); no journey, ranks or characters
+return with the navigation.
 
-Reference (read-only): `knightly-old/web/src/components/kn-icon.tsx`,
-`logo.tsx` and `styles/tokens.css`.
+## Main destinations
 
-## Shared foundations
+Today, Games and Progress are peers. On iOS and Android, use Expo Router's
+native bottom tabs with the original full-colour Knightly moon, board and bars
+icons and labels. Each destination has its own stack, native title and Account
+action; Today keeps the streak. Hidden positions is pushed within Progress.
 
-**Tokens.** The old palette is in the theme ([themes.ts](../../src/theme/themes.ts)):
-`sky` #49a8f2, `skyLedge` #2577bb, `onSky` #08192a, `gold` #ffc233,
-`goldLedge` #c28c00. Glyphs and navigation selection use these tokens, not
-`boardAnnotations`, so board colours can change without changing navigation.
+Web uses the restored 240px sidebar from 768px, with Today, Games, Progress,
+Settings and the account footer. Narrower layouts use the brand/account header
+and three bottom links. Selected, hovered and keyboard-focused states remain
+visually distinct. The shell uses theme tokens and does not load account data
+in development previews. Existing root URLs remain valid.
 
-**Glyphs.** `KnightlyGlyph` (`src/components/ui/knightly-glyph.tsx`, shapes in
-`glyph-art.ts`) draws `today` (the moon), `games` (the board), `progress`
-(bars), `star` (Progress's tile) and `settings` (gear). Knightly glyphs are
-only for navigation and big moments; inline controls keep plain utility
-icons. `npm run brand:generate` writes their SVG masters to
-`assets/navigation/`; there are no native tab PNGs.
+## Focused screens and Account
 
-**Labels.** Nunito ExtraBold, uppercase by style (not by changing the
-string, so VoiceOver doesn't spell words out), 0.6 letter spacing.
-Accessible names stay in title case.
-
-## The path's header (iOS and Android)
-
-Shared in [navigation-header-options.ts](../../src/components/ui/navigation-header-options.ts):
-`headerTitleStyle` is `typography.heading` (Fredoka) about 20 pt in `ink`;
-the background is `page` with no shadow (it works with Liquid Glass); back
-tint `brandText`.
-
-The path's stack ([home-stack](../../src/features/shell/home-stack.ios.tsx))
-has a transparent header over the path: the streak pill at the top left
-(once the daily review has loaded; no placeholder), the rank chip as its
-title view (opens Progress) and the account avatar at the top right (opens
-Account), with the `Avatar`'s 3 px `brandLedge` ledge. iOS draws the pill and
-avatar as `Stack.Toolbar` views; Android as header views. The pinned section
-banner and the Games and Progress side tiles sit under the header, over the
-path.
-
-## Modals: Account, Games, Progress
-
-The root stack presents `(account)` and `progress` the same way:
-`presentation: 'modal'` on iOS (the system's full-height sheet with its own
-spring, swipe down to close; no animation with reduced motion), `card` on
-Android and the web. Games holds a board, so on iOS it is a
-`fullScreenModal` instead: the sheet's inset made the board smaller, and only
-its ✕ closes it. Each has its own stack: iOS puts the native toolbar ✕
-(`xmark`, "Close Games") at the top right of its root; Android a close
-`IconButton` in the header's right; the web page's header Back closes it.
-`useCloseModal` closes to the path (or replaces with it when a link opened
-the modal with nothing under it); `useLeaveModal` closes first, then opens a
-route outside the modal over the path. A game's review inside Games turns the
-swipe-down off while it shows (`useLockModalDismiss`; a no-op full screen).
-
-## Web
-
-No sidebar and no bottom tabs. The path draws its own top bar (streak pill,
-rank chip, avatar) and the same side tiles; Games, Progress and Account are
-pages with Back. The Account page lists its settings at every width, since
-there is no Settings gear any more. The daily update's status shows in
-Settings → Daily update (the sidebar's account row and its status line are
-gone).
-
-## Ownership and files
-
-- `src/theme/themes.ts`: tokens.
-- `src/components/ui/knightly-glyph.tsx`, `glyph-art.ts`, `avatar.tsx`,
-  `navigation-header-options.ts`.
-- `src/features/shell/root-navigator.tsx` (modal presentation),
-  `home-stack*.tsx`, `modal-stack*.tsx`, `node-sheet-options.ts`,
-  `shell-lab-screen.tsx`.
-- `src/features/today/home-tiles.tsx`, `today-screen.tsx`.
+Practice, review (including `/games/:id`) and lesson introductions open above the
+tabs, keeping the whole screen for the board. Back returns to the originating
+destination; direct game links fall back to Games. Games and Progress no longer
+open as modals or offer a root Close button. Account retains its existing iOS
+modal, native forms, detail Back, Close and swipe-down behavior. Old journey
+links still return to Today.
 
 ## Verification
 
-The shell lab (`/shell-lab`, development only, on every platform) shows the
-home with sample data: the top bar, banner and tiles; the avatar opens the
-Account preview. No pixel snapshots.
+The development-only `/navigation-preview` uses the actual layouts and sample
+content without auth or backend queries. Production redirects its routes home.
+The existing app smoke checks protected navigation, then switches the real web
+preview routes, including keyboard activation and reload. This protects the
+restored main navigation; mocked components cannot prove browser route/focus
+behavior. Keep the existing seven-test smoke suite.
 
-- Existing browser smoke for protected navigation stays unchanged; the
-  production smoke still checks that the development labs redirect.
-- Devices (needs a native rebuild: the native tab navigator is gone): iOS
-  for the modal sheet, its ✕ and swipe down (and that a game's board drags
-  never close Games), the header's pill, chip and avatar, the tiles with
-  large text and their VoiceOver names; Android for the pushed pages and
-  their close button.
+Inspect narrow and wide web, keyboard focus and selected links. Native icon
+rendering, tab restoration, full-screen lessons, large text and VoiceOver remain
+selected-device checks. Platform exports establish bundling only.
+
+API reference: [Expo Router SDK 57 native tabs](https://docs.expo.dev/versions/v57.0.0/sdk/router/native-tabs/).

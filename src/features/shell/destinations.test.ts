@@ -2,7 +2,7 @@ import { parseReturnRoute } from '../../lib/auth/return-route';
 import { EXTRA_WATCH_HREF } from '../practice/practice-api';
 import { isDestinationAvailable } from './destinations';
 
-test('the path, its modals and the routes they open stay reachable after sign-in', () => {
+test('main destinations and full-screen game links stay reachable after sign-in', () => {
   expect(isDestinationAvailable('/')).toBe(true);
   expect(isDestinationAvailable('/games')).toBe(true);
   expect(isDestinationAvailable('/games/7')).toBe(true);

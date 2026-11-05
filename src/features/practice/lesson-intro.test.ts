@@ -68,7 +68,7 @@ test('the intro explains, demonstrates, then judges the learner’s try locally 
   act(() => result.current?.actions[1]?.onPress());
   // The try: the opponent's move plays in, then the board takes White's move.
   act(() => jest.advanceTimersByTime(600));
-  expect(result.current?.title).toBe('Your turn on watch');
+  expect(result.current?.title).toBe('Your turn');
   expect(result.current?.board.policy.mode).toBe('movable');
   // Think first: no hint until a moment has passed.
   expect(result.current?.board.presentation.hint).toBeUndefined();

@@ -1,1 +1,1 @@
-export { HomeStack as default } from '../../features/shell/home-stack';
+export { MainLayout as default } from '../../features/shell/main-layout';

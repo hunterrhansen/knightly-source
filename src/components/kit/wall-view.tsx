@@ -116,20 +116,6 @@ export function WallViewNear({
   );
 }
 
-/** The knight's place on the wall: where the words beside him start (in
- * the column) and how far down he reaches. */
-export function wallViewKnight(view: WallView, columnWidth: number) {
-  const slot = view.near.items.find((item) => item.id === 'knight');
-  if (slot?.kind !== 'actor') return { inset: 0, bottom: 0 };
-  return {
-    inset:
-      slot.left === undefined
-        ? columnWidth - (slot.right ?? 0)
-        : (Number.parseFloat(slot.left) / 100) * columnWidth + slot.width,
-    bottom: slot.top + slot.height,
-  };
-}
-
 /** A soft glow centred on the knight's `lantern` anchor. */
 function LanternLight({
   sprite,

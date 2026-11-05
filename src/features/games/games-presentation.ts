@@ -93,7 +93,7 @@ export function reviewLabel(game: GameSummary) {
   if (!game.color) return 'Replay available';
   return 'To review';
 }
-/** Where a game's slips are, by colour: on watch (sky), held (green),
+/** Where a game's slips are, by colour: due for practice (sky), held (green),
  * stopped slipping (gold), Clean, or still being analysed. */
 export type SlipTone = 'watch' | 'held' | 'stopped' | 'clean' | 'pending';
 
@@ -111,7 +111,7 @@ export function slipStatus(
       ? undefined
       : { label: 'Checking for slips…', tone: 'pending' };
   if (slips.on_watch > 0)
-    return { label: `${slips.on_watch} on watch`, tone: 'watch' };
+    return { label: `${slips.on_watch} due for practice`, tone: 'watch' };
   if (slips.held > 0) return { label: `${slips.held} held`, tone: 'held' };
   if (slips.stopped > 0)
     return { label: `${slips.stopped} stopped slipping`, tone: 'stopped' };
@@ -129,7 +129,7 @@ export function weekSummary(week: GamesPage['week']) {
         ? 'Nothing slipped past you'
         : `${week.slipped} ${week.slipped === 1 ? 'move' : 'moves'} slipped past you`,
     chips: [
-      { tone: 'watch', label: `${week.on_watch} on your watch` },
+      { tone: 'watch', label: `${week.on_watch} due for practice` },
       { tone: 'held', label: `${week.held} held` },
       { tone: 'stopped', label: `${week.stopped} stopped slipping` },
     ] as const,

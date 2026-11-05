@@ -557,7 +557,7 @@ function ringOf(
     return {
       total,
       center: { count: moves.stopped, label: 'stopped' },
-      accessibilityLabel: `${moves.on_watch} on watch, ${moves.held} held, ${moves.stopped} stopped slipping`,
+      accessibilityLabel: `${moves.on_watch} due for practice, ${moves.held} held, ${moves.stopped} stopped slipping`,
       segments: [
         { value: moves.stopped, color: colors.gold },
         { value: moves.held, color: colors.brand },
@@ -567,7 +567,7 @@ function ringOf(
         {
           kind: 'dot' as const,
           color: colors.sky,
-          label: 'On watch',
+          label: 'Due for practice',
           count: moves.on_watch,
         },
         {

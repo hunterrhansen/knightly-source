@@ -171,7 +171,9 @@ export function ReviewSummary({
   );
   const actions = slips ? (
     <>
-      {onKeepWatch && <Button onPress={onKeepWatch}>Keep watch tonight</Button>}
+      {onKeepWatch && (
+        <Button onPress={onKeepWatch}>Start daily practice</Button>
+      )}
       <Button variant={onKeepWatch ? 'secondary' : 'primary'} onPress={onStart}>
         Replay the game
       </Button>

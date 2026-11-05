@@ -78,7 +78,7 @@ const lastReached = (journey: JourneyMap) =>
 
 /** The learner's rank and its chip ("Squire II · ★ 23"), as the home's top
  * bar and Progress show it. */
-export function journeyRank(journey: JourneyMap) {
+function journeyRank(journey: JourneyMap) {
   const current = journey.ranks[Math.max(0, lastReached(journey))];
   const rank = current
     ? { key: current.key, name: journey.rank || current.name }

@@ -82,13 +82,17 @@ const settle = () =>
     jest.advanceTimersByTime(5000);
   });
 
-test('a review whose answers reached a new rank ends on the rank-up beat', async () => {
+test('a completed review ignores legacy rank data and retains its saved learning summary', async () => {
   const onExit = renderFinished({ streak: null, mastered: 1, rankUp });
   await settle();
   expect(screen.getByText('Review complete')).toBeTruthy();
   fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
-  expect(screen.getByRole('header', { name: 'Squire I' })).toBeTruthy();
-  expect(screen.getByText('New rank')).toBeTruthy();
+  expect(
+    screen.getByRole('header', {
+      name: '1 position moved to long-term memory',
+    }),
+  ).toBeTruthy();
+  expect(screen.queryByText('New rank')).toBeNull();
   await settle();
   fireEvent.press(screen.getByRole('button', { name: 'Done' }));
   expect(onExit).toHaveBeenCalledTimes(1);

@@ -15,12 +15,12 @@ import {
 
 function WatchSection({ view }: { view: ReminderSettingsView }) {
   return (
-    <SettingsSection title="Your watch" padded={false}>
+    <SettingsSection title="Practice reminders" padded={false}>
       <SettingsNavigationRow
         label="Time and habit"
         value={view.watch.time}
         description={
-          view.watch.anchor ?? 'Choose the habit your watch follows.'
+          view.watch.anchor ?? 'Choose the habit your practice follows.'
         }
         onPress={view.onOpenWatch}
       />
@@ -72,7 +72,7 @@ function ConnectedReminderSettings() {
   return <ReminderPanel view={useReminderSettings()} />;
 }
 
-/** Settings → Your watch: the watch time and habit, and whether to be reminded. */
+/** Settings → Practice reminders: the watch time and habit, and whether to be reminded. */
 export function ReminderSettings({ preview = false }: { preview?: boolean }) {
   return preview ? (
     <ReminderPanel view={previewReminderSettings} />

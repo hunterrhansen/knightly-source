@@ -19,20 +19,13 @@ import {
   RollingNumber,
   type SessionResults,
   Sparkles,
-  SpriteView,
   StreakCalendar,
   type StreakDays,
   type StreakNights,
   todayOf,
-  useRankEmblem,
   useRewardMoment,
-  useWatchEndReady,
-  useWatchEndWords,
-  WatchEndScene,
-  watchColors,
   weekDays,
 } from '../../ui';
-import { PostBeat } from './post-beat';
 import type { PostMoment } from './ward-path';
 import { WatchAskBeat } from './watch-ask-beat';
 
@@ -47,7 +40,6 @@ const STREAK = {
   ready: 3800,
 };
 const MEMORY_READY = tokens.motion.celebrate + 300;
-const RANK = { name: 500, story: 900, moves: 1300, ready: 1800 };
 // When a bounce first touches down: the moment its sparkles, haptic and sound
 // play.
 const BOUNCE_LANDS = tokens.motion.celebrate * 0.45;
@@ -81,7 +73,7 @@ export type RankUp = {
 };
 
 const nightsInARow = (count: number) =>
-  `${count === 1 ? 'night' : 'nights'} in a row`;
+  `${count === 1 ? 'day' : 'days'} in a row`;
 
 /** The streak grew: the moon waxes to the new night's phase, the count rolls
  * on, and today's moon drops into the week. */
@@ -97,7 +89,7 @@ export function StreakBeat({
   const lit = useRewardMoment(STREAK.ignite + BOUNCE_LANDS, 'celebrate');
   const share = () =>
     void Share.share({
-      message: `I've kept my Knightly streak for ${streak.to} ${streak.to === 1 ? 'night' : 'nights'}.`,
+      message: `I've kept my Knightly streak for ${streak.to} ${streak.to === 1 ? 'day' : 'days'}.`,
     }).catch(() => {});
   return (
     <BeatFrame
@@ -192,127 +184,11 @@ export function MemoryBeat({
   );
 }
 
-/** The end of the watch, before its Results: over the wall, the knight's
- * lantern brightens a step per held move and "N raids turned back" lands
- * over the gate. The board is gone by now: nothing here can move it. */
-function WatchEndBeat({
-  held,
-  primary,
-}: {
-  held: number;
-  primary: BeatAction;
-}) {
-  const styles = useStyles();
-  const words = useWatchEndWords(held);
-  return (
-    <BeatFrame
-      announcement={words.caption}
-      readyAfter={useWatchEndReady(held)}
-      primary={primary}
-    >
-      <View
-        accessible
-        accessibilityRole="header"
-        accessibilityLabel={words.caption}
-      >
-        <WatchEndScene held={held} />
-      </View>
-      <Text style={styles.coachText}>{words.coach}</Text>
-    </BeatFrame>
-  );
-}
-
-const earnedOn = (date: string, today: string) =>
-  date === today
-    ? 'tonight'
-    : new Date(`${date}T12:00:00`).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-      });
-
-/** A new rank: its emblem drops onto the night-sky disc, the stars that
- * carried it, the last moves that stopped slipping and the next rank. In
- * place of Long-term memory, so a session ends on one reward beat. Gold sparkle and the
- * reward cue; no confetti, so nothing to hold back after 21:00. */
-export function RankUpBeat({
-  rankUp,
-  today,
-  primary,
-}: {
-  rankUp: RankUp;
-  today: string;
-  primary: BeatAction;
-}) {
-  const styles = useStyles();
-  const { theme } = useTheme();
-  const emblem = useRankEmblem({ key: rankUp.key, name: rankUp.rank });
-  const landed = useRewardMoment(BOUNCE_LANDS, 'reward');
-  const moves = rankUp.stars === 1 ? 'move' : 'moves';
-  const story = `Every post before this castle is held. ${rankUp.stars} ${moves} from your own games ${rankUp.stars === 1 ? 'has' : 'have'} stopped slipping along the way.`;
-  return (
-    <BeatFrame
-      announcement={`New rank. ${rankUp.rank}. ${story}`}
-      readyAfter={RANK.ready}
-      primary={primary}
-    >
-      <View style={styles.centered}>
-        <View style={styles.skyDisc}>
-          <PopIn bounce>
-            <SpriteView sprite={emblem} size={96} />
-          </PopIn>
-          <Sparkles fire={landed} color={theme.colors.gold} reach={84} />
-        </View>
-        <FadeIn delay={RANK.name}>
-          <View style={styles.centered}>
-            <Text style={styles.eyebrow}>New rank</Text>
-            <Text accessibilityRole="header" style={styles.rankName}>
-              {rankUp.rank}
-            </Text>
-          </View>
-        </FadeIn>
-        <FadeIn delay={RANK.story}>
-          <Text style={styles.coachText}>{story}</Text>
-        </FadeIn>
-      </View>
-      {!!rankUp.latest?.length && (
-        <FadeIn delay={RANK.moves}>
-          <View style={styles.moves}>
-            {rankUp.latest.map((star) => (
-              <View key={`${star.game_id}-${star.ply}`} style={styles.move}>
-                <Text style={styles.moveLabel} numberOfLines={1}>
-                  {`★ ${star.label} · ${star.san}`}
-                </Text>
-                <Text style={styles.moveMeta}>
-                  {earnedOn(star.earned_on, today)}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </FadeIn>
-      )}
-      {rankUp.nextRank && rankUp.nextPost != null && (
-        <FadeIn delay={RANK.moves}>
-          <Text style={styles.next}>
-            {`Next: ${rankUp.nextRank} after post ${rankUp.nextPost}`}
-          </Text>
-        </FadeIn>
-      )}
-    </BeatFrame>
-  );
-}
-
-/** A session's end: the watch's end over the wall (the daily lesson, when
- * a move held), Results, then Streak extended, then the posts held on the
- * ward path, then Rank up or Long-term
- * memory when they apply (a rank-up replaces Long-term memory), each
- * advancing on its button; the last one finishes. */
+/** Results, streak acknowledgement and optional learning/reminder follow-up. */
 export function SessionBeats({
-  held = 0,
   results,
   streak,
   mastered = 0,
-  rankUp,
-  posts,
   pending = false,
   finish,
 }: {
@@ -333,24 +209,16 @@ export function SessionBeats({
 }) {
   const [index, setIndex] = useState(0);
   const beats = [
-    ...(held > 0 ? (['wall'] as const) : []),
     'results' as const,
     ...(streak ? (['streak'] as const) : []),
     ...(streak?.askWatch ? (['watch'] as const) : []),
-    ...(posts ? (['post'] as const) : []),
-    ...(rankUp
-      ? (['rank'] as const)
-      : mastered > 0
-        ? (['memory'] as const)
-        : []),
+    ...(mastered > 0 ? (['memory'] as const) : []),
   ];
   const beat = beats[Math.min(index, beats.length - 1)];
   const action =
     index >= beats.length - 1
       ? finish
       : { label: 'Continue', onPress: () => setIndex(index + 1) };
-  if (beat === 'wall')
-    return <WatchEndBeat key="wall" held={held} primary={action} />;
   if (beat === 'streak' && streak)
     return <StreakBeat key="streak" streak={streak} primary={action} />;
   if (beat === 'watch' && streak?.askWatch)
@@ -362,19 +230,6 @@ export function SessionBeats({
         next={action.onPress}
       />
     );
-  if (beat === 'post' && posts)
-    return (
-      <PostBeat key="post" posts={posts} showRank={!rankUp} primary={action} />
-    );
-  if (beat === 'rank' && rankUp)
-    return (
-      <RankUpBeat
-        key="rank"
-        rankUp={rankUp}
-        today={streak?.day ?? localDay()}
-        primary={action}
-      />
-    );
   if (beat === 'memory')
     return <MemoryBeat key="memory" count={mastered} primary={action} />;
   return (
@@ -382,65 +237,7 @@ export function SessionBeats({
   );
 }
 
-const localDay = (now = new Date()) =>
-  `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-
 const useStyles = createStyles((theme) => ({
-  skyDisc: {
-    width: 148,
-    height: 148,
-    borderRadius: 74,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: watchColors.skyDisc,
-    borderWidth: 4,
-    borderColor: watchColors.skyDiscRim,
-  },
-  eyebrow: {
-    color: theme.colors.goldText,
-    fontFamily: theme.typography.bold,
-    fontSize: theme.typography.size.eyebrow,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
-  rankName: {
-    color: theme.colors.ink,
-    fontFamily: theme.typography.heading,
-    fontSize: 36,
-    lineHeight: 42,
-    textAlign: 'center',
-  },
-  moves: {
-    alignSelf: 'stretch',
-    gap: theme.spacing.xs,
-    padding: theme.spacing.md,
-    borderRadius: theme.radius.panel,
-    borderWidth: 2,
-    borderColor: theme.colors.line,
-    backgroundColor: theme.colors.surface,
-  },
-  move: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: theme.spacing.sm,
-  },
-  moveLabel: {
-    flexShrink: 1,
-    color: theme.colors.ink,
-    fontFamily: theme.typography.bold,
-    fontSize: theme.typography.size.body,
-  },
-  moveMeta: {
-    color: theme.colors.inkMuted,
-    fontFamily: theme.typography.body,
-    fontSize: theme.typography.size.small,
-  },
-  next: {
-    color: theme.colors.inkMuted,
-    fontFamily: theme.typography.bold,
-    fontSize: theme.typography.size.body,
-    textAlign: 'center',
-  },
   // The old night's moon, waiting to wax.
   dimmed: { opacity: 0.45 },
   title: {

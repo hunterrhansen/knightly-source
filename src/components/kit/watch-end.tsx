@@ -42,16 +42,6 @@ export function lanternLevel(step: number, held: number) {
   return LOW + ((1 - LOW) * Math.min(Math.max(step, 0), held)) / steps;
 }
 
-/** The watch's end in words: "3 raids turned back" (the scene's caption,
- * for the beat's header and announcement) and the line under the scene. */
-export function useWatchEndWords(held: number) {
-  const copy = useWatchEndCopy();
-  return {
-    caption: `${held} ${held === 1 ? copy.one : copy.many}`,
-    coach: copy.coach,
-  };
-}
-
 /** The beat's timings for `held` steps of `step`, then `caption`: each step's
  * spacing (shorter for many, so the whole stays brief), when the caption
  * lands and when the beat is ready for its button. */
@@ -62,15 +52,6 @@ function timing(held: number, step: Recipe, caption: Recipe) {
       : step.duration;
   const land = START + held * every;
   return { every, land, ready: land + caption.duration };
-}
-
-/** When the watch's end beat is ready for its button, in ms from mount. */
-export function useWatchEndReady(held: number) {
-  return timing(
-    held,
-    useRecipe('fx.lanternBrighten'),
-    useRecipe('fx.turnedBack'),
-  ).ready;
 }
 
 /**

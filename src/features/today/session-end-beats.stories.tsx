@@ -6,7 +6,6 @@ import { PostBeat } from './post-beat';
 import {
   MemoryBeat,
   type RankUp,
-  RankUpBeat,
   SessionBeats,
   StreakBeat,
   type StreakExtension,
@@ -147,34 +146,6 @@ export const StreakAndRankUp: Story = {
   args: { streak, mastered: 1, rankUp },
 };
 /** The rank-up beat on its own: the emblem drops onto the night-sky disc. */
-export const RankUpOnly: Story = {
-  render: () => (
-    <RankUpBeat
-      rankUp={rankUp}
-      today="2026-10-14"
-      primary={{ label: 'Done', onPress: () => {} }}
-    />
-  ),
-};
-/** Knight I: the gold emblem and its crown. */
-export const RankUpKnight: Story = {
-  render: () => (
-    <RankUpBeat
-      rankUp={{
-        ...rankUp,
-        rank: 'Knight I',
-        key: 'knight-1',
-        stars: 60,
-        nextRank: 'Knight II',
-        nextPost: 15,
-      }}
-      today="2026-10-14"
-      primary={{ label: 'Done', onPress: () => {} }}
-    />
-  ),
-};
-/** The watch's end: the lantern brightens per held move, the raids turned
- * back land over the gate, then Results and the streak. */
 export const WatchEnd: Story = { args: { held: 4, streak } };
 /** The watch's end at a narrow width, with many moves held. */
 export const WatchEndNarrow: Story = {

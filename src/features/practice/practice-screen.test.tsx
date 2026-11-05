@@ -89,7 +89,7 @@ async function finishedSession() {
   return session;
 }
 
-test('an extra watch ends over the wall and with its results, never the streak beat', async () => {
+test('extra practice shows results directly without changing the daily streak', async () => {
   const session = await finishedSession();
   const done = jest.fn();
   render(
@@ -103,11 +103,8 @@ test('an extra watch ends over the wall and with its results, never the streak b
     />,
   );
   await act(async () => {});
-  // The end-of-watch beat: the raid turned back.
-  fireEvent.press(screen.getByRole('button', { name: 'Continue' }));
-  await act(async () => {});
   expect(
-    screen.getByRole('header', { name: 'Extra watch complete' }),
+    screen.getByRole('header', { name: 'Extra practice complete' }),
   ).toBeTruthy();
   // Results are the last beat: Done goes home, with no "Night 13 kept".
   fireEvent.press(screen.getByRole('button', { name: 'Done' }));
@@ -166,7 +163,7 @@ test('tapping a badge explains it in the coach bubble, and tapping again puts th
   // The badge says it is mixed review and nothing about which idea.
   expect(screen.queryByText(/post you.ve passed/)).toBeNull();
   fireEvent.press(badge);
-  expect(screen.getByText(/post you.ve passed, not named/)).toBeTruthy();
+  expect(screen.getByText(/previously practiced idea, not named/)).toBeTruthy();
   expect(screen.queryByText(/fork/i)).toBeNull();
   fireEvent.press(badge);
   expect(screen.queryByText(/post you.ve passed/)).toBeNull();
@@ -271,11 +268,11 @@ test('a post’s test is started on the server and its positions carry the test�
     />,
   );
   await act(async () => {});
-  fireEvent.press(screen.getByRole('button', { name: 'The post’s test' }));
-  expect(screen.getByText(/Ten right and the post is yours/)).toBeTruthy();
+  fireEvent.press(screen.getByRole('button', { name: 'Practice check' }));
+  expect(screen.getByText(/Aim for ten correct answers/)).toBeTruthy();
 });
 
-test('a passed test ends on “Post cleared” with the score, and never the streak', async () => {
+test('a passed test ends on “Practice complete” with the score, and never the streak', async () => {
   const { session } = testSession({
     ...testing,
     mode: null,
@@ -300,7 +297,9 @@ test('a passed test ends on “Post cleared” with the score, and never the str
     />,
   );
   await act(async () => {});
-  expect(screen.getByRole('header', { name: 'Post cleared' })).toBeTruthy();
+  expect(
+    screen.getByRole('header', { name: 'Practice complete' }),
+  ).toBeTruthy();
   expect(screen.getByText('11 of 12 right')).toBeTruthy();
   expect(screen.queryByText(/streak/i)).toBeNull();
 });

@@ -2,7 +2,7 @@ import { Text, View } from 'react-native';
 import { createStyles } from '../../theme/theme';
 import type { SlipTone } from './games-presentation';
 
-/** A slip state in the watch story's colours: on watch sky, held green,
+/** A slip state in the watch story's colours: due for practice sky, held green,
  * stopped slipping gold; Clean and pending stay quiet. */
 export function SlipChip({ tone, label }: { tone: SlipTone; label: string }) {
   const styles = useStyles();

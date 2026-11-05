@@ -96,10 +96,12 @@ test('rows show their slips, the scope picks slipped or clean games, and the wee
       page={{ total: 1, page: 1, page_size: 50, games: [slipped], week }}
     />,
   );
-  expect(view.getByText('3 on watch')).toBeTruthy();
+  expect(view.getByText('3 due for practice')).toBeTruthy();
   // The accessible label keeps the review status beside the slips.
   expect(
-    view.getByRole('button', { name: /vs Opponent.*3 on watch, To review/ }),
+    view.getByRole('button', {
+      name: /vs Opponent.*3 due for practice, To review/,
+    }),
   ).toBeTruthy();
   expect(view.queryByText(/slipped past you/)).toBeNull();
   fireEvent.press(view.getByRole('radio', { name: 'Show games: Slipped' }));
@@ -125,7 +127,7 @@ test('rows show their slips, the scope picks slipped or clean games, and the wee
     />,
   );
   expect(view.getByText('4 moves slipped past you')).toBeTruthy();
-  expect(view.getByText('3 on your watch')).toBeTruthy();
+  expect(view.getAllByText('3 due for practice')).toHaveLength(2);
   fireEvent.press(view.getByRole('radio', { name: 'Show games: All' }));
   expect(onFilters).toHaveBeenLastCalledWith({
     rated: 'all',

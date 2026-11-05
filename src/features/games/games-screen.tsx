@@ -18,7 +18,7 @@ export function GamesScreen({
 }: {
   onOpenGame: (id: number) => void;
   onAccounts: () => void;
-  onClose: () => void;
+  onClose?: () => void;
 }) {
   const params = useLocalSearchParams();
   const router = useRouter();

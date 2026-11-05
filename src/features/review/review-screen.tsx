@@ -1051,8 +1051,6 @@ export function ReviewLayout({
         }}
         streak={end?.streak}
         mastered={end?.mastered}
-        rankUp={end?.rankUp}
-        posts={end?.posts}
         pending={end?.pending}
         finish={{ label: 'Done', onPress: onExit }}
       />

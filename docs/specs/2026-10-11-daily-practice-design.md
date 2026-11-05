@@ -1,5 +1,15 @@
 # Daily practice integration
 
+## Current presentation
+
+Use the plain fitted-board layout with a character-free explanation panel.
+Keep the lesson progress bar, points/star icon, streak, move feedback and score
+breakdown. Do not show castle backgrounds, raiders, characters, ranks or posts.
+Daily sessions open directly from Home; old journey links return there. Use
+practice, threats and completed/correct wording. This replaces story-specific
+layout directions below; grading, scheduling and recovery contracts remain.
+
+
 Implemented contract for the real practice journey, including
 [multi-move solutions](#multi-move-solutions) that extend its single-move
 answers. Runtime evidence and remaining checks live in
@@ -25,8 +35,8 @@ Read-only inspection of the integrated backend establishes these endpoints:
 
 | Endpoint | Use |
 | --- | --- |
-| `GET /api/deck` | Server day, learning counts, today's saved results and next card, including its original FEN and source-game context. `mode=lesson` (the default) is tonight's watch, in [the watch's mix](2026-10-19-path-home-design.md#what-a-watch-holds-decided-2026-10-22); `mode=extra` continues tonight's extra watch ([path home](2026-10-19-path-home-design.md#backend-and-api)). |
-| `POST /api/lesson/extra` | Start (or resume) tonight's extra watch once the lesson is finished; returns its deck, as `mode=extra` does. |
+| `GET /api/deck` | Server day, learning counts, today's saved results and next card, including its original FEN and source-game context. `mode=lesson` (the default) is the daily practice session; `mode=extra` continues additional practice after it. |
+| `POST /api/lesson/extra` | Start (or resume) additional practice once the daily lesson is finished; returns its deck, as `mode=extra` does. |
 | `POST /api/deck/answer` | Submit `game_id`, `ply`, complete UCI, `expected_day`, hint flag, elapsed seconds and redo flag; return authoritative quality, rating, best move and scheduling result. |
 | `POST /api/deck/hint` | Retrieve the best move for opt-in piece and arrow hints; client marks subsequent answers assisted. This endpoint itself does not save a grade. |
 | `POST /api/deck/more` | Learn more: once today's queue is finished, raise today's new-position limit by one pace's worth for today only; returns `added` (0: nothing to add) and the server `day`. |
@@ -137,7 +147,7 @@ highlight without replaying the setup.
 4. A requested hint reveals the origin piece, then the move arrow. Hint/reveal
    marks the attempt assisted. Retry alone never reveals help. Missing reliable
    explanations use a plain fallback rather than fabricated chess commentary.
-5. Continue loads the next server card. The watch (and an extra watch) ends
+5. Continue loads the next server card. The daily lesson (and additional practice) ends
    when the server's deck has nothing left: a miss is not brought back within
    the session. Finally refresh saved results and show the completion screen.
 
